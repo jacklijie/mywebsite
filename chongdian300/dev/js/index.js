@@ -1,0 +1,3 @@
+var indexApp = new Vue({
+
+})

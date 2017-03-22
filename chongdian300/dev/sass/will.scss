@@ -1,0 +1,31 @@
+@import "common";
+
+.will-app{
+  text-align: center;
+  > p{
+    color: #333;
+    line-height: torem(30);
+    font-size: torem(15);
+    margin-top: torem(21);
+    margin-bottom: torem(16);
+  }
+  > span{
+    color: #fff;
+    font-size: torem(16);
+    display: block;
+    line-height: torem(39);
+    margin-left: torem(15);
+    margin-right: torem(15);
+    background-size:100% 100%;
+    background-repeat: no-repeat;
+    background-position-y: center;
+    &.pay-btn{
+      margin-top: torem(30);
+      background-image: url(../img/bg_1.png);
+    }
+    &.share-btn{
+      margin-top: torem(15);
+      background-image: url(../img/bg_2.png);
+    }
+  }
+}

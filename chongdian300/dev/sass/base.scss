@@ -1,0 +1,75 @@
+@import "common";
+
+body,
+html {
+    width: 100%;
+    height: 100%;
+}
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+body{
+  font-size: $fontsize+px;
+  background: #f4f5f7;
+  box-sizing: border-box;
+  box-sizing: -webkit-border-box;
+  @include padding(15,25,30,25);
+}
+@media (max-width:375px) {
+  html,body{
+    font-size: ($fontsize - 1) + px ;
+  }
+}
+@media (max-width:320px) {
+  html,body{
+    font-size: ($fontsize - 2) + px ;
+  }
+}
+.app-box {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    position: relative;
+    border-radius: 5px;
+    box-shadow: #ddd 0 0 5px;
+    .app-header{
+      border-bottom: 1px solid #ededed;
+      img{
+        display: inline-block;
+        width: torem(60);
+        height: torem(60);
+        margin-top: torem(35);
+        &.shouting{
+          margin-top: torem(23);
+        }
+      }
+      span{
+        display: block;
+        color:$blue;
+        font-size:torem(16);
+        margin-top: torem(15);
+        margin-bottom: torem(30);
+      }
+      p{
+        color:$blue;
+        &:first-of-type{
+          margin-top: torem(14);
+          margin-bottom: torem(10);
+        }
+        &:last-of-type{
+          margin-top: torem(10);
+          margin-bottom: torem(20);
+        }
+      }
+    }
+    .app-footer{
+      position: absolute;
+      bottom: torem(30);
+      text-align: center;
+      font-size: torem(14);
+      width: 100%;
+      color: $blue;
+    }
+}

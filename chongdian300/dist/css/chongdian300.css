@@ -1,0 +1,239 @@
+body,
+html {
+  width: 100%;
+  height: 100%; }
+
+* {
+  margin: 0;
+  padding: 0;
+  border: 0; }
+
+body {
+  font-size: 14px;
+  background: #f4f5f7;
+  box-sizing: border-box;
+  box-sizing: -webkit-border-box;
+  padding: 1.07143rem 1.78571rem 2.14286rem 1.78571rem; }
+
+@media (max-width: 375px) {
+  html, body {
+    font-size: 13px; } }
+
+@media (max-width: 320px) {
+  html, body {
+    font-size: 12px; } }
+
+.app-box {
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  position: relative;
+  border-radius: 5px;
+  box-shadow: #ddd 0 0 5px; }
+  .app-box .app-header {
+    border-bottom: 1px solid #ededed; }
+    .app-box .app-header img {
+      display: inline-block;
+      width: 4.28571rem;
+      height: 4.28571rem;
+      margin-top: 2.5rem; }
+      .app-box .app-header img.shouting {
+        margin-top: 1.64286rem; }
+    .app-box .app-header span {
+      display: block;
+      color: #0065ca;
+      font-size: 1.14286rem;
+      margin-top: 1.07143rem;
+      margin-bottom: 2.14286rem; }
+    .app-box .app-header p {
+      color: #0065ca; }
+      .app-box .app-header p:first-of-type {
+        margin-top: 1rem;
+        margin-bottom: 0.71429rem; }
+      .app-box .app-header p:last-of-type {
+        margin-top: 0.71429rem;
+        margin-bottom: 1.42857rem; }
+  .app-box .app-footer {
+    position: absolute;
+    bottom: 2.14286rem;
+    text-align: center;
+    font-size: 1rem;
+    width: 100%;
+    color: #0065ca; }
+
+
+.index-app {
+  text-align: center; }
+  .index-app .tip {
+    text-align: right;
+    color: #0065ca;
+    font-size: 1rem;
+    padding-top: 1.07143rem;
+    margin-right: 1.07143rem; }
+  .index-app .img {
+    margin-top: 3.42857rem; }
+    .index-app .img img {
+      display: inline-block;
+      width: 7.14286rem;
+      height: 7.14286rem; }
+  .index-app .time > span {
+    margin-top: 1.07143rem;
+    font-size: 1rem;
+    color: #999;
+    display: inline-block; }
+  .index-app .time div {
+    width: 15.35714rem;
+    margin: 1.07143rem auto 0;
+    height: 1px;
+    background: #aaa;
+    position: relative; }
+    .index-app .time div .loaded {
+      position: absolute;
+      width: 80%;
+      height: 1px;
+      left: 0;
+      display: inline-block;
+      background: #ccc; }
+    .index-app .time div .had {
+      position: absolute;
+      width: 60%;
+      height: 1px;
+      left: 0;
+      display: inline-block;
+      background: #ffc000; }
+    .index-app .time div .cur {
+      background: #ffc000;
+      position: absolute;
+      width: 0.71429rem;
+      height: 0.71429rem;
+      top: 0;
+      border-radius: 50%;
+      left: 60%;
+      transform: translate(-50%, -50%);
+      display: inline-block; }
+  .index-app .desc {
+    color: #333;
+    margin-top: 1.57143rem; }
+    .index-app .desc h3 {
+      font-weight: normal;
+      font-size: 1.28571rem; }
+    .index-app .desc p {
+      margin-top: 1.42857rem;
+      font-size: 1.14286rem; }
+  .index-app .audio-ctrl {
+    margin-top: 3.92857rem; }
+    .index-app .audio-ctrl span {
+      width: 4.28571rem;
+      height: 4.28571rem;
+      display: inline-block;
+      background: url(../img/play.png) no-repeat center center;
+      background-size: 100%; }
+      .index-app .audio-ctrl span.pause {
+        background-image: url(../img/pause.png); }
+  .index-app .user-like {
+    margin-top: 2.64286rem; }
+    .index-app .user-like span {
+      width: 1.78571rem;
+      height: 1.60714rem;
+      display: inline-block;
+      background: url(../img/like.png) no-repeat center center;
+      background-size: 100%; }
+      .index-app .user-like span.like-icon {
+        background-image: url(../img/un-like.png); }
+
+.pay-app {
+  text-align: center; }
+  .pay-app .pay-con {
+    padding: 2.14286rem 1.07143rem 2.14286rem 1.07143rem; }
+    .pay-app .pay-con .tip {
+      display: block;
+      text-align: left; }
+    .pay-app .pay-con .pay-list {
+      margin-top: 1.42857rem;
+      display: flex; }
+      .pay-app .pay-con .pay-list span {
+        width: 5.35714rem;
+        height: 2.14286rem;
+        line-height: 2.14286rem;
+        display: inline-block;
+        background: url(../img/button.png) no-repeat;
+        background-size: 100% 100%;
+        flex: 1; }
+        .pay-app .pay-con .pay-list span:not(:last-of-type) {
+          margin-right: 2.5rem; }
+      .pay-app .pay-con .pay-list:last-of-type {
+        margin-top: 1.07143rem; }
+    .pay-app .pay-con .pay-btn {
+      color: #fff;
+      font-size: 1.14286rem;
+      display: block;
+      line-height: 2.78571rem;
+      background-size: 100% 100%;
+      margin-top: 2.14286rem;
+      background-repeat: no-repeat;
+      background-position-y: center;
+      background-image: url(../img/bg_1.png); }
+    .pay-app .pay-con .back-btn {
+      color: #333;
+      font-size: 1.14286rem;
+      display: block;
+      line-height: 2.78571rem;
+      margin-top: 1.07143rem;
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      background-position-y: center;
+      background-image: url(../img/button-bg.png); }
+
+.share-app {
+  text-align: center; }
+  .share-app .share-con {
+    padding: 2rem 1rem 2.28571rem 1rem; }
+    .share-app .share-con h4 {
+      color: #333;
+      text-align: left;
+      font-size: 1rem; }
+    .share-app .share-con p {
+      text-align: left;
+      line-height: 1.5rem;
+      color: #666;
+      font-size: 0.92857rem;
+      margin-top: 0.57143rem;
+      margin-bottom: 0.71429rem; }
+      .share-app .share-con p img {
+        width: 1rem;
+        vertical-align: -0.21429rem; }
+    .share-app .share-con span {
+      color: #333;
+      font-size: 1.14286rem;
+      display: block;
+      line-height: 2.78571rem;
+      margin-top: 1.07143rem;
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      background-position-y: center;
+      background-image: url(../img/button-bg.png); }
+
+.will-app {
+  text-align: center; }
+  .will-app > p {
+    color: #333;
+    line-height: 2.14286rem;
+    font-size: 1.07143rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1.14286rem; }
+  .will-app > span {
+    color: #fff;
+    font-size: 1.14286rem;
+    display: block;
+    line-height: 2.78571rem;
+    margin-left: 1.07143rem;
+    margin-right: 1.07143rem;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position-y: center; }
+    .will-app > span.pay-btn {
+      margin-top: 2.14286rem;
+      background-image: url(../img/bg_1.png); }
+    .will-app > span.share-btn {
+      margin-top: 1.07143rem;
+      background-image: url(../img/bg_2.png); }

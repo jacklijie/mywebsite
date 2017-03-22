@@ -1,0 +1,36 @@
+@import "common";
+
+.share-app{
+  text-align: center;
+  .share-con{
+    @include padding(28,14,32,14);
+    h4{
+      color: #333;
+      text-align: left;
+      font-size: torem(14);
+    }
+    p{
+      text-align: left;
+      line-height: torem(21);
+      color: #666;
+      font-size: torem(13);
+      margin-top: torem(8);
+      margin-bottom: torem(10);
+      img{
+        width:torem(14);
+        vertical-align: torem(-3);
+      }
+    }
+    span{
+      color: #333;
+      font-size: torem(16);
+      display: block;
+      line-height: torem(39);
+      margin-top: torem(15);
+      background-size:100% 100%;
+      background-repeat: no-repeat;
+      background-position-y: center;
+      background-image: url(../img/button-bg.png);
+    }
+  }
+}

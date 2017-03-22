@@ -1,0 +1,9 @@
+$fontsize:14;
+$blue:#0065ca;
+
+@function torem($px) {
+  @return ($px/$fontsize)+rem;
+}
+@mixin padding($top,$right,$bottom,$left) {
+  padding:($top/$fontsize)+rem ($right/$fontsize)+rem ($bottom/$fontsize)+rem ($left/$fontsize)+rem;
+}
