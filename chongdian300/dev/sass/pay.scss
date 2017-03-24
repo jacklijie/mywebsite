@@ -1,53 +1,69 @@
 @import "common";
 
-.pay-app{
-  text-align: center;
-  .pay-con{
-    @include padding(30,15,30,15);
-    .tip{
-      display: block;
-      text-align: left;
-    }
-    .pay-list{
-      margin-top: torem(20);
-      display: flex;
-      span{
-        width: torem(75);
-        height: torem(30);
-        line-height: torem(30);
-        display: inline-block;
-        background: url(../img/button.png) no-repeat;
-        background-size: 100% 100%;
-        flex: 1;
-        &:not(:last-of-type){
-          margin-right: torem(35);
+.pay-app {
+    text-align: center;
+
+    .pay-con {
+        @include padding(30,15,30,15);
+
+        .tip {
+            display: block;
+            text-align: left;
         }
-      }
-      &:last-of-type{
-        margin-top: torem(15);
-      }
+
+        .pay-list {
+            margin-top: torem(20);
+            display: flex;
+
+            span {
+                color: #333;
+                width: torem(75);
+                height: torem(30);
+                line-height: torem(30);
+                display: inline-block;
+                background: url("../img/button.png") no-repeat;
+                background-size: 100% 100%;
+                flex: 1;
+                transition: all 0.3s;
+
+                &:not(:last-of-type) {
+                    margin-right: torem(35);
+                }
+
+                &.active {
+                    background: #0065ca;
+                    color: #fff;
+                    border-radius: 3px;
+                }
+            }
+
+            &:last-of-type {
+                margin-top: torem(15);
+            }
+        }
+
+        .pay-btn {
+            color: #fff;
+            font-size: torem(16);
+            display: block;
+            line-height: torem(39);
+            background-size: 100% 100%;
+            margin-top: torem(30);
+            background-repeat: no-repeat;
+            background-position-y: center;
+            background-image: url("../img/bg_1.png");
+        }
+
+        .back-btn {
+            color: #333;
+            font-size: torem(16);
+            display: block;
+            line-height: torem(39);
+            margin-top: torem(15);
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            background-position-y: center;
+            background-image: url("../img/button-bg.png");
+        }
     }
-    .pay-btn{
-      color: #fff;
-      font-size: torem(16);
-      display: block;
-      line-height: torem(39);
-      background-size:100% 100%;
-      margin-top: torem(30);
-      background-repeat: no-repeat;
-      background-position-y: center;
-      background-image: url(../img/bg_1.png);
-    }
-    .back-btn{
-      color: #333;
-      font-size: torem(16);
-      display: block;
-      line-height: torem(39);
-      margin-top: torem(15);
-      background-size:100% 100%;
-      background-repeat: no-repeat;
-      background-position-y: center;
-      background-image: url(../img/button-bg.png);
-    }
-  }
 }

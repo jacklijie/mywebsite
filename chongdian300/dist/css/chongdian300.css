@@ -87,21 +87,14 @@ body {
     color: #999;
     display: inline-block; }
   .index-app .time div {
-    width: 15.35714rem;
+    width: 215px;
     margin: 1.07143rem auto 0;
     height: 1px;
     background: #aaa;
     position: relative; }
-    .index-app .time div .loaded {
-      position: absolute;
-      width: 80%;
-      height: 1px;
-      left: 0;
-      display: inline-block;
-      background: #ccc; }
     .index-app .time div .had {
       position: absolute;
-      width: 60%;
+      width: 0;
       height: 1px;
       left: 0;
       display: inline-block;
@@ -109,11 +102,11 @@ body {
     .index-app .time div .cur {
       background: #ffc000;
       position: absolute;
-      width: 0.71429rem;
-      height: 0.71429rem;
+      width: 10px;
+      height: 10px;
       top: 0;
       border-radius: 50%;
-      left: 60%;
+      left: 0;
       transform: translate(-50%, -50%);
       display: inline-block; }
   .index-app .desc {
@@ -143,8 +136,19 @@ body {
       display: inline-block;
       background: url(../img/like.png) no-repeat center center;
       background-size: 100%; }
-      .index-app .user-like span.like-icon {
-        background-image: url(../img/un-like.png); }
+      .index-app .user-like span.liking {
+        background-image: url(../img/liking.png); }
+
+.index-mine {
+  position: absolute;
+  bottom: 2.14286rem;
+  right: 2.14286rem;
+  background: url(../img/headd.png);
+  background-size: 100%;
+  display: inline-block;
+  width: 24px;
+  height: 26px;
+  z-index: 1; }
 
 .pay-app {
   text-align: center; }
@@ -157,15 +161,21 @@ body {
       margin-top: 1.42857rem;
       display: flex; }
       .pay-app .pay-con .pay-list span {
+        color: #333;
         width: 5.35714rem;
         height: 2.14286rem;
         line-height: 2.14286rem;
         display: inline-block;
-        background: url(../img/button.png) no-repeat;
+        background: url("../img/button.png") no-repeat;
         background-size: 100% 100%;
-        flex: 1; }
+        flex: 1;
+        transition: all 0.3s; }
         .pay-app .pay-con .pay-list span:not(:last-of-type) {
           margin-right: 2.5rem; }
+        .pay-app .pay-con .pay-list span.active {
+          background: #0065ca;
+          color: #fff;
+          border-radius: 3px; }
       .pay-app .pay-con .pay-list:last-of-type {
         margin-top: 1.07143rem; }
     .pay-app .pay-con .pay-btn {
@@ -177,7 +187,7 @@ body {
       margin-top: 2.14286rem;
       background-repeat: no-repeat;
       background-position-y: center;
-      background-image: url(../img/bg_1.png); }
+      background-image: url("../img/bg_1.png"); }
     .pay-app .pay-con .back-btn {
       color: #333;
       font-size: 1.14286rem;
@@ -187,7 +197,7 @@ body {
       background-size: 100% 100%;
       background-repeat: no-repeat;
       background-position-y: center;
-      background-image: url(../img/button-bg.png); }
+      background-image: url("../img/button-bg.png"); }
 
 .share-app {
   text-align: center; }

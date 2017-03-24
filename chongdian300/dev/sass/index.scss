@@ -30,37 +30,40 @@
       display:inline-block;
     }
     div{
-      width:torem(215);
+      width:215px;
       margin:torem(15) auto 0;
       height:1px;
       background:#aaa;
       position:relative;
-      .loaded{
-        position:absolute;
-        width:80%;
-        height:1px;
-        left:0;
-        display:inline-block;
-        background:#ccc;
-      }
+      // .loaded{
+      //   position:absolute;
+      //   width:80%;
+      //   height:1px;
+      //   left:0;
+      //   display:inline-block;
+      //   background:#ccc;
+      //   transition: width .1s;
+      // }
       .had{
         position:absolute;
-        width:60%;
+        width:0;
         height:1px;
         left:0;
         display:inline-block;
         background:#ffc000;
+        // transition: width 1s;
       }
       .cur{
         background:#ffc000;
         position:absolute;
-        width:torem(10);
-        height:torem(10);
+        width:10px;
+        height:10px;
         top:0;
         border-radius:50%;
-        left:60%;
+        left:0;
         transform:translate(-50%, -50%);
         display:inline-block;
+        // transition: left 1s;
       }
     }
   }
@@ -97,9 +100,20 @@
       display:inline-block;
       background:url(../img/like.png) no-repeat center center;
       background-size:100%;
-      &.like-icon{
-        background-image:url(../img/un-like.png);
+      &.liking{
+        background-image:url(../img/liking.png);
       }
     }
   }
+}
+.index-mine{
+  position: absolute;
+  bottom: torem(30);
+  right: torem(30);
+  background: url(../img/headd.png);
+  background-size:100%;
+  display: inline-block;
+  width: 24px;
+  height:26px;
+  z-index: 1;
 }

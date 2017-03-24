@@ -23,11 +23,82 @@
                   每成功分享1次，可续听1期，以此类推。老听众重复点击您的分享链接是无效的，所以要赶快邀请好友哦。</p>
                 <h4>成功分享</h4>
                 <p>在任意节目播放页，点击“<img src="dist/img/head.png"/>”图标，可查看您当前的收听权限。</p>
-                <span>返回</span>
+                <span onclick="location.href='will.html'">返回</span>
             </div>
         </div>
         <footer class="app-footer"><span>听得懂 用得着</span></footer>
     </section>
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script type="text/javascript" src="dist/js/zepto.js"></script>
+    <script type="text/javascript">
+        window.onload = function(){
+            try{
+                //初始化微信jsk sdk配置url 请严格按照微信sdk标准返回结果
+                Q_UTILS.WX_SHARE.initParams.url = Q_UTILS.CONSTANTS.URL.OAUTH;
+                Q_UTILS.WX_SHARE.initParams.isStringify = true;
+                //自定义请求参数
+                Q_UTILS.WX_SHARE.initParams.params = {
+                    WX_flag : 4,
+                    action : 'WXconfig',
+                    rd_session : Q_UTILS.CONSTANTS.RD_SESSION
+                };
+                //            Q_UTILS.WX_SHARE.initParams.method = 'get';//默认是post
+                //初始化
+                Q_UTILS.WX_SHARE.init();
+            } catch (e) {
+                console.log(e);
+            }
+        };
+        try{
+            wx.ready(function(){
+                var request = {
+                    action : 'FM300Shareconfig',
+                    rd_session : Q_UTILS.CONSTANTS.RD_SESSION,
+                    WX_flag : 5,
+                    para : ''
+                };
+                $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify(request), function(response){
+                    response = JSON.parse(response).WXShareSource[0];
+                    //微信分享描述
+                    Q_UTILS.WX_SHARE.shareObj.desc = response.descr;
+                    //好友圈分享标题
+                    Q_UTILS.WX_SHARE.shareObj.timelineTitle = response.title;
+                    //微信分享给朋友标题
+                    Q_UTILS.WX_SHARE.shareObj.friendTitle = Q_UTILS.WX_SHARE.shareObj.timelineTitle;
+                    //分享链接
+                    if(response.shareLink != undefined){
+                        Q_UTILS.WX_SHARE.shareObj.shareLink = response.shareLink;
+                    } else {
+                        Q_UTILS.WX_SHARE.shareObj.shareLink = 'https://www.chongdianshijian.com/questionGame/oauth.html';
+                    }
+                    //分享大图标
+                    Q_UTILS.WX_SHARE.shareObj.shareBigImg = response.imgUrl;
+                    //分享图标
+                    Q_UTILS.WX_SHARE.shareObj.shareImg = response.imgUrl;
+                    //分享成功回掉
+                    Q_UTILS.WX_SHARE.shareObj.shareSuccess = function(){
+                        var shareRequest = {
+                            action : 'saveShare',
+                            rd_session : Q_UTILS.CONSTANTS.RD_SESSION,
+                            WX_flag : 4,
+                            para : 'GamePage'
+                        };
+                        $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify(shareRequest), function(shareSuccessResponse){
+                            //shareSuccessResponse = JSON.parse(shareSuccessResponse);
+                        });
+                    };
+                    //取消分享回掉
+                    Q_UTILS.WX_SHARE.shareObj.shareCancel = function(){
+
+                    };
+                    //此行不可注释
+                    Q_UTILS.WX_SHARE.onReady();
+                });
+
+            });
+        } catch (e) {
+        }
+    </script>
 </body>
 
 </html>
