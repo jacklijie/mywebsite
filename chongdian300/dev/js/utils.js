@@ -55,16 +55,16 @@ Q_UTILS.CONSTANTS = {
   },
   RD_SESSION: ''
 };
-Q_UTILS.IS_DEV = true;
+Q_UTILS.IS_DEV = false;
 Q_UTILS.WX_SHARE = {
   wxConfig: {
     jsApiList: [
       'checkJsApi',
-      'chooseImage',
-      'onMenuShareTimeline',
-      'onMenuShareAppMessage',
-      'onMenuShareQQ',
-      'onMenuShareWeibo',
+      'chooseImage'
+    // 'onMenuShareTimeline',
+    // 'onMenuShareAppMessage',
+    // 'onMenuShareQQ',
+    // 'onMenuShareWeibo',
     ]
   },
   initParams: {
@@ -86,15 +86,37 @@ Q_UTILS.WX_SHARE = {
   init: function() {
     var self = this,
       successCallback = function(configResponse) {
-        var configJson = {};
+        var configJson = {},
+          response = {};
         try {
           configResponse = JSON.parse(configResponse);
         } catch (e) {}
         configJson = configResponse.Config[0];
-        console.log(configJson);
+        response = configResponse.WXShareDescr[0];
+        //微信分享描述
+        self.shareObj.desc = response.descr;
+        //好友圈分享标题
+        self.shareObj.timelineTitle = response.title;
+        //微信分享给朋友标题
+        self.shareObj.friendTitle = self.shareObj.timelineTitle;
+        //分享链接
+        if (response.link != undefined) {
+          self.shareObj.shareLink = response.link;
+        } else {
+          self.shareObj.shareLink = 'https://www.chongdianshijian.com/common/wechat';
+        }
+        //分享大图标
+        self.shareObj.shareBigImg = response.imgUrl;
+        //分享图标
+        self.shareObj.shareImg = response.imgUrl;
+
+        var jsApiList = configResponse.jsApiList;
+        for (var i = 0; i < jsApiList.length; i++) {
+          self.wxConfig.jsApiList.push(jsApiList[i].SharejsApiList);
+        }
         configJson.debug = false;
         configJson.jsApiList = self.wxConfig.jsApiList;
-        configJson.timestamp = parseInt(configJson.timestamp);
+        // configJson.timestamp = parseInt(configJson.timestamp);
         wx.config(configJson);
       };
     self.initParams.params.para = window.location.href;

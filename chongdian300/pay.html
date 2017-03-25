@@ -39,72 +39,29 @@
     <script type="text/javascript">
         window.onload = function(){
           payReady();
-            try{
-                //初始化微信jsk sdk配置url 请严格按照微信sdk标准返回结果
-                Q_UTILS.WX_SHARE.initParams.url = Q_UTILS.CONSTANTS.URL.OAUTH;
-                Q_UTILS.WX_SHARE.initParams.isStringify = true;
-                //自定义请求参数
-                Q_UTILS.WX_SHARE.initParams.params = {
-                    WX_flag : 4,
-                    action : 'WXconfig',
-                    rd_session : Q_UTILS.CONSTANTS.RD_SESSION
-                };
-                //            Q_UTILS.WX_SHARE.initParams.method = 'get';//默认是post
-                //初始化
-                Q_UTILS.WX_SHARE.init();
-            } catch (e) {
-                console.log(e);
-            }
-        };
-        try{
-            wx.ready(function(){
-                var request = {
-                    action : 'FM300Shareconfig',
-                    rd_session : Q_UTILS.CONSTANTS.RD_SESSION,
-                    WX_flag : 5,
-                    para : ''
-                };
-                $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify(request), function(response){
-                    response = JSON.parse(response).WXShareSource[0];
-                    //微信分享描述
-                    Q_UTILS.WX_SHARE.shareObj.desc = response.descr;
-                    //好友圈分享标题
-                    Q_UTILS.WX_SHARE.shareObj.timelineTitle = response.title;
-                    //微信分享给朋友标题
-                    Q_UTILS.WX_SHARE.shareObj.friendTitle = Q_UTILS.WX_SHARE.shareObj.timelineTitle;
-                    //分享链接
-                    if(response.shareLink != undefined){
-                        Q_UTILS.WX_SHARE.shareObj.shareLink = response.shareLink;
-                    } else {
-                        Q_UTILS.WX_SHARE.shareObj.shareLink = 'https://www.chongdianshijian.com/questionGame/oauth.html';
-                    }
-                    //分享大图标
-                    Q_UTILS.WX_SHARE.shareObj.shareBigImg = response.imgUrl;
-                    //分享图标
-                    Q_UTILS.WX_SHARE.shareObj.shareImg = response.imgUrl;
-                    //分享成功回掉
-                    Q_UTILS.WX_SHARE.shareObj.shareSuccess = function(){
-                        var shareRequest = {
-                            action : 'saveShare',
-                            rd_session : Q_UTILS.CONSTANTS.RD_SESSION,
-                            WX_flag : 4,
-                            para : 'GamePage'
-                        };
-                        $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify(shareRequest), function(shareSuccessResponse){
-                            //shareSuccessResponse = JSON.parse(shareSuccessResponse);
-                        });
-                    };
-                    //取消分享回掉
-                    Q_UTILS.WX_SHARE.shareObj.shareCancel = function(){
-
-                    };
-                    //此行不可注释
-                    Q_UTILS.WX_SHARE.onReady();
-                });
-
-            });
-        } catch (e) {
-        }
+          try {
+              //初始化微信jsk sdk配置url 请严格按照微信sdk标准返回结果
+              Q_UTILS.WX_SHARE.initParams.url = Q_UTILS.CONSTANTS.URL.OAUTH;
+              Q_UTILS.WX_SHARE.initParams.isStringify = true;
+              //自定义请求参数
+              Q_UTILS.WX_SHARE.initParams.params = {
+                  action: 'FM300Shareconfig',
+                  rd_session: Q_UTILS.CONSTANTS.RD_SESSION,
+                  WX_flag: 5,
+                  para: ''
+              };
+              //Q_UTILS.WX_SHARE.initParams.method = 'get';//默认是post
+              //初始化
+              Q_UTILS.WX_SHARE.init();
+          } catch (e) {
+              console.log(e);
+          }
+      };
+      try {
+          wx.ready(function() {
+              Q_UTILS.WX_SHARE.onReady();
+          });
+      } catch (e) {}
     </script>
 </body>
 </html>

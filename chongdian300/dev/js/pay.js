@@ -32,7 +32,8 @@ var payReady = function() {
           $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify(req), function(res) {
             res = JSON.parse(res);
             if (res.result == "OK") {
-              console.log(res);
+              localStorage.setItem("payParams", JSON.stringify(res.pay));
+              window.location.href = "paying.html";
             }
           })
         }

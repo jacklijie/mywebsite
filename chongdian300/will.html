@@ -1,94 +1,54 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>充电300秒</title>
     <link rel="stylesheet" href="/dist/css/chongdian300.css">
-  </head>
-  <body>
-      <section class="app-box">
+</head>
+
+<body>
+    <section class="app-box">
         <div class="will-app">
-          <div class="app-header">
-            <img src="dist/img/end.png" alt="">
-            <span>未完待续</span>
-          </div>
-          <p>继续收听<br/>请以<b>分享</b>或<b>付费</b>的形式<br/>支持我们</p>
-          <span class="pay-btn" onclick="location.href='pay.html'">付费</span>
-          <span class="share-btn" onclick="location.href = 'share.html'">分享</span>
+            <div class="app-header">
+                <img src="dist/img/end.png" alt="">
+                <span>未完待续</span>
+            </div>
+            <p>继续收听<br/>请以<b>分享</b>或<b>付费</b>的形式<br/>支持我们</p>
+            <span class="pay-btn" onclick="location.href='pay.html'">付费</span>
+            <span class="share-btn" onclick="location.href = 'share.html'">分享</span>
         </div>
         <footer class="app-footer"><span>听得懂 用得着</span></footer>
-      </section>
-      <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
-      <script type="text/javascript" src="dist/js/zepto.js"></script>
-      <script type="text/javascript">
-          window.onload = function(){
-              try{
-                  //初始化微信jsk sdk配置url 请严格按照微信sdk标准返回结果
-                  Q_UTILS.WX_SHARE.initParams.url = Q_UTILS.CONSTANTS.URL.OAUTH;
-                  Q_UTILS.WX_SHARE.initParams.isStringify = true;
-                  //自定义请求参数
-                  Q_UTILS.WX_SHARE.initParams.params = {
-                      WX_flag : 4,
-                      action : 'WXconfig',
-                      rd_session : Q_UTILS.CONSTANTS.RD_SESSION
-                  };
-                  //            Q_UTILS.WX_SHARE.initParams.method = 'get';//默认是post
-                  //初始化
-                  Q_UTILS.WX_SHARE.init();
-              } catch (e) {
-                  console.log(e);
-              }
-          };
-          try{
-              wx.ready(function(){
-                  var request = {
-                      action : 'FM300Shareconfig',
-                      rd_session : Q_UTILS.CONSTANTS.RD_SESSION,
-                      WX_flag : 5,
-                      para : ''
-                  };
-                  $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify(request), function(response){
-                      response = JSON.parse(response).WXShareSource[0];
-                      //微信分享描述
-                      Q_UTILS.WX_SHARE.shareObj.desc = response.descr;
-                      //好友圈分享标题
-                      Q_UTILS.WX_SHARE.shareObj.timelineTitle = response.title;
-                      //微信分享给朋友标题
-                      Q_UTILS.WX_SHARE.shareObj.friendTitle = Q_UTILS.WX_SHARE.shareObj.timelineTitle;
-                      //分享链接
-                      if(response.shareLink != undefined){
-                          Q_UTILS.WX_SHARE.shareObj.shareLink = response.shareLink;
-                      } else {
-                          Q_UTILS.WX_SHARE.shareObj.shareLink = 'https://www.chongdianshijian.com/questionGame/oauth.html';
-                      }
-                      //分享大图标
-                      Q_UTILS.WX_SHARE.shareObj.shareBigImg = response.imgUrl;
-                      //分享图标
-                      Q_UTILS.WX_SHARE.shareObj.shareImg = response.imgUrl;
-                      //分享成功回掉
-                      Q_UTILS.WX_SHARE.shareObj.shareSuccess = function(){
-                          var shareRequest = {
-                              action : 'saveShare',
-                              rd_session : Q_UTILS.CONSTANTS.RD_SESSION,
-                              WX_flag : 4,
-                              para : 'GamePage'
-                          };
-                          $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify(shareRequest), function(shareSuccessResponse){
-                              //shareSuccessResponse = JSON.parse(shareSuccessResponse);
-                          });
-                      };
-                      //取消分享回掉
-                      Q_UTILS.WX_SHARE.shareObj.shareCancel = function(){
+    </section>
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script type="text/javascript" src="dist/js/zepto.js"></script>
+    <script type="text/javascript">
+        window.onload = function() {
+            try {
+                //初始化微信jsk sdk配置url 请严格按照微信sdk标准返回结果
+                Q_UTILS.WX_SHARE.initParams.url = Q_UTILS.CONSTANTS.URL.OAUTH;
+                Q_UTILS.WX_SHARE.initParams.isStringify = true;
+                //自定义请求参数
+                Q_UTILS.WX_SHARE.initParams.params = {
+                    action: 'FM300Shareconfig',
+                    rd_session: Q_UTILS.CONSTANTS.RD_SESSION,
+                    WX_flag: 5,
+                    para: ''
+                };
+                //Q_UTILS.WX_SHARE.initParams.method = 'get';//默认是post
+                //初始化
+                Q_UTILS.WX_SHARE.init();
+            } catch (e) {
+                console.log(e);
+            }
+        };
+        try {
+            wx.ready(function() {
+                Q_UTILS.WX_SHARE.onReady();
+            });
+        } catch (e) {}
+    </script>
+</body>
 
-                      };
-                      //此行不可注释
-                      Q_UTILS.WX_SHARE.onReady();
-                  });
-
-              });
-          } catch (e) {
-          }
-      </script>
-  </body>
 </html>

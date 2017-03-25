@@ -172,6 +172,7 @@ var getCodeReady = function() {
         code: code,
         WX_flag: 5
       }), function(res) {
+        console.log(res.rd_session);
         res = JSON.parse(res);
         Q_UTILS.CONSTANTS.RD_SESSION = res.rd_session;
         localStorage.setItem('q_rd_session', res.rd_session);
@@ -203,8 +204,8 @@ var getCodeReady = function() {
     // });
     }
   } else {
-    localStorage.setItem('q_rd_session', 'ae2kol0bpojx44h9h33d374btwp0xeeq');
-    Q_UTILS.CONSTANTS.RD_SESSION = 'ae2kol0bpojx44h9h33d374btwp0xeeq';
+    localStorage.setItem('q_rd_session', 'np3p32s5f7n2zf3bhr8el42p1x1ysa3q');
+    Q_UTILS.CONSTANTS.RD_SESSION = 'np3p32s5f7n2zf3bhr8el42p1x1ysa3q';
     window.location.href = 'index.html';
   }
 };
@@ -266,6 +267,11 @@ var indexReady = function() {
             self.audioList[self.showIndex].progress = 0;
             self.audioList[self.showIndex].status = "pause";
           });
+          (function(a) {
+            audio.addEventListener("canplay", function() {
+              self.audioList[a].progress = 1;
+            })
+          })(i)
           self.audioList.push({
             obj: audio,
             status: "pause",
@@ -327,6 +333,12 @@ var indexReady = function() {
       barTouchEnd: function() {
         this.audioList[this.showIndex].obj.currentTime = this.audioList[this.showIndex].progress / 215 * this.audioList[this.showIndex].obj.duration;
         this.dragging = false;
+      },
+      progresClick: function(evt) {
+        var t = evt.target;
+        if (t.nodeName == "DIV" || t.className == "had") {
+          this.audioList[this.showIndex].obj.currentTime = evt.offsetX / 215 * this.audioList[this.showIndex].obj.duration;
+        }
       },
       likeClick: function() {
         if (this.fmSubList[this.showIndex].PraiseValue != 'Y') {
@@ -420,7 +432,8 @@ var payReady = function() {
           $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify(req), function(res) {
             res = JSON.parse(res);
             if (res.result == "OK") {
-              console.log(res);
+              localStorage.setItem("payParams", JSON.stringify(res.pay));
+              window.location.href = "paying.html";
             }
           })
         }
@@ -486,16 +499,16 @@ Q_UTILS.CONSTANTS = {
   },
   RD_SESSION: ''
 };
-Q_UTILS.IS_DEV = true;
+Q_UTILS.IS_DEV = false;
 Q_UTILS.WX_SHARE = {
   wxConfig: {
     jsApiList: [
       'checkJsApi',
-      'chooseImage',
-      'onMenuShareTimeline',
-      'onMenuShareAppMessage',
-      'onMenuShareQQ',
-      'onMenuShareWeibo',
+      'chooseImage'
+    // 'onMenuShareTimeline',
+    // 'onMenuShareAppMessage',
+    // 'onMenuShareQQ',
+    // 'onMenuShareWeibo',
     ]
   },
   initParams: {
@@ -517,15 +530,37 @@ Q_UTILS.WX_SHARE = {
   init: function() {
     var self = this,
       successCallback = function(configResponse) {
-        var configJson = {};
+        var configJson = {},
+          response = {};
         try {
           configResponse = JSON.parse(configResponse);
         } catch (e) {}
         configJson = configResponse.Config[0];
-        console.log(configJson);
+        response = configResponse.WXShareDescr[0];
+        //微信分享描述
+        self.shareObj.desc = response.descr;
+        //好友圈分享标题
+        self.shareObj.timelineTitle = response.title;
+        //微信分享给朋友标题
+        self.shareObj.friendTitle = self.shareObj.timelineTitle;
+        //分享链接
+        if (response.link != undefined) {
+          self.shareObj.shareLink = response.link;
+        } else {
+          self.shareObj.shareLink = 'https://www.chongdianshijian.com/common/wechat';
+        }
+        //分享大图标
+        self.shareObj.shareBigImg = response.imgUrl;
+        //分享图标
+        self.shareObj.shareImg = response.imgUrl;
+
+        var jsApiList = configResponse.jsApiList;
+        for (var i = 0; i < jsApiList.length; i++) {
+          self.wxConfig.jsApiList.push(jsApiList[i].SharejsApiList);
+        }
         configJson.debug = false;
         configJson.jsApiList = self.wxConfig.jsApiList;
-        configJson.timestamp = parseInt(configJson.timestamp);
+        // configJson.timestamp = parseInt(configJson.timestamp);
         wx.config(configJson);
       };
     self.initParams.params.para = window.location.href;

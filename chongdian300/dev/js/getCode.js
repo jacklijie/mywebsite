@@ -13,6 +13,7 @@ var getCodeReady = function() {
         code: code,
         WX_flag: 5
       }), function(res) {
+        console.log(res.rd_session);
         res = JSON.parse(res);
         Q_UTILS.CONSTANTS.RD_SESSION = res.rd_session;
         localStorage.setItem('q_rd_session', res.rd_session);
@@ -44,8 +45,8 @@ var getCodeReady = function() {
     // });
     }
   } else {
-    localStorage.setItem('q_rd_session', 'ae2kol0bpojx44h9h33d374btwp0xeeq');
-    Q_UTILS.CONSTANTS.RD_SESSION = 'ae2kol0bpojx44h9h33d374btwp0xeeq';
+    localStorage.setItem('q_rd_session', 'np3p32s5f7n2zf3bhr8el42p1x1ysa3q');
+    Q_UTILS.CONSTANTS.RD_SESSION = 'np3p32s5f7n2zf3bhr8el42p1x1ysa3q';
     window.location.href = 'index.html';
   }
 };

@@ -55,6 +55,11 @@ var indexReady = function() {
             self.audioList[self.showIndex].progress = 0;
             self.audioList[self.showIndex].status = "pause";
           });
+          (function(a) {
+            audio.addEventListener("canplay", function() {
+              self.audioList[a].progress = 1;
+            })
+          })(i)
           self.audioList.push({
             obj: audio,
             status: "pause",
@@ -116,6 +121,12 @@ var indexReady = function() {
       barTouchEnd: function() {
         this.audioList[this.showIndex].obj.currentTime = this.audioList[this.showIndex].progress / 215 * this.audioList[this.showIndex].obj.duration;
         this.dragging = false;
+      },
+      progresClick: function(evt) {
+        var t = evt.target;
+        if (t.nodeName == "DIV" || t.className == "had") {
+          this.audioList[this.showIndex].obj.currentTime = evt.offsetX / 215 * this.audioList[this.showIndex].obj.duration;
+        }
       },
       likeClick: function() {
         if (this.fmSubList[this.showIndex].PraiseValue != 'Y') {
