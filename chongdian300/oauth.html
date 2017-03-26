@@ -18,13 +18,13 @@
         }
         var request = {
             action: 'getOAuthUrl',
-           para: 'https://www.chongdianshijian.com/Webchat/Default2.aspx',//这里写重定向的地址，只有他们那边的地址才可以，然后从微信中复制跳转的url，获取code
-            // para: 'https://www.chongdianshijian.com/chongdian300/getrdsession.html',//
+          //  para: 'https://www.chongdianshijian.com/Webchat/Default2.aspx',//这里写重定向的地址，只有他们那边的地址才可以，然后从微信中复制跳转的url，获取code
+            para: 'https://www.chongdianshijian.com/chongdian300/getrdsession.html',//
             WX_flag: 5
         };
         $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify(request), function (res) {
             res = JSON.parse(res);
-            // window.location.href = "";//res.OAuthUrl;
+            window.location.href = res.OAuthUrl;
         });
     }
 </script>

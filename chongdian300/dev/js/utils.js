@@ -31,6 +31,24 @@ Q_UTILS.GET_30_RANDOM_NUMBER = function(max) {
     return a - b;
   });
 };
+Q_UTILS.SHOW_SLOGAN = function() {
+  var slogan = localStorage.getItem("slogan"),
+    sloganIndex = localStorage.getItem("sloganIndex");
+  if (slogan && JSON.parse(slogan).length > 0) {
+    slogan = JSON.parse(slogan);
+    if (sloganIndex || sloganIndex == 0) {
+      if (sloganIndex < slogan.length - 1) {
+        sloganIndex++;
+      } else {
+        sloganIndex = 0;
+      }
+    } else {
+      sloganIndex = 0;
+    }
+    localStorage.setItem("sloganIndex", sloganIndex);
+    $(".app-footer span").text(slogan[sloganIndex].Slogan);
+  }
+};
 
 Q_UTILS.MAP = {
   /**
@@ -60,7 +78,7 @@ Q_UTILS.WX_SHARE = {
   wxConfig: {
     jsApiList: [
       'checkJsApi',
-      'chooseImage'
+      'chooseImage' //,
     // 'onMenuShareTimeline',
     // 'onMenuShareAppMessage',
     // 'onMenuShareQQ',
@@ -103,7 +121,7 @@ Q_UTILS.WX_SHARE = {
         if (response.link != undefined) {
           self.shareObj.shareLink = response.link;
         } else {
-          self.shareObj.shareLink = 'https://www.chongdianshijian.com/common/wechat';
+          self.shareObj.shareLink = 'https://www.chongdianshijian.com/chongdian300/oauth.html';
         }
         //分享大图标
         self.shareObj.shareBigImg = response.imgUrl;
@@ -116,7 +134,7 @@ Q_UTILS.WX_SHARE = {
         }
         configJson.debug = false;
         configJson.jsApiList = self.wxConfig.jsApiList;
-        // configJson.timestamp = parseInt(configJson.timestamp);
+        configJson.timestamp = parseInt(configJson.timestamp);
         wx.config(configJson);
       };
     self.initParams.params.para = window.location.href;

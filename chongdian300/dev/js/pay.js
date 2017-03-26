@@ -1,4 +1,5 @@
 var payReady = function() {
+  Q_UTILS.CONSTANTS.RD_SESSION = localStorage.getItem("q_rd_session");
   var payApp = new Vue({
     el: ".pay-app",
     data: {
@@ -6,6 +7,7 @@ var payReady = function() {
       payment: []
     },
     created: function() {
+      Q_UTILS.SHOW_SLOGAN();
       var self = this;
       var payList = localStorage.getItem("Payment");
       if (payList) {

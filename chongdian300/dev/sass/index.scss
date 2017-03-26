@@ -3,6 +3,9 @@
   text-align:center;
   width:100%;
   height:100%;
+  background: #fff;
+  border-radius: 5px;
+  box-shadow: #ddd 0 0 5px;
   overflow:hidden;
   .swiper-slide{
     text-align:center;
@@ -15,7 +18,7 @@
     margin-right:torem(15);
   }
   .img{
-    margin-top:torem(48);
+    margin-top:torem(38);
     img{
       display:inline-block;
       width:torem(100);
@@ -63,6 +66,8 @@
         left:0;
         transform:translate(-50%, -50%);
         display:inline-block;
+        border: 3px solid #fff;
+        box-shadow: #ccc 0 0 5px;
         // transition: left 1s;
       }
     }
@@ -80,7 +85,7 @@
     }
   }
   .audio-ctrl{
-    margin-top:torem(55);
+    margin-top:torem(38);
     span{
       width:torem(60);
       height:torem(60);
@@ -108,8 +113,8 @@
 }
 .index-mine{
   position: absolute;
-  bottom: torem(30);
-  right: torem(30);
+  bottom: torem(50);
+  right: torem(45);
   background: url(../img/headd.png);
   background-size:100%;
   display: inline-block;

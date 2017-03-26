@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>充电300秒</title>
-    <link rel="stylesheet" href="/dist/css/chongdian300.css">
+    <link rel="stylesheet" href="dist/css/chongdian300.css">
 </head>
 
 <body>
@@ -29,9 +29,14 @@
         <footer class="app-footer"><span>听得懂 用得着</span></footer>
     </section>
     <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script type="text/javascript" src="dist/js/vue.min.js"></script>
     <script type="text/javascript" src="dist/js/zepto.js"></script>
+    <script type="text/javascript" src="dist/js/chongdian300.js"></script>
     <script type="text/javascript">
         window.onload = function() {
+          Q_UTILS.CONSTANTS.RD_SESSION = localStorage.getItem("q_rd_session");
+          Q_UTILS.SHOW_SLOGAN();
+          Q_UTILS.CONSTANTS.RD_SESSION = localStorage.getItem("q_rd_session");
             try {
                 //初始化微信jsk sdk配置url 请严格按照微信sdk标准返回结果
                 Q_UTILS.WX_SHARE.initParams.url = Q_UTILS.CONSTANTS.URL.OAUTH;

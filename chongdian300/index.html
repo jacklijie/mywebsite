@@ -13,37 +13,41 @@
 </head>
 
 <body>
-    <section class="app-box">
-        <div class="index-app">
+    <div style="width:100%;height:100%;overflow:hidden;">
+        <div id="index-app" style="width:100%;height:100%;">
             <div class="swiper-wrapper">
                 <div class="swiper-slide" v-for="(sub,index) in fmSubList">
-                    <div class="tip" v-html="sub.ProgrammeValue"></div>
-                    <div class="img">
-                        <img :src="sub.ProgrammeCoverRectangle" alt="">
-                    </div>
-                    <div class="time">
-                        <span>{{audioList[index]|timer}}</span>
-                        <div @click="progresClick($event)">
-                            <span class="had" :style="{width:audioList[index].progress+'px'}"></span>
-                            <span class="cur" :style="{left:audioList[index].progress+'px'}" @touchStart.stop="barTouchStart($event)" @touchMove="barTouchMove($event)" @touchEnd="barTouchEnd()"></span>
+                    <section class="app-box">
+                        <div class="index-app">
+                            <div class="tip" v-html="sub.ProgrammeValue"></div>
+                            <div class="img">
+                                <img :src="sub.ProgrammeCoverRectangle" alt="">
+                            </div>
+                            <div class="time">
+                                <span>{{audioList[index]|timer}}</span>
+                                <div @click="progresClick($event)">
+                                    <span class="had" :style="{width:audioList[index].progress+'px'}"></span>
+                                    <span class="cur" :style="{left:audioList[index].progress+'px'}" @touchStart.stop="barTouchStart($event)" @touchMove="barTouchMove($event)" @touchEnd="barTouchEnd()"></span>
+                                </div>
+                            </div>
+                            <div class="desc">
+                                <h3 v-html="sub.ProgrammeTitle"></h3>
+                                <p>- {{sub.AlbumName}} -</p>
+                            </div>
+                            <div class="audio-ctrl">
+                                <span :class="{pause:audioList[index].status=='pause'}" @click="playClick"></span>
+                            </div>
+                            <div class="user-like">
+                                <span :class="{liking:sub.PraiseValue=='Y'}" @click="likeClick"></span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="desc">
-                        <h3 v-html="sub.ProgrammeTitle"></h3>
-                        <p>- {{sub.AlbumName}} -</p>
-                    </div>
-                    <div class="audio-ctrl">
-                        <span :class="{pause:audioList[index].status=='pause'}" @click="playClick"></span>
-                    </div>
-                    <div class="user-like">
-                        <span :class="{liking:sub.PraiseValue=='Y'}" @click="likeClick"></span>
-                    </div>
+                        <a href="mine.html" class="index-mine"></a>
+                        <footer class="app-footer"><span>听得懂 用得着</span></footer>
+                    </section>
                 </div>
             </div>
         </div>
-        <a href="mine.html" class="index-mine"></a>
-        <footer class="app-footer"><span>听得懂 用得着</span></footer>
-    </section>
+    </div>
     <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
     <script type="text/javascript" src="dist/js/vue.min.js"></script>
     <script type="text/javascript" src="dist/js/zepto.js"></script>

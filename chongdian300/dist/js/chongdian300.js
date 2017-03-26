@@ -181,27 +181,6 @@ var getCodeReady = function() {
     } else {
       Q_UTILS.CONSTANTS.RD_SESSION = localRdSession;
       window.location.href = 'index.html';
-    // $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify({
-    //   action: 'FMGameLastResult',
-    //   rd_session: localRdSession,
-    //   WX_flag: 4
-    // }), function(res) {
-    //   res = JSON.parse(res);
-    //   console.log(res);
-    //   if (res.IsFirst) {
-    //     window.location.href = 'index.html';
-    //   } else {
-    //     var scores = res.textResult;
-    //     scores.sort(function(a, b) {
-    //       return a.TypeScores - b.TypeScores;
-    //     });
-    //     console.log(scores);
-    //     res.maxAblilty = scores[scores.length - 1];
-    //     res.minAblilty = scores[0];
-    //     localStorage.setItem("test_result", JSON.stringify(res));
-    //     window.location.href = 'chart.html';
-    //   }
-    // });
     }
   } else {
     localStorage.setItem('q_rd_session', 'np3p32s5f7n2zf3bhr8el42p1x1ysa3q');
@@ -213,10 +192,11 @@ var getCodeReady = function() {
 var indexReady = function() {
   Q_UTILS.CONSTANTS.RD_SESSION = localStorage.getItem("q_rd_session");
   var indexApp = new Vue({
-    el: ".index-app",
+    el: "#index-app",
     data: {
       oldIndex: 0,
       showIndex: 0,
+      listenRecordMax: 0,
       fmSubList: [],
       audioList: [],
       curBar: {
@@ -238,30 +218,58 @@ var indexReady = function() {
         req.fromplace = _form;
       }
       var self = this;
+      var initIndex = localStorage.getItem("listenHistoryIndex");
+      var listenMax = localStorage.getItem("listenRecordMax");
+      if (initIndex) {
+        self.showIndex = parseInt(initIndex);
+      }
+      if (listenMax) {
+        self.listenRecordMax = listenMax;
+      }
       $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify(req), function(res) {
         res = JSON.parse(res);
         if (res.result == "OK") {
           res.ProgrammeInfo.splice(0, 1);
           self.fmSubList = res.ProgrammeInfo;
-          localStorage.setItem("myinfo", JSON.stringify(res.CustomerRightsText[0]));
-          localStorage.setItem("Payment", JSON.stringify(res.Payment));
-          self.init();
-          setTimeout(function() {
-            self.initSwiper();
-          }, 120)
+          if (self.fmSubList.length > 0) {
+            // self.audioList = new Array(self.fmSubList.length);
+            for (var i = 0; i < self.fmSubList.length; i++) {
+              self.audioList.push({
+                obj: null,
+                status: "pause",
+                progress: 0
+              })
+            }
+            localStorage.setItem("myinfo", JSON.stringify(res.CustomerRightsText[0]));
+            localStorage.setItem("Payment", JSON.stringify(res.Payment));
+            localStorage.setItem("slogan", JSON.stringify(res.Slogan));
+            Q_UTILS.SHOW_SLOGAN();
+            self.initAudio(self.showIndex);
+            self.saveListen();
+            setTimeout(function() {
+              self.initSwiper();
+              if (self.showIndex + 1 < self.fmSubList.length) self.initAudio(self.showIndex + 1);
+              if (self.showIndex > 0) self.initAudio(self.showIndex - 1);
+            }, 120)
+          }
         }
       })
     },
     methods: {
-      init: function() {
+      initAudio: function(i) {
         var self = this;
-        for (var i = 0; i < self.fmSubList.length; i++) {
+        if (!this.audioList[i].obj) {
           var audio = document.createElement("audio");
           audio.src = self.fmSubList[i].Url;
           audio.preload = "load";
+          if (i == self.showIndex) {
+            audio.autoplay = "autoplay";
+          }
           audio.addEventListener("timeupdate", function() {
-            if (!self.dragging)
+            if (!self.dragging) {
               self.audioList[self.showIndex].progress = ((215 / this.duration) * this.currentTime).toFixed(2);
+              console.log(self.showIndex);
+            }
           });
           audio.addEventListener("ended", function() {
             self.audioList[self.showIndex].progress = 0;
@@ -272,21 +280,22 @@ var indexReady = function() {
               self.audioList[a].progress = 1;
             })
           })(i)
-          self.audioList.push({
+          self.audioList[i] = {
             obj: audio,
-            status: "pause",
+            status: i == self.showIndex ? "play" : "pause",
             progress: 0
-          });
+          };
         }
       },
       initSwiper: function() {
         var self = this;
-        var swiper = new Swiper('.index-app', {
+        var swiper = new Swiper('#index-app', {
+          initialSlide: self.showIndex,
           onTouchEnd: function(swiper, event) {
             self.oldIndex = swiper.activeIndex;
           },
           onTouchMove: function(swiper, evt) {
-            if (swiper.touches.diff <= -150 && self.showIndex == 2) {
+            if (swiper.touches.diff <= -150 && self.showIndex == self.audioList.length - 1) {
               window.location.href = "will.html";
             }
           },
@@ -295,16 +304,29 @@ var indexReady = function() {
           },
           onSlideChangeEnd: function(swiper) {
             self.showIndex = swiper.activeIndex;
+            if (self.showIndex + 1 < self.fmSubList.length) self.initAudio(self.showIndex + 1);
+            if (self.showIndex > 0) self.initAudio(self.showIndex - 1);
+            localStorage.setItem("listenHistoryIndex", self.showIndex);
+            if (self.listenRecordMax < self.showIndex) {
+              self.listenRecordMax = self.showIndex;
+              localStorage.setItem("listenRecordMax", self.showIndex);
+              self.saveListen();
+            }
             self.changeIndex();
+            Q_UTILS.SHOW_SLOGAN();
           }
         });
       },
       changeIndex: function() {
         var self = this;
-        this.audioList[this.oldIndex].obj.pause();
-        this.audioList[this.oldIndex].status = "pause";
+        if (this.audioList[this.oldIndex].obj) {
+          this.audioList[this.oldIndex].obj.pause();
+          this.audioList[this.oldIndex].status = "pause";
+        }
         setTimeout(function() {
           self.dragging = false;
+          self.audioList[self.showIndex].obj.play();
+          self.audioList[self.showIndex].status = "play";
         }, 10)
       },
       playClick: function() {
@@ -339,6 +361,28 @@ var indexReady = function() {
         if (t.nodeName == "DIV" || t.className == "had") {
           this.audioList[this.showIndex].obj.currentTime = evt.offsetX / 215 * this.audioList[this.showIndex].obj.duration;
         }
+      },
+      saveListen: function() {
+        var req = {
+          action: 'FM300SaveListenRecord',
+          rd_session: Q_UTILS.CONSTANTS.RD_SESSION,
+          WX_flag: 5,
+          para: this.fmSubList[this.showIndex].ProgrammeID,
+          fromplace: "",
+          shareID: ""
+        }
+        var _form = localStorage.getItem("_form");
+        if (_form != null) {
+          req.fromplace = _form;
+        }
+        var self = this;
+        $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify(req), function(res) {
+          console.log(res);
+          res = JSON.parse(res);
+          if (res.result == "OK") {
+            console.log("FM300SaveListenRecord==success");
+          }
+        })
       },
       likeClick: function() {
         if (this.fmSubList[this.showIndex].PraiseValue != 'Y') {
@@ -379,12 +423,14 @@ var indexReady = function() {
 };
 
 var mineReady = function() {
+  Q_UTILS.CONSTANTS.RD_SESSION = localStorage.getItem("q_rd_session");
   var mineApp = new Vue({
     el: ".mine-app",
     data: {
       myInfo: {}
     },
     created: function() {
+      Q_UTILS.SHOW_SLOGAN();
       var myInfo = localStorage.getItem("myinfo");
       if (myInfo) {
         this.myInfo = JSON.parse(myInfo);
@@ -399,6 +445,7 @@ var mineReady = function() {
 };
 
 var payReady = function() {
+  Q_UTILS.CONSTANTS.RD_SESSION = localStorage.getItem("q_rd_session");
   var payApp = new Vue({
     el: ".pay-app",
     data: {
@@ -406,6 +453,7 @@ var payReady = function() {
       payment: []
     },
     created: function() {
+      Q_UTILS.SHOW_SLOGAN();
       var self = this;
       var payList = localStorage.getItem("Payment");
       if (payList) {
@@ -475,6 +523,24 @@ Q_UTILS.GET_30_RANDOM_NUMBER = function(max) {
     return a - b;
   });
 };
+Q_UTILS.SHOW_SLOGAN = function() {
+  var slogan = localStorage.getItem("slogan"),
+    sloganIndex = localStorage.getItem("sloganIndex");
+  if (slogan && JSON.parse(slogan).length > 0) {
+    slogan = JSON.parse(slogan);
+    if (sloganIndex || sloganIndex == 0) {
+      if (sloganIndex < slogan.length - 1) {
+        sloganIndex++;
+      } else {
+        sloganIndex = 0;
+      }
+    } else {
+      sloganIndex = 0;
+    }
+    localStorage.setItem("sloganIndex", sloganIndex);
+    $(".app-footer span").text(slogan[sloganIndex].Slogan);
+  }
+};
 
 Q_UTILS.MAP = {
   /**
@@ -504,7 +570,7 @@ Q_UTILS.WX_SHARE = {
   wxConfig: {
     jsApiList: [
       'checkJsApi',
-      'chooseImage'
+      'chooseImage' //,
     // 'onMenuShareTimeline',
     // 'onMenuShareAppMessage',
     // 'onMenuShareQQ',
@@ -547,7 +613,7 @@ Q_UTILS.WX_SHARE = {
         if (response.link != undefined) {
           self.shareObj.shareLink = response.link;
         } else {
-          self.shareObj.shareLink = 'https://www.chongdianshijian.com/common/wechat';
+          self.shareObj.shareLink = 'https://www.chongdianshijian.com/chongdian300/oauth.html';
         }
         //分享大图标
         self.shareObj.shareBigImg = response.imgUrl;
@@ -560,7 +626,7 @@ Q_UTILS.WX_SHARE = {
         }
         configJson.debug = false;
         configJson.jsApiList = self.wxConfig.jsApiList;
-        // configJson.timestamp = parseInt(configJson.timestamp);
+        configJson.timestamp = parseInt(configJson.timestamp);
         wx.config(configJson);
       };
     self.initParams.params.para = window.location.href;

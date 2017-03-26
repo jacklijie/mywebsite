@@ -1,10 +1,11 @@
 var indexReady = function() {
   Q_UTILS.CONSTANTS.RD_SESSION = localStorage.getItem("q_rd_session");
   var indexApp = new Vue({
-    el: ".index-app",
+    el: "#index-app",
     data: {
       oldIndex: 0,
       showIndex: 0,
+      listenRecordMax: 0,
       fmSubList: [],
       audioList: [],
       curBar: {
@@ -26,30 +27,58 @@ var indexReady = function() {
         req.fromplace = _form;
       }
       var self = this;
+      var initIndex = localStorage.getItem("listenHistoryIndex");
+      var listenMax = localStorage.getItem("listenRecordMax");
+      if (initIndex) {
+        self.showIndex = parseInt(initIndex);
+      }
+      if (listenMax) {
+        self.listenRecordMax = listenMax;
+      }
       $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify(req), function(res) {
         res = JSON.parse(res);
         if (res.result == "OK") {
           res.ProgrammeInfo.splice(0, 1);
           self.fmSubList = res.ProgrammeInfo;
-          localStorage.setItem("myinfo", JSON.stringify(res.CustomerRightsText[0]));
-          localStorage.setItem("Payment", JSON.stringify(res.Payment));
-          self.init();
-          setTimeout(function() {
-            self.initSwiper();
-          }, 120)
+          if (self.fmSubList.length > 0) {
+            // self.audioList = new Array(self.fmSubList.length);
+            for (var i = 0; i < self.fmSubList.length; i++) {
+              self.audioList.push({
+                obj: null,
+                status: "pause",
+                progress: 0
+              })
+            }
+            localStorage.setItem("myinfo", JSON.stringify(res.CustomerRightsText[0]));
+            localStorage.setItem("Payment", JSON.stringify(res.Payment));
+            localStorage.setItem("slogan", JSON.stringify(res.Slogan));
+            Q_UTILS.SHOW_SLOGAN();
+            self.initAudio(self.showIndex);
+            self.saveListen();
+            setTimeout(function() {
+              self.initSwiper();
+              if (self.showIndex + 1 < self.fmSubList.length) self.initAudio(self.showIndex + 1);
+              if (self.showIndex > 0) self.initAudio(self.showIndex - 1);
+            }, 120)
+          }
         }
       })
     },
     methods: {
-      init: function() {
+      initAudio: function(i) {
         var self = this;
-        for (var i = 0; i < self.fmSubList.length; i++) {
+        if (!this.audioList[i].obj) {
           var audio = document.createElement("audio");
           audio.src = self.fmSubList[i].Url;
           audio.preload = "load";
+          if (i == self.showIndex) {
+            audio.autoplay = "autoplay";
+          }
           audio.addEventListener("timeupdate", function() {
-            if (!self.dragging)
+            if (!self.dragging) {
               self.audioList[self.showIndex].progress = ((215 / this.duration) * this.currentTime).toFixed(2);
+              console.log(self.showIndex);
+            }
           });
           audio.addEventListener("ended", function() {
             self.audioList[self.showIndex].progress = 0;
@@ -60,21 +89,22 @@ var indexReady = function() {
               self.audioList[a].progress = 1;
             })
           })(i)
-          self.audioList.push({
+          self.audioList[i] = {
             obj: audio,
-            status: "pause",
+            status: i == self.showIndex ? "play" : "pause",
             progress: 0
-          });
+          };
         }
       },
       initSwiper: function() {
         var self = this;
-        var swiper = new Swiper('.index-app', {
+        var swiper = new Swiper('#index-app', {
+          initialSlide: self.showIndex,
           onTouchEnd: function(swiper, event) {
             self.oldIndex = swiper.activeIndex;
           },
           onTouchMove: function(swiper, evt) {
-            if (swiper.touches.diff <= -150 && self.showIndex == 2) {
+            if (swiper.touches.diff <= -150 && self.showIndex == self.audioList.length - 1) {
               window.location.href = "will.html";
             }
           },
@@ -83,16 +113,29 @@ var indexReady = function() {
           },
           onSlideChangeEnd: function(swiper) {
             self.showIndex = swiper.activeIndex;
+            if (self.showIndex + 1 < self.fmSubList.length) self.initAudio(self.showIndex + 1);
+            if (self.showIndex > 0) self.initAudio(self.showIndex - 1);
+            localStorage.setItem("listenHistoryIndex", self.showIndex);
+            if (self.listenRecordMax < self.showIndex) {
+              self.listenRecordMax = self.showIndex;
+              localStorage.setItem("listenRecordMax", self.showIndex);
+              self.saveListen();
+            }
             self.changeIndex();
+            Q_UTILS.SHOW_SLOGAN();
           }
         });
       },
       changeIndex: function() {
         var self = this;
-        this.audioList[this.oldIndex].obj.pause();
-        this.audioList[this.oldIndex].status = "pause";
+        if (this.audioList[this.oldIndex].obj) {
+          this.audioList[this.oldIndex].obj.pause();
+          this.audioList[this.oldIndex].status = "pause";
+        }
         setTimeout(function() {
           self.dragging = false;
+          self.audioList[self.showIndex].obj.play();
+          self.audioList[self.showIndex].status = "play";
         }, 10)
       },
       playClick: function() {
@@ -127,6 +170,28 @@ var indexReady = function() {
         if (t.nodeName == "DIV" || t.className == "had") {
           this.audioList[this.showIndex].obj.currentTime = evt.offsetX / 215 * this.audioList[this.showIndex].obj.duration;
         }
+      },
+      saveListen: function() {
+        var req = {
+          action: 'FM300SaveListenRecord',
+          rd_session: Q_UTILS.CONSTANTS.RD_SESSION,
+          WX_flag: 5,
+          para: this.fmSubList[this.showIndex].ProgrammeID,
+          fromplace: "",
+          shareID: ""
+        }
+        var _form = localStorage.getItem("_form");
+        if (_form != null) {
+          req.fromplace = _form;
+        }
+        var self = this;
+        $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify(req), function(res) {
+          console.log(res);
+          res = JSON.parse(res);
+          if (res.result == "OK") {
+            console.log("FM300SaveListenRecord==success");
+          }
+        })
       },
       likeClick: function() {
         if (this.fmSubList[this.showIndex].PraiseValue != 'Y') {
