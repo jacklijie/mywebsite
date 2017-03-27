@@ -1,124 +1,178 @@
 @import "common";
-.index-app{
-  text-align:center;
-  width:100%;
-  height:100%;
-  background: #fff;
-  border-radius: 5px;
-  box-shadow: #ddd 0 0 5px;
-  overflow:hidden;
-  .swiper-slide{
-    text-align:center;
-  }
-  .tip{
-    text-align:right;
-    color:$blue;
-    font-size:torem(14);
-    padding-top:torem(15);
-    margin-right:torem(15);
-  }
-  .img{
-    margin-top:torem(38);
-    img{
-      display:inline-block;
-      width:torem(100);
-      height:torem(100);
-    }
-  }
-  .time{
-    > span{
-      margin-top:torem(15);
-      font-size:torem(14);
-      color:#999;
-      display:inline-block;
-    }
-    div{
-      width:215px;
-      margin:torem(15) auto 0;
-      height:1px;
-      background:#aaa;
-      position:relative;
-      // .loaded{
-      //   position:absolute;
-      //   width:80%;
-      //   height:1px;
-      //   left:0;
-      //   display:inline-block;
-      //   background:#ccc;
-      //   transition: width .1s;
-      // }
-      .had{
-        position:absolute;
-        width:0;
-        height:1px;
-        left:0;
-        display:inline-block;
-        background:#ffc000;
-        // transition: width 1s;
-      }
-      .cur{
-        background:#ffc000;
-        position:absolute;
-        width:10px;
-        height:10px;
-        top:0;
-        border-radius:50%;
-        left:0;
-        transform:translate(-50%, -50%);
-        display:inline-block;
-        border: 3px solid #fff;
-        box-shadow: #ccc 0 0 5px;
-        // transition: left 1s;
-      }
-    }
-  }
-  .desc{
-    color:#333;
-    margin-top:torem(22);
-    h3{
-      font-weight:normal;
-      font-size:torem(18);
-    }
-    p{
-      margin-top:torem(20);
-      font-size:torem(16);
-    }
-  }
-  .audio-ctrl{
-    margin-top:torem(38);
-    span{
-      width:torem(60);
-      height:torem(60);
-      display:inline-block;
-      background:url(../img/play.png) no-repeat center center;
-      background-size:100%;
-      &.pause{
-        background-image:url(../img/pause.png);
-      }
-    }
-  }
-  .user-like{
-    margin-top:torem(37);
-    span{
-      width:torem(25);
-      height:torem(22.5);
-      display:inline-block;
-      background:url(../img/like.png) no-repeat center center;
-      background-size:100%;
-      &.liking{
-        background-image:url(../img/liking.png);
-      }
-    }
-  }
+
+#index-app {
+    width: 100%;
+    height: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
 }
-.index-mine{
-  position: absolute;
-  bottom: torem(50);
-  right: torem(45);
-  background: url(../img/headd.png);
-  background-size:100%;
-  display: inline-block;
-  width: 24px;
-  height:26px;
-  z-index: 1;
+
+.index-app {
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: #ddd 0 0 5px;
+    overflow: hidden;
+
+    .swiper-slide {
+        text-align: center;
+    }
+
+    .tip {
+        text-align: right;
+        color: $blue;
+        font-size: torem(14);
+        padding-top: torem(15);
+        margin-right: torem(20);
+    }
+
+    .img {
+        margin-top: torem(38);
+
+        img {
+            display: inline-block;
+            width: torem(100);
+            height: torem(100);
+        }
+    }
+
+    .time {
+        > span {
+            margin-top: torem(15);
+            font-size: torem(14);
+            color: #999;
+            display: inline-block;
+        }
+
+        div {
+            width: 215px;
+            margin: torem(15) auto 0;
+            height: 2px;
+            padding:5px 0;
+            position: relative;
+            // .loaded{
+            //   position:absolute;
+            //   width:80%;
+            //   height:1px;
+            //   left:0;
+            //   display:inline-block;
+            //   background:#ccc;
+            //   transition: width .1s;
+            // }
+            &:before{
+              content:'';
+              width:100%;
+              height: 2px;
+              display: block;
+              background: #aaa;
+              border-radius: 1px;
+            }
+            .had {
+                position: absolute;
+                width: 0;
+                height: 2px;
+                padding:5px 0;
+                top:0;
+                left: 0;
+                display: inline-block;
+                &:before{
+                  content: '';
+                  width:100%;
+                  height:2px;
+                  display: block;
+                  background: #ffc000;
+                }
+            }
+
+            .cur {
+                position: absolute;
+                width: 24px;
+                height: 24px;
+                top: 50%;
+                left: 0;
+                transform: translate(-50%, -50%);
+                display: inline-block;
+                &:before{
+                  content: '';
+                  width:10px;
+                  height:10px;
+                  display: block;
+                  margin:4px;
+                  border-radius: 50%;
+                  background: #ffc000;
+                  border: 3px solid #fff;
+                  box-shadow: #ccc 0 0 5px;
+                }
+            }
+        }
+    }
+
+    .desc {
+        color: #333;
+        margin-top: torem(22);
+
+        h3 {
+            font-weight: normal;
+            font-size: torem(18);
+        }
+
+        p {
+            margin-top: torem(20);
+            font-size: torem(16);
+        }
+    }
+
+    .audio-ctrl {
+        margin-top: torem(38);
+
+        span {
+            width: torem(60);
+            height: torem(60);
+            display: inline-block;
+            background: url("../img/play.png") no-repeat center center;
+            background-size: 100%;
+
+            &.pause {
+                background-image: url("../img/pause.png");
+            }
+        }
+    }
+
+    .user-like {
+        margin-top: torem(37);
+
+        span {
+            width: torem(25);
+            height: torem(22.5);
+            display: inline-block;
+            background: url("../img/like.png") no-repeat center center;
+            background-size: 100%;
+
+            &.liking {
+                background-image: url("../img/liking.png");
+            }
+        }
+    }
+}
+
+.index-mine {
+    position: absolute;
+    bottom: torem(50);
+    right: torem(45);
+    display: inline-block;
+    z-index: 1;
+    padding: 10.5px 0 0 21px;
+    &:before{
+      content:'';
+      width: 9px;
+      height: 19.5px;
+      display: block;
+      background: url("../img/mine.png");
+      background-size: 100%;
+    }
 }

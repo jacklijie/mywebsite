@@ -61,6 +61,15 @@ body {
     transform: translateX(-50%); }
 
 
+#index-app {
+  width: 100%;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  overflow: hidden;
+  z-index: 1; }
+
 .index-app {
   text-align: center;
   width: 100%;
@@ -76,7 +85,7 @@ body {
     color: #0065ca;
     font-size: 1rem;
     padding-top: 1.07143rem;
-    margin-right: 1.07143rem; }
+    margin-right: 1.42857rem; }
   .index-app .img {
     margin-top: 2.71429rem; }
     .index-app .img img {
@@ -91,28 +100,48 @@ body {
   .index-app .time div {
     width: 215px;
     margin: 1.07143rem auto 0;
-    height: 1px;
-    background: #aaa;
+    height: 2px;
+    padding: 5px 0;
     position: relative; }
+    .index-app .time div:before {
+      content: '';
+      width: 100%;
+      height: 2px;
+      display: block;
+      background: #aaa;
+      border-radius: 1px; }
     .index-app .time div .had {
       position: absolute;
       width: 0;
-      height: 1px;
-      left: 0;
-      display: inline-block;
-      background: #ffc000; }
-    .index-app .time div .cur {
-      background: #ffc000;
-      position: absolute;
-      width: 10px;
-      height: 10px;
+      height: 2px;
+      padding: 5px 0;
       top: 0;
-      border-radius: 50%;
+      left: 0;
+      display: inline-block; }
+      .index-app .time div .had:before {
+        content: '';
+        width: 100%;
+        height: 2px;
+        display: block;
+        background: #ffc000; }
+    .index-app .time div .cur {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      top: 50%;
       left: 0;
       transform: translate(-50%, -50%);
-      display: inline-block;
-      border: 3px solid #fff;
-      box-shadow: #ccc 0 0 5px; }
+      display: inline-block; }
+      .index-app .time div .cur:before {
+        content: '';
+        width: 10px;
+        height: 10px;
+        display: block;
+        margin: 4px;
+        border-radius: 50%;
+        background: #ffc000;
+        border: 3px solid #fff;
+        box-shadow: #ccc 0 0 5px; }
   .index-app .desc {
     color: #333;
     margin-top: 1.57143rem; }
@@ -128,31 +157,35 @@ body {
       width: 4.28571rem;
       height: 4.28571rem;
       display: inline-block;
-      background: url(../img/play.png) no-repeat center center;
+      background: url("../img/play.png") no-repeat center center;
       background-size: 100%; }
       .index-app .audio-ctrl span.pause {
-        background-image: url(../img/pause.png); }
+        background-image: url("../img/pause.png"); }
   .index-app .user-like {
     margin-top: 2.64286rem; }
     .index-app .user-like span {
       width: 1.78571rem;
       height: 1.60714rem;
       display: inline-block;
-      background: url(../img/like.png) no-repeat center center;
+      background: url("../img/like.png") no-repeat center center;
       background-size: 100%; }
       .index-app .user-like span.liking {
-        background-image: url(../img/liking.png); }
+        background-image: url("../img/liking.png"); }
 
 .index-mine {
   position: absolute;
   bottom: 3.57143rem;
   right: 3.21429rem;
-  background: url(../img/headd.png);
-  background-size: 100%;
   display: inline-block;
-  width: 24px;
-  height: 26px;
-  z-index: 1; }
+  z-index: 1;
+  padding: 10.5px 0 0 21px; }
+  .index-mine:before {
+    content: '';
+    width: 9px;
+    height: 19.5px;
+    display: block;
+    background: url("../img/mine.png");
+    background-size: 100%; }
 
 .pay-app {
   text-align: center;

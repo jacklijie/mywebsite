@@ -31,6 +31,8 @@ var indexReady = function() {
       var listenMax = localStorage.getItem("listenRecordMax");
       if (initIndex) {
         self.showIndex = parseInt(initIndex);
+      } else {
+        localStorage.setItem("listenHistoryIndex", 0);
       }
       if (listenMax) {
         self.listenRecordMax = listenMax;
@@ -38,22 +40,24 @@ var indexReady = function() {
       $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify(req), function(res) {
         res = JSON.parse(res);
         if (res.result == "OK") {
-          res.ProgrammeInfo.splice(0, 1);
           self.fmSubList = res.ProgrammeInfo;
           if (self.fmSubList.length > 0) {
-            // self.audioList = new Array(self.fmSubList.length);
             for (var i = 0; i < self.fmSubList.length; i++) {
               self.audioList.push({
-                obj: null,
+                // obj: null,
                 status: "pause",
                 progress: 0
               })
             }
-            localStorage.setItem("myinfo", JSON.stringify(res.CustomerRightsText[0]));
+            if (self.showIndex >= self.fmSubList.length) {
+              self.showIndex = 0;
+              localStorage.setItem("listenHistoryIndex", 0);
+            }
+            // localStorage.setItem("myinfo", JSON.stringify(res.CustomerRightsText[0]));
             localStorage.setItem("Payment", JSON.stringify(res.Payment));
             localStorage.setItem("slogan", JSON.stringify(res.Slogan));
             Q_UTILS.SHOW_SLOGAN();
-            self.initAudio(self.showIndex);
+            self.initAudio(self.showIndex, true);
             self.saveListen();
             setTimeout(function() {
               self.initSwiper();
@@ -65,46 +69,54 @@ var indexReady = function() {
       })
     },
     methods: {
-      initAudio: function(i) {
+      initAudio: function(i, autoplay) {
         var self = this;
         if (!this.audioList[i].obj) {
           var audio = document.createElement("audio");
           audio.src = self.fmSubList[i].Url;
-          audio.preload = "load";
-          if (i == self.showIndex) {
-            audio.autoplay = "autoplay";
-          }
+          audio.preload = "auto";
+          // if (autoplay) {
+          // audio.autoplay = "autoplay";
+          // self.audioList[i].status = "play";
+          // }
           audio.addEventListener("timeupdate", function() {
             if (!self.dragging) {
               self.audioList[self.showIndex].progress = ((215 / this.duration) * this.currentTime).toFixed(2);
-              console.log(self.showIndex);
             }
           });
           audio.addEventListener("ended", function() {
-            self.audioList[self.showIndex].progress = 0;
+            self.audioList[self.showIndex].progress = 1;
             self.audioList[self.showIndex].status = "pause";
           });
           (function(a) {
             audio.addEventListener("canplay", function() {
               self.audioList[a].progress = 1;
+              if (autoplay) {
+                self.audioList[a].obj.play();
+                self.audioList[a].status = "play";
+              }
             })
           })(i)
-          self.audioList[i] = {
-            obj: audio,
-            status: i == self.showIndex ? "play" : "pause",
-            progress: 0
-          };
+          self.audioList[i].obj = audio;
         }
       },
       initSwiper: function() {
         var self = this;
         var swiper = new Swiper('#index-app', {
           initialSlide: self.showIndex,
+          threshold: 30,
+          touchMoveStopPropagation: false,
+          iOSEdgeSwipeDetection: true,
+          passiveListeners: false,
+          onTouchStart: function(swiper, event) {
+            event.preventDefault();
+            return;
+          },
           onTouchEnd: function(swiper, event) {
             self.oldIndex = swiper.activeIndex;
           },
           onTouchMove: function(swiper, evt) {
-            if (swiper.touches.diff <= -150 && self.showIndex == self.audioList.length - 1) {
+            if (swiper.touches.diff <= -100 && self.showIndex == self.audioList.length - 1) {
               window.location.href = "will.html";
             }
           },
@@ -168,7 +180,8 @@ var indexReady = function() {
       progresClick: function(evt) {
         var t = evt.target;
         if (t.nodeName == "DIV" || t.className == "had") {
-          this.audioList[this.showIndex].obj.currentTime = evt.offsetX / 215 * this.audioList[this.showIndex].obj.duration;
+          var offsetLeft = t.className == "had" ? t.parentElement.offsetLeft : t.offsetLeft;
+          this.audioList[this.showIndex].obj.currentTime = (evt.touches[0].pageX - offsetLeft) / 215 * this.audioList[this.showIndex].obj.duration;
         }
       },
       saveListen: function() {
@@ -186,7 +199,6 @@ var indexReady = function() {
         }
         var self = this;
         $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify(req), function(res) {
-          console.log(res);
           res = JSON.parse(res);
           if (res.result == "OK") {
             console.log("FM300SaveListenRecord==success");

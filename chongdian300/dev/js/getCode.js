@@ -6,7 +6,6 @@ var getCodeReady = function() {
   if (!Q_UTILS.IS_DEV) {
     var code = COMMON_UTILS.getUrlParam("code");
     var localRdSession = localStorage.getItem("q_rd_session");
-    console.log(localRdSession);
     if (localRdSession == null || localRdSession == 'undefined') {
       $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify({
         action: 'getrd_session',
@@ -24,8 +23,8 @@ var getCodeReady = function() {
       window.location.href = 'index.html';
     }
   } else {
-    localStorage.setItem('q_rd_session', 'np3p32s5f7n2zf3bhr8el42p1x1ysa3q');
-    Q_UTILS.CONSTANTS.RD_SESSION = 'np3p32s5f7n2zf3bhr8el42p1x1ysa3q';
+    // localStorage.setItem('q_rd_session', 'np3p32s5f7n2zf3bhr8el42p1x1ysa3q');
+    // Q_UTILS.CONSTANTS.RD_SESSION = 'np3p32s5f7n2zf3bhr8el42p1x1ysa3q';
     window.location.href = 'index.html';
   }
 };
