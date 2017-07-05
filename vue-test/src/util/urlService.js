@@ -14,7 +14,7 @@ export default {
         if (url.indexOf("?") != -1) {
             str = url.substr(1);
             var strObj = this.getObjByStr(str);
-            str = "userId=" + strObj.userId + "&casCookie=" + strObj.casCookie + "&sessionId=" + strObj.sessionId;
+            str = "userId=" + strObj.userId;
         }
         return str;
     },

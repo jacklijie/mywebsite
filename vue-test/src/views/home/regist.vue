@@ -26,7 +26,7 @@
                 </div>
                 <div class="row box-foot">
                     <input type="text" v-model="uinfo.vcode" placeholder="请输入手机验证码">
-                    <span class="btn">获取</span>
+                    <span class="btn" @click="sendMsgCode">获取</span>
                 </div>
             </div>
             <footer>
@@ -56,10 +56,35 @@ export default {
             }
         }
     },
-    methods:{
-        submit(){
+    methods: {
+        sendMsgCode() {
             let _this = this;
-            let postUrl = url.host + "/nhr/elcontract/queryRecord.action?" + url.getUrlStr();
+            let postUrl = url.host + "/nhr/elcontract/sendMsg.action?" + url.getUrlStr();
+            ajax.post(postUrl, {
+                request: {
+                    cellPhone: _this.uinfo.mobile
+                }
+            }).then(function (res) {
+                if (res.data && res.data.response && res.data.response.result) {
+                    /*if (res.data.response.result == "0") {
+                        _this.$router.push("/confirm");
+                    } else if (res.data.response.result == "2") {
+                        _this.$router.push("/regist");
+                    } else {
+                        alert("密码错误");
+                    }*/
+                }
+            }).catch(function (err) {
+                console.log(err);
+                alert("服务异常，请联系系统管理员");
+            })
+        },
+        submit() {
+            let _this = this;
+            if (this.uinfo.name == "") {
+                
+            }
+            let postUrl = url.host + "/nhr/elcontract/cloudRegistration.action?" + url.getUrlStr();
             ajax.post(postUrl, {
                 request: {
                     psnCode: url.getUrlObj()["userId"],
@@ -80,7 +105,7 @@ export default {
                 alert("服务异常，请联系系统管理员");
             })
         },
-        reset(){
+        reset() {
             this.uinfo = {
                 name: "",
                 codeId: "",
