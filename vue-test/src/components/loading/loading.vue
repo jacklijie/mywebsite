@@ -1,18 +1,23 @@
 <template>
   <modal>
       <div class="loading-box">
-          <span>加载中。。。</span>
+          <span v-text="text"></span>
       </div>
   </modal>
 </template>
 <script>
-    import modal from "../modal"
+    import modal from "../modal";
+    import { mapState } from "vuex";
 
     export default {
         name: 'loading',
-        data(){
-
-        },
+        // data(){
+        //     return {};
+        // },
+        // props:['text'],
+        computed: mapState({
+            text: state => state.loadingText
+        }),
         components:{
             modal
         }
@@ -21,17 +26,22 @@
 <style lang="scss">
 @keyframes loadAnimate{
     0%{
-        content: '。';
+        content: '.';
     }
     50%{
-        content: '。。';
+        content: '..';
+    }
+    100%{
+        content: '...';
     }
 }
 .loading-box{
+    align-self: center;
+    font-size: 18px;
     span{
         &::after{
-            content: '。。。';
-            animation: loadAnimate infinite;
+            content: '...';
+            animation: loadAnimate linear 1s infinite;
         }
     }
 }

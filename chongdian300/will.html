@@ -16,8 +16,9 @@
                 <span>未完待续</span>
             </div>
             <p>继续收听<br/>请以<b>分享</b>或<b>付费</b>的形式<br/>支持我们</p>
-            <span class="pay-btn" ontouchStart="location.href='pay.html'">付费</span>
+            <span class="pay-btn" ontouchStart="location.href='pay.html'" v-if="isAccount=='N'">付费</span>
             <span class="share-btn" ontouchStart="location.href = 'share.html'">分享</span>
+            <span class="back-btn" ontouchStart="location.href='index.html'">返回</span>
         </div>
         <footer class="app-footer"><span>听得懂 用得着</span></footer>
     </section>
@@ -27,8 +28,32 @@
     <script type="text/javascript" src="dist/js/chongdian300.js"></script>
     <script type="text/javascript">
         window.onload = function() {
-          Q_UTILS.CONSTANTS.RD_SESSION = localStorage.getItem("q_rd_session");
-          Q_UTILS.SHOW_SLOGAN();
+            Q_UTILS.CONSTANTS.INIT();
+            (function() {
+                var willApp = new Vue({
+                    el: ".will-app",
+                    data: {
+                        isAccount: "N"
+                    },
+                    created: function() {
+                        var req = {
+                            action: "CustomerRights",
+                            rd_session: Q_UTILS.CONSTANTS.RD_SESSION,
+                            WX_flag: Q_UTILS.CONSTANTS.WX_FLAG,
+                            fromplace: Q_UTILS.CONSTANTS.URL.FROMPLACE,
+                            shareID: Q_UTILS.CONSTANTS.URL.SHAREID
+                        };
+                        var self = this;
+                        $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify(req), function(res) {
+                            res = JSON.parse(res);
+                            if (res.result == "OK") {
+                                self.isAccount = res.CustomerRightsText[0].ISAccount;
+                            }
+                        })
+                        Q_UTILS.SHOW_SLOGAN();
+                    }
+                })
+            })()
             try {
                 //初始化微信jsk sdk配置url 请严格按照微信sdk标准返回结果
                 Q_UTILS.WX_SHARE.initParams.url = Q_UTILS.CONSTANTS.URL.OAUTH;
@@ -37,8 +62,9 @@
                 Q_UTILS.WX_SHARE.initParams.params = {
                     action: 'FM300Shareconfig',
                     rd_session: Q_UTILS.CONSTANTS.RD_SESSION,
-                    WX_flag: 5,
-                    para: ''
+                    WX_flag: Q_UTILS.CONSTANTS.WX_FLAG,
+                    fromplace: Q_UTILS.CONSTANTS.URL.FROMPLACE,
+                    shareID: Q_UTILS.CONSTANTS.URL.SHAREID
                 };
                 //Q_UTILS.WX_SHARE.initParams.method = 'get';//默认是post
                 //初始化

@@ -70,15 +70,26 @@ Q_UTILS.MAP = {
 Q_UTILS.CONSTANTS = {
   URL: {
     OAUTH: 'https://www.chongdianshijian.com/WebSite1/Handler.ashx',
+    FROMPLACE: '',
+    SHAREID: ''
   },
-  RD_SESSION: ''
+  RD_SESSION: '',
+  WX_FLAG: '',
+  INIT: function() {
+    this.RD_SESSION = localStorage.getItem("q_rd_session");
+    this.WX_FLAG = localStorage.getItem("WX_flag");
+    this.URL.FROMPLACE = localStorage.getItem("_from");
+    this.URL.SHAREID = localStorage.getItem("_shareId");
+  }
 };
 Q_UTILS.IS_DEV = false;
 Q_UTILS.WX_SHARE = {
   wxConfig: {
     jsApiList: [
-      'checkJsApi',
-      'chooseImage' //,
+      'hideMenuItems',
+      'showMenuItems'
+    // 'checkJsApi',
+    // 'chooseImage',
     // 'onMenuShareTimeline',
     // 'onMenuShareAppMessage',
     // 'onMenuShareQQ',
@@ -150,6 +161,31 @@ Q_UTILS.WX_SHARE = {
   onReady: function() {
     var self = this;
     if (wx) {
+      self.wxConfig.jsApiList.splice(0, 2);
+      var hideMenuList = [],
+        apilistStr = self.wxConfig.jsApiList.join(","),
+        showMenuList = self.wxConfig.jsApiList;
+      if (apilistStr.indexOf("timeline") == -1) {
+        hideMenuList.push("menuItem:share:timeline");
+      }
+      if (apilistStr.indexOf("appmessage") == -1) {
+        hideMenuList.push("menuItem:share:appMessage");
+      }
+      if (apilistStr.indexOf("qq") == -1) {
+        hideMenuList.push("menuItem:share:qq");
+      }
+      if (apilistStr.indexOf("weiboApp") == -1) {
+        hideMenuList.push("menuItem:share:weiboApp");
+      }
+      if (apilistStr.indexOf("QZone") == -1) {
+        hideMenuList.push("menuItem:share:QZone");
+      }
+      wx.hideMenuItems({
+        menuList: hideMenuList
+      });
+      wx.showMenuItems({
+        menuList: showMenuList
+      });
       wx.onMenuShareTimeline({
         title: self.shareObj.timelineTitle, // 分享标题
         link: self.shareObj.shareLink, // 分享链接
@@ -161,7 +197,6 @@ Q_UTILS.WX_SHARE = {
         cancel: function() {
           // 用户取消分享后执行的回调函数
           self.shareObj.shareCancel();
-        //                alert('分享失败');
         }
       });
 
@@ -170,29 +205,49 @@ Q_UTILS.WX_SHARE = {
         desc: self.shareObj.desc, // 分享描述
         link: self.shareObj.shareLink, // 分享链接
         imgUrl: self.shareObj.shareImg, // 分享图标
-        type: 'link', // 分享类型,music、video或link，不填默认为link
-        //            dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+        // type: 'link', // 分享类型,music、video或link，不填默认为link
+        //dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
         success: function() {
-          // 用户确认分享后执行的回调函数
           self.shareObj.shareSuccess();
         },
         cancel: function() {
-          // 用户取消分享后执行的回调函数
           self.shareObj.shareCancel();
         }
       });
 
       wx.onMenuShareQQ({
-        title: self.shareObj.title, // 分享标题
+        title: self.shareObj.friendTitle, // 分享标题
         desc: self.shareObj.desc, // 分享描述
-        link: self.shareObj.shareImg, // 分享链接
+        link: self.shareObj.shareLink, // 分享链接
         imgUrl: self.shareObj.shareImg, // 分享图标
         success: function() {
-          // 用户确认分享后执行的回调函数
           self.shareObj.shareSuccess();
         },
         cancel: function() {
-          // 用户取消分享后执行的回调函数
+          self.shareObj.shareCancel();
+        }
+      });
+      wx.onMenuShareWeibo({
+        title: self.shareObj.friendTitle, // 分享标题
+        desc: self.shareObj.desc, // 分享描述
+        link: self.shareObj.shareLink, // 分享链接
+        imgUrl: self.shareObj.shareImg, // 分享图标
+        success: function() {
+          self.shareObj.shareSuccess();
+        },
+        cancel: function() {
+          self.shareObj.shareCancel();
+        }
+      });
+      wx.onMenuShareQZone({
+        title: self.shareObj.friendTitle, // 分享标题
+        desc: self.shareObj.desc, // 分享描述
+        link: self.shareObj.shareLink, // 分享链接
+        imgUrl: self.shareObj.shareImg, // 分享图标
+        success: function() {
+          self.shareObj.shareSuccess();
+        },
+        cancel: function() {
           self.shareObj.shareCancel();
         }
       });

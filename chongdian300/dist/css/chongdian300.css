@@ -149,10 +149,10 @@ body {
       font-weight: normal;
       font-size: 1.28571rem; }
     .index-app .desc p {
-      margin-top: 1.42857rem;
+      margin-top: 1.07143rem;
       font-size: 1.14286rem; }
   .index-app .audio-ctrl {
-    margin-top: 2.71429rem; }
+    margin-top: 2.28571rem; }
     .index-app .audio-ctrl span {
       width: 4.28571rem;
       height: 4.28571rem;
@@ -161,8 +161,12 @@ body {
       background-size: 100%; }
       .index-app .audio-ctrl span.pause {
         background-image: url("../img/pause.png"); }
+      .index-app .audio-ctrl span.loading {
+        background: url(../img/loading.gif) #1760ad no-repeat center center;
+        background-size: 76%;
+        border-radius: 50%; }
   .index-app .user-like {
-    margin-top: 2.64286rem; }
+    margin-top: 2.14286rem; }
     .index-app .user-like span {
       width: 1.78571rem;
       height: 1.60714rem;
@@ -262,7 +266,7 @@ body {
       margin-top: 0.57143rem;
       margin-bottom: 0.71429rem; }
       .share-app .share-con p img {
-        width: 1rem;
+        width: 0.64286rem;
         vertical-align: -0.21429rem; }
     .share-app .share-con span {
       color: #333;
@@ -304,3 +308,7 @@ body {
     .will-app > span.share-btn {
       margin-top: 1.07143rem;
       background-image: url(../img/bg_2.png); }
+    .will-app > span.back-btn {
+      color: #333;
+      margin-top: 1.07143rem;
+      background-image: url(../img/button-bg.png); }

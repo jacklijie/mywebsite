@@ -1,5 +1,5 @@
 var payReady = function() {
-  Q_UTILS.CONSTANTS.RD_SESSION = localStorage.getItem("q_rd_session");
+  Q_UTILS.CONSTANTS.INIT();
   var payApp = new Vue({
     el: ".pay-app",
     data: {
@@ -21,9 +21,9 @@ var payReady = function() {
           var req = {
             action: 'FM300creatConsume',
             rd_session: Q_UTILS.CONSTANTS.RD_SESSION,
-            WX_flag: 5,
-            fromplace: "",
-            shareID: "",
+            WX_flag: Q_UTILS.CONSTANTS.WX_FLAG,
+            fromplace: Q_UTILS.CONSTANTS.URL.FROMPLACE,
+            shareID: Q_UTILS.CONSTANTS.URL.SHAREID,
             para: this.payment[this.payIndex].substance
           }
           var _form = localStorage.getItem("_form");

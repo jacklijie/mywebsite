@@ -22,8 +22,8 @@
                 <p>每一名新听众，通过点击您分享的链接，进入收听“充电300秒”，则算1次成功分享。 每成功分享1次，可续听1期，以此类推。老听众重复点击您的分享链接是无效的，所以要赶快邀请好友哦。
                 </p>
                 <h4>成功分享</h4>
-                <p>在任意节目播放页，点击“<img src="dist/img/head.png" />”图标，可查看您当前的收听权限。</p>
-                <span ontouchStart="location.href='will.html'">返回</span>
+                <p>在任意节目播放页，点击“<img src="dist/img/mine.png" />”图标，可查看您当前的收听权限。</p>
+                <span ontouchStart="location.href='index.html'">返回</span>
             </div>
         </div>
         <footer class="app-footer"><span>听得懂 用得着</span></footer>
@@ -34,9 +34,8 @@
     <script type="text/javascript" src="dist/js/chongdian300.js"></script>
     <script type="text/javascript">
         window.onload = function() {
-          Q_UTILS.CONSTANTS.RD_SESSION = localStorage.getItem("q_rd_session");
+          Q_UTILS.CONSTANTS.INIT();
           Q_UTILS.SHOW_SLOGAN();
-          Q_UTILS.CONSTANTS.RD_SESSION = localStorage.getItem("q_rd_session");
             try {
                 //初始化微信jsk sdk配置url 请严格按照微信sdk标准返回结果
                 Q_UTILS.WX_SHARE.initParams.url = Q_UTILS.CONSTANTS.URL.OAUTH;
@@ -45,8 +44,9 @@
                 Q_UTILS.WX_SHARE.initParams.params = {
                     action: 'FM300Shareconfig',
                     rd_session: Q_UTILS.CONSTANTS.RD_SESSION,
-                    WX_flag: 5,
-                    para: ''
+                    WX_flag: Q_UTILS.CONSTANTS.WX_FLAG,
+                    fromplace: Q_UTILS.CONSTANTS.URL.FROMPLACE,
+                    shareID: Q_UTILS.CONSTANTS.URL.SHAREID
                 };
                 //Q_UTILS.WX_SHARE.initParams.method = 'get';//默认是post
                 //初始化

@@ -1,5 +1,5 @@
 var mineReady = function() {
-  Q_UTILS.CONSTANTS.RD_SESSION = localStorage.getItem("q_rd_session");
+  Q_UTILS.CONSTANTS.INIT();
   var mineApp = new Vue({
     el: ".mine-app",
     data: {
@@ -9,16 +9,12 @@ var mineReady = function() {
       Q_UTILS.SHOW_SLOGAN();
       var req = {
         action: "CustomerRights",
-        WX_flag: 5,
         rd_session: Q_UTILS.CONSTANTS.RD_SESSION,
-        fromplace: "",
-        shareID: ""
+        WX_flag: Q_UTILS.CONSTANTS.WX_FLAG,
+        fromplace: Q_UTILS.CONSTANTS.URL.FROMPLACE,
+        shareID: Q_UTILS.CONSTANTS.URL.SHAREID
       };
       var self = this;
-      var _form = localStorage.getItem("_form");
-      if (_form != null) {
-        req.fromplace = _form;
-      }
       $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify(req), function(res) {
         res = JSON.parse(res);
         if (res.result == "OK") {

@@ -164,32 +164,35 @@ var getCodeReady = function() {
   //部署到对方服务器后将这里注释打开
   if (!Q_UTILS.IS_DEV) {
     var code = COMMON_UTILS.getUrlParam("code");
-    var localRdSession = localStorage.getItem("q_rd_session");
-    if (localRdSession == null || localRdSession == 'undefined') {
+    Q_UTILS.CONSTANTS.INIT();
+    if (Q_UTILS.CONSTANTS.RD_SESSION == null || Q_UTILS.CONSTANTS.RD_SESSION == 'undefined') {
       $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify({
         action: 'getrd_session',
         code: code,
-        WX_flag: 5
+        WX_flag: Q_UTILS.CONSTANTS.WX_FLAG,
+        fromplace: Q_UTILS.CONSTANTS.URL.FROMPLACE,
+        shareID: Q_UTILS.CONSTANTS.URL.SHAREID
       }), function(res) {
-        console.log(res.rd_session);
+        // console.log(res.rd_session);
         res = JSON.parse(res);
-        Q_UTILS.CONSTANTS.RD_SESSION = res.rd_session;
+        // Q_UTILS.CONSTANTS.RD_SESSION = res.rd_session;
         localStorage.setItem('q_rd_session', res.rd_session);
         window.location.reload();
       });
     } else {
-      Q_UTILS.CONSTANTS.RD_SESSION = localRdSession;
+      // Q_UTILS.CONSTANTS.RD_SESSION = localRdSession;
       window.location.href = 'index.html';
     }
   } else {
-    // localStorage.setItem('q_rd_session', 'np3p32s5f7n2zf3bhr8el42p1x1ysa3q');
-    // Q_UTILS.CONSTANTS.RD_SESSION = 'np3p32s5f7n2zf3bhr8el42p1x1ysa3q';
+    localStorage.setItem('q_rd_session', 'np3p32s5f7n2zf3bhr8el42p1x1ysa3q');
+    localStorage.setItem("_from", "test");
+    localStorage.setItem("_shareId", "118");
+    localStorage.setItem("WX_flag", "5");
     window.location.href = 'index.html';
   }
 };
 
 var indexReady = function() {
-  Q_UTILS.CONSTANTS.RD_SESSION = localStorage.getItem("q_rd_session");
   var indexApp = new Vue({
     el: "#index-app",
     data: {
@@ -197,24 +200,21 @@ var indexReady = function() {
       showIndex: 0,
       listenRecordMax: 0,
       fmSubList: [],
-      audioList: [],
+      ISAccount: "N",
       curBar: {
         sx: 0,
         mx: 0
       },
-      dragging: false
+      dragging: false,
+      curState: "pause"
     },
     created: function() {
       var req = {
         action: 'FM300Programme',
         rd_session: Q_UTILS.CONSTANTS.RD_SESSION,
-        WX_flag: 5,
-        fromplace: "",
-        shareID: ""
-      }
-      var _form = localStorage.getItem("_form");
-      if (_form != null) {
-        req.fromplace = _form;
+        WX_flag: Q_UTILS.CONSTANTS.WX_FLAG,
+        fromplace: Q_UTILS.CONSTANTS.URL.FROMPLACE,
+        shareID: Q_UTILS.CONSTANTS.URL.SHAREID
       }
       var self = this;
       var initIndex = localStorage.getItem("listenHistoryIndex");
@@ -231,64 +231,52 @@ var indexReady = function() {
         res = JSON.parse(res);
         if (res.result == "OK") {
           self.fmSubList = res.ProgrammeInfo;
+          self.ISAccount = res.CustomerRightsText[0].ISAccount;
           if (self.fmSubList.length > 0) {
             for (var i = 0; i < self.fmSubList.length; i++) {
-              self.audioList.push({
-                // obj: null,
-                status: "pause",
-                progress: 0
-              })
+              self.fmSubList[i]["status"] = "pause";
+              self.fmSubList[i]["HourLong"] = -1;
             }
             if (self.showIndex >= self.fmSubList.length) {
               self.showIndex = 0;
               localStorage.setItem("listenHistoryIndex", 0);
             }
-            // localStorage.setItem("myinfo", JSON.stringify(res.CustomerRightsText[0]));
             localStorage.setItem("Payment", JSON.stringify(res.Payment));
             localStorage.setItem("slogan", JSON.stringify(res.Slogan));
             Q_UTILS.SHOW_SLOGAN();
-            self.initAudio(self.showIndex, true);
             self.saveListen();
             setTimeout(function() {
               self.initSwiper();
-              if (self.showIndex + 1 < self.fmSubList.length) self.initAudio(self.showIndex + 1);
-              if (self.showIndex > 0) self.initAudio(self.showIndex - 1);
             }, 120)
           }
         }
       })
     },
     methods: {
-      initAudio: function(i, autoplay) {
-        var self = this;
-        if (!this.audioList[i].obj) {
-          var audio = document.createElement("audio");
-          audio.src = self.fmSubList[i].Url;
-          audio.preload = "auto";
-          // if (autoplay) {
-          // audio.autoplay = "autoplay";
-          // self.audioList[i].status = "play";
-          // }
-          audio.addEventListener("timeupdate", function() {
-            if (!self.dragging) {
-              self.audioList[self.showIndex].progress = ((215 / this.duration) * this.currentTime).toFixed(2);
+      timeUpdate: function() {
+        var self = this,
+          _this = document.getElementById("audio_" + self.showIndex);
+        if (!self.dragging) {
+          if (_this.readyState != 4) {
+            if (!_this.paused)
+              self.curState = "loading";
+          } else {
+            if (_this.paused) {
+              self.curState = "pause";
+            } else {
+              self.curState = "play";
             }
-          });
-          audio.addEventListener("ended", function() {
-            self.audioList[self.showIndex].progress = 1;
-            self.audioList[self.showIndex].status = "pause";
-          });
-          (function(a) {
-            audio.addEventListener("canplay", function() {
-              self.audioList[a].progress = 1;
-              if (autoplay) {
-                self.audioList[a].obj.play();
-                self.audioList[a].status = "play";
-              }
-            })
-          })(i)
-          self.audioList[i].obj = audio;
+          }
+          self.fmSubList[self.showIndex].HourLong = ((215 / _this.duration) * _this.currentTime).toFixed(2);
+          console.log(self.curState);
         }
+      },
+      ended: function() {
+        this.fmSubList[this.showIndex].progress = 0;
+        this.fmSubList[this.showIndex].status = "pause";
+      },
+      canplay: function() {
+        this.fmSubList[this.showIndex].progress = 0;
       },
       initSwiper: function() {
         var self = this;
@@ -306,7 +294,7 @@ var indexReady = function() {
             self.oldIndex = swiper.activeIndex;
           },
           onTouchMove: function(swiper, evt) {
-            if (swiper.touches.diff <= -100 && self.showIndex == self.audioList.length - 1) {
+            if (swiper.touches.diff <= -10 && self.showIndex == self.fmSubList.length - 1 && self.ISAccount == "N") {
               window.location.href = "will.html";
             }
           },
@@ -315,8 +303,6 @@ var indexReady = function() {
           },
           onSlideChangeEnd: function(swiper) {
             self.showIndex = swiper.activeIndex;
-            if (self.showIndex + 1 < self.fmSubList.length) self.initAudio(self.showIndex + 1);
-            if (self.showIndex > 0) self.initAudio(self.showIndex - 1);
             localStorage.setItem("listenHistoryIndex", self.showIndex);
             if (self.listenRecordMax < self.showIndex) {
               self.listenRecordMax = self.showIndex;
@@ -329,25 +315,24 @@ var indexReady = function() {
         });
       },
       changeIndex: function() {
-        var self = this;
-        if (this.audioList[this.oldIndex].obj) {
-          this.audioList[this.oldIndex].obj.pause();
-          this.audioList[this.oldIndex].status = "pause";
-        }
-        setTimeout(function() {
-          self.dragging = false;
-          self.audioList[self.showIndex].obj.play();
-          self.audioList[self.showIndex].status = "play";
-        }, 10)
+        document.getElementById("audio_" + this.oldIndex).pause();
+        this.curState = "pause";
+        this.dragging = false;
       },
-      playClick: function() {
-        var audio = this.audioList[this.showIndex];
-        if (audio.obj.paused) {
-          audio.status = "play";
-          audio.obj.play();
+      playClick: function(sub) {
+        var audio = document.getElementById("audio_" + this.showIndex);
+        if (audio) {
+
         } else {
-          audio.status = "pause";
-          audio.obj.pause();
+          alert("audio is null");
+          audio.pause();
+        }
+        if (audio.paused) {
+          this.curState = "loading";
+          audio.play();
+        } else {
+          this.curState = "pause";
+          audio.pause();
         }
       },
       barTouchStart: function(evt) {
@@ -358,73 +343,69 @@ var indexReady = function() {
       },
       barTouchMove: function(evt) {
         var t = evt.touches[0];
-        var move = parseFloat(this.audioList[this.showIndex].progress) + (t.pageX - this.curBar.mx);
+        var move = parseFloat(this.fmSubList[this.showIndex].HourLong) + (t.pageX - this.curBar.mx);
         this.curBar.mx = t.pageX;
         if (move > 0 && move < 215)
-          this.audioList[this.showIndex].progress = move;
+          this.fmSubList[this.showIndex].HourLong = move;
       },
       barTouchEnd: function() {
-        this.audioList[this.showIndex].obj.currentTime = this.audioList[this.showIndex].progress / 215 * this.audioList[this.showIndex].obj.duration;
+        var audio = document.getElementById("audio_" + this.showIndex);
+        audio.currentTime = this.fmSubList[this.showIndex].HourLong / 215 * audio.duration;
+        this.curState = "loading";
         this.dragging = false;
       },
       progresClick: function(evt) {
         var t = evt.target;
+        var audio = document.getElementById("audio_" + this.showIndex);
         if (t.nodeName == "DIV" || t.className == "had") {
           var offsetLeft = t.className == "had" ? t.parentElement.offsetLeft : t.offsetLeft;
-          this.audioList[this.showIndex].obj.currentTime = (evt.touches[0].pageX - offsetLeft) / 215 * this.audioList[this.showIndex].obj.duration;
+          this.curState = "loading";
+          audio.currentTime = (evt.touches[0].pageX - offsetLeft) / 215 * audio.duration;
         }
       },
       saveListen: function() {
         var req = {
           action: 'FM300SaveListenRecord',
           rd_session: Q_UTILS.CONSTANTS.RD_SESSION,
-          WX_flag: 5,
           para: this.fmSubList[this.showIndex].ProgrammeID,
-          fromplace: "",
-          shareID: ""
-        }
-        var _form = localStorage.getItem("_form");
-        if (_form != null) {
-          req.fromplace = _form;
+          WX_flag: Q_UTILS.CONSTANTS.WX_FLAG,
+          fromplace: Q_UTILS.CONSTANTS.URL.FROMPLACE,
+          shareID: Q_UTILS.CONSTANTS.URL.SHAREID
         }
         var self = this;
         $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify(req), function(res) {
           res = JSON.parse(res);
           if (res.result == "OK") {
-            console.log("FM300SaveListenRecord==success");
+            // console.log("FM300SaveListenRecord==success");
           }
         })
       },
       likeClick: function() {
-        if (this.fmSubList[this.showIndex].PraiseValue != 'Y') {
-          var req = {
-            action: 'FM300SavePraise',
-            rd_session: Q_UTILS.CONSTANTS.RD_SESSION,
-            WX_flag: 5,
-            fromplace: "",
-            shareID: "",
-            para: this.fmSubList[this.showIndex].ProgrammeID
-          }
-          var _form = localStorage.getItem("_form");
-          if (_form != null) {
-            req.fromplace = _form;
-          }
-          var self = this;
-          $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify(req), function(res) {
-            res = JSON.parse(res);
-            if (res.result == "OK") {
-              self.fmSubList[self.showIndex].PraiseValue = "Y";
-            }
-          })
+        var curPraiseValue = this.fmSubList[this.showIndex].PraiseValue;
+        var req = {
+          action: curPraiseValue == 'N' ? 'FM300SavePraise' : 'FM300CancelPraise',
+          rd_session: Q_UTILS.CONSTANTS.RD_SESSION,
+          WX_flag: Q_UTILS.CONSTANTS.WX_FLAG,
+          fromplace: Q_UTILS.CONSTANTS.URL.FROMPLACE,
+          shareID: Q_UTILS.CONSTANTS.URL.SHAREID,
+          para: this.fmSubList[this.showIndex].ProgrammeID
         }
+        var self = this;
+        $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify(req), function(res) {
+          res = JSON.parse(res);
+          if (res.result == "OK") {
+            self.fmSubList[self.showIndex].PraiseValue = curPraiseValue == 'N' ? 'Y' : 'N';
+          }
+        })
       }
     },
     filters: {
-      timer: function(data) {
-        if (!data.progress) return "00:00";
+      timer: function(progress, index) {
+        if (progress == -1 || progress == "NaN") return "00:00";
         var minute = "",
-          second = "";
-        var template = data.obj.duration - data.obj.duration * (data.progress / 215);
+          second = "",
+          audio = document.getElementById("audio_" + index);
+        var template = audio.duration - audio.duration * (progress / 215);
         minute = Math.floor(template / 60);
         second = (template % 60).toFixed(0);
         return (minute < 10 ? "0" + minute : minute) + ":" + (second < 10 ? "0" + second : second);
@@ -434,7 +415,7 @@ var indexReady = function() {
 };
 
 var mineReady = function() {
-  Q_UTILS.CONSTANTS.RD_SESSION = localStorage.getItem("q_rd_session");
+  Q_UTILS.CONSTANTS.INIT();
   var mineApp = new Vue({
     el: ".mine-app",
     data: {
@@ -444,16 +425,12 @@ var mineReady = function() {
       Q_UTILS.SHOW_SLOGAN();
       var req = {
         action: "CustomerRights",
-        WX_flag: 5,
         rd_session: Q_UTILS.CONSTANTS.RD_SESSION,
-        fromplace: "",
-        shareID: ""
+        WX_flag: Q_UTILS.CONSTANTS.WX_FLAG,
+        fromplace: Q_UTILS.CONSTANTS.URL.FROMPLACE,
+        shareID: Q_UTILS.CONSTANTS.URL.SHAREID
       };
       var self = this;
-      var _form = localStorage.getItem("_form");
-      if (_form != null) {
-        req.fromplace = _form;
-      }
       $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify(req), function(res) {
         res = JSON.parse(res);
         if (res.result == "OK") {
@@ -470,7 +447,7 @@ var mineReady = function() {
 };
 
 var payReady = function() {
-  Q_UTILS.CONSTANTS.RD_SESSION = localStorage.getItem("q_rd_session");
+  Q_UTILS.CONSTANTS.INIT();
   var payApp = new Vue({
     el: ".pay-app",
     data: {
@@ -492,9 +469,9 @@ var payReady = function() {
           var req = {
             action: 'FM300creatConsume',
             rd_session: Q_UTILS.CONSTANTS.RD_SESSION,
-            WX_flag: 5,
-            fromplace: "",
-            shareID: "",
+            WX_flag: Q_UTILS.CONSTANTS.WX_FLAG,
+            fromplace: Q_UTILS.CONSTANTS.URL.FROMPLACE,
+            shareID: Q_UTILS.CONSTANTS.URL.SHAREID,
             para: this.payment[this.payIndex].substance
           }
           var _form = localStorage.getItem("_form");
@@ -587,15 +564,26 @@ Q_UTILS.MAP = {
 Q_UTILS.CONSTANTS = {
   URL: {
     OAUTH: 'https://www.chongdianshijian.com/WebSite1/Handler.ashx',
+    FROMPLACE: '',
+    SHAREID: ''
   },
-  RD_SESSION: ''
+  RD_SESSION: '',
+  WX_FLAG: '',
+  INIT: function() {
+    this.RD_SESSION = localStorage.getItem("q_rd_session");
+    this.WX_FLAG = localStorage.getItem("WX_flag");
+    this.URL.FROMPLACE = localStorage.getItem("_from");
+    this.URL.SHAREID = localStorage.getItem("_shareId");
+  }
 };
 Q_UTILS.IS_DEV = false;
 Q_UTILS.WX_SHARE = {
   wxConfig: {
     jsApiList: [
-      'checkJsApi',
-      'chooseImage' //,
+      'hideMenuItems',
+      'showMenuItems'
+    // 'checkJsApi',
+    // 'chooseImage',
     // 'onMenuShareTimeline',
     // 'onMenuShareAppMessage',
     // 'onMenuShareQQ',
@@ -667,6 +655,31 @@ Q_UTILS.WX_SHARE = {
   onReady: function() {
     var self = this;
     if (wx) {
+      self.wxConfig.jsApiList.splice(0, 2);
+      var hideMenuList = [],
+        apilistStr = self.wxConfig.jsApiList.join(","),
+        showMenuList = self.wxConfig.jsApiList;
+      if (apilistStr.indexOf("timeline") == -1) {
+        hideMenuList.push("menuItem:share:timeline");
+      }
+      if (apilistStr.indexOf("appmessage") == -1) {
+        hideMenuList.push("menuItem:share:appMessage");
+      }
+      if (apilistStr.indexOf("qq") == -1) {
+        hideMenuList.push("menuItem:share:qq");
+      }
+      if (apilistStr.indexOf("weiboApp") == -1) {
+        hideMenuList.push("menuItem:share:weiboApp");
+      }
+      if (apilistStr.indexOf("QZone") == -1) {
+        hideMenuList.push("menuItem:share:QZone");
+      }
+      wx.hideMenuItems({
+        menuList: hideMenuList
+      });
+      wx.showMenuItems({
+        menuList: showMenuList
+      });
       wx.onMenuShareTimeline({
         title: self.shareObj.timelineTitle, // 分享标题
         link: self.shareObj.shareLink, // 分享链接
@@ -678,7 +691,6 @@ Q_UTILS.WX_SHARE = {
         cancel: function() {
           // 用户取消分享后执行的回调函数
           self.shareObj.shareCancel();
-        //                alert('分享失败');
         }
       });
 
@@ -687,29 +699,49 @@ Q_UTILS.WX_SHARE = {
         desc: self.shareObj.desc, // 分享描述
         link: self.shareObj.shareLink, // 分享链接
         imgUrl: self.shareObj.shareImg, // 分享图标
-        type: 'link', // 分享类型,music、video或link，不填默认为link
-        //            dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+        // type: 'link', // 分享类型,music、video或link，不填默认为link
+        //dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
         success: function() {
-          // 用户确认分享后执行的回调函数
           self.shareObj.shareSuccess();
         },
         cancel: function() {
-          // 用户取消分享后执行的回调函数
           self.shareObj.shareCancel();
         }
       });
 
       wx.onMenuShareQQ({
-        title: self.shareObj.title, // 分享标题
+        title: self.shareObj.friendTitle, // 分享标题
         desc: self.shareObj.desc, // 分享描述
-        link: self.shareObj.shareImg, // 分享链接
+        link: self.shareObj.shareLink, // 分享链接
         imgUrl: self.shareObj.shareImg, // 分享图标
         success: function() {
-          // 用户确认分享后执行的回调函数
           self.shareObj.shareSuccess();
         },
         cancel: function() {
-          // 用户取消分享后执行的回调函数
+          self.shareObj.shareCancel();
+        }
+      });
+      wx.onMenuShareWeibo({
+        title: self.shareObj.friendTitle, // 分享标题
+        desc: self.shareObj.desc, // 分享描述
+        link: self.shareObj.shareLink, // 分享链接
+        imgUrl: self.shareObj.shareImg, // 分享图标
+        success: function() {
+          self.shareObj.shareSuccess();
+        },
+        cancel: function() {
+          self.shareObj.shareCancel();
+        }
+      });
+      wx.onMenuShareQZone({
+        title: self.shareObj.friendTitle, // 分享标题
+        desc: self.shareObj.desc, // 分享描述
+        link: self.shareObj.shareLink, // 分享链接
+        imgUrl: self.shareObj.shareImg, // 分享图标
+        success: function() {
+          self.shareObj.shareSuccess();
+        },
+        cancel: function() {
           self.shareObj.shareCancel();
         }
       });

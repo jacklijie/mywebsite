@@ -122,13 +122,13 @@
         }
 
         p {
-            margin-top: torem(20);
+            margin-top: torem(15);
             font-size: torem(16);
         }
     }
 
     .audio-ctrl {
-        margin-top: torem(38);
+        margin-top: torem(32);
 
         span {
             width: torem(60);
@@ -140,11 +140,16 @@
             &.pause {
                 background-image: url("../img/pause.png");
             }
+            &.loading{
+              background: url(../img/loading.gif) #1760ad no-repeat center center;
+              background-size: 76%;
+              border-radius: 50%;
+            }
         }
     }
 
     .user-like {
-        margin-top: torem(37);
+        margin-top: torem(30);
 
         span {
             width: torem(25);

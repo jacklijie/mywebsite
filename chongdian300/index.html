@@ -7,7 +7,7 @@
     <meta content="yes" name="apple-touch-fullscreen">
     <meta content="telephone=no,email=no" name="format-detection">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>充电300秒</title>
+    <title>永不过时的营销思维</title>
     <link rel="stylesheet" href="dist/css/swiper-3.4.2.min.css">
     <link rel="stylesheet" href="dist/css/chongdian300.css">
 </head>
@@ -23,19 +23,21 @@
                             <img :src="sub.ProgrammeCoverRectangle" alt="">
                         </div>
                         <div class="time">
-                            <span>{{audioList[index]|timer}}</span>
+                            <span>{{sub.HourLong|timer(index)}}</span>
                             <div @touchStart="progresClick($event)">
-                                <span class="had" :style="{width:audioList[index].progress+'px'}"></span>
-                                <span class="cur" :style="{left:audioList[index].progress+'px'}" @touchStart.stop="barTouchStart($event)" @touchMove="barTouchMove($event)" @touchEnd="barTouchEnd()"></span>
+                                <span class="had" :style="{width:sub.HourLong+'px'}"></span>
+                                <span class="cur" :style="{left:sub.HourLong+'px'}" @touchStart.stop="barTouchStart($event)" @touchMove="barTouchMove($event)" @touchEnd="barTouchEnd()"></span>
                             </div>
                         </div>
                         <div class="desc">
                             <h3 v-html="sub.ProgrammeTitle"></h3>
                             <p>- {{sub.AlbumName}} -</p>
-                            <i :id="'playBtn_'+index" @click="playClick"></i>
+                            <!-- <i :id="'playBtn_'+index" @click="playClick"></i> -->
+                            <audio :src="sub.Url" preload="none" :id="'audio_'+index" @timeupdate="timeUpdate" @ended="ended" @canplay="canplay">
+                            </audio>
                         </div>
                         <div class="audio-ctrl">
-                            <span :class="{pause:audioList[index].status=='pause'}" @touchStart="playClick"></span>
+                            <span :class="{'pause':curState=='pause','loading':curState=='loading'}" @touchStart="playClick(sub)"></span>
                         </div>
                         <div class="user-like">
                             <span :class="{liking:sub.PraiseValue=='Y'}" @touchStart="likeClick"></span>
@@ -57,8 +59,9 @@
             event.preventDefault();
         }
         document.addEventListener('touchmove', preventDefaultTouchmove, false);
+        Q_UTILS.CONSTANTS.INIT();
+        indexReady();
         window.onload = function() {
-            indexReady();
             try {
                 //初始化微信jsk sdk配置url 请严格按照微信sdk标准返回结果
                 Q_UTILS.WX_SHARE.initParams.url = Q_UTILS.CONSTANTS.URL.OAUTH;
@@ -67,8 +70,9 @@
                 Q_UTILS.WX_SHARE.initParams.params = {
                     action: 'FM300Shareconfig',
                     rd_session: Q_UTILS.CONSTANTS.RD_SESSION,
-                    WX_flag: 5,
-                    para: ''
+                    WX_flag: Q_UTILS.CONSTANTS.WX_FLAG,
+                    fromplace: Q_UTILS.CONSTANTS.URL.FROMPLACE,
+                    shareID: Q_UTILS.CONSTANTS.URL.SHAREID
                 };
                 //初始化
                 Q_UTILS.WX_SHARE.init();
@@ -78,15 +82,22 @@
         };
         try {
             wx.ready(function() {
-                var playIndex = localStorage.getItem("listenHistoryIndex");
-                if (playIndex) {
-                    $("#playBtn_" + playIndex).click();
-                } else {
-                    $("#playBtn_0").click();
-                }
+              var playIndex = localStorage.getItem("listenHistoryIndex");
+              document.getElementById("audio_" + playIndex).preload = "metadata";
+              document.getElementById("audio_" + playIndex).load();
+                // if (navigator.appVersion.indexOf("iPhone") != -1) {
+                //     var playIndex = localStorage.getItem("listenHistoryIndex");
+                //     if (playIndex) {
+                //         $("#playBtn_" + playIndex).trigger("click");
+                //     } else {
+                //         $("#playBtn_0").trigger("click");
+                //     }
+                // }
                 Q_UTILS.WX_SHARE.onReady();
             });
-        } catch (e) {}
+        } catch (e) {
+          console.log(e);
+        }
     </script>
 </body>
 

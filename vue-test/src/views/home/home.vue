@@ -26,7 +26,8 @@ export default {
     },
     methods: {
         submit() {
-            let _this = this;
+            this.$emit("loading", "加载中呀");
+            /*let _this = this;
             let postUrl = url.host + "/nhr/elcontract/queryRecord.action?" + url.getUrlStr();
             ajax.post(postUrl, {
                 request: {
@@ -46,7 +47,7 @@ export default {
             }).catch(function (err) {
                 console.log(err);
                 alert("服务异常，请联系系统管理员");
-            })
+            })*/
         }
     }
 }

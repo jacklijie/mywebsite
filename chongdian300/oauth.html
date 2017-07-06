@@ -17,19 +17,26 @@
             var rdd_session = localStorage.getItem("q_rd_session");
             if (rdd_session)
                 localStorage.removeItem("q_rd_session");
-            var _form = COMMON_UTILS.getUrlParam("from") + "";
+            var _form = COMMON_UTILS.getUrlParam("fromplace") + "";
             if (_form != 'undefined' && _form != '') {
-                localStorage.setItem("_form", _form);
+                localStorage.setItem("_from", _form);
+            }
+            var _shareId = COMMON_UTILS.getUrlParam("shareID") + "";
+            if (_shareId != 'undefined' && _shareId != '') {
+                localStorage.setItem("_shareId", _shareId);
             }
             var request = {
                 action: 'getOAuthUrl',
                 //  para: 'https://www.chongdianshijian.com/Webchat/Default2.aspx',//这里写重定向的地址，只有他们那边的地址才可以，然后从微信中复制跳转的url，获取code
-                para: 'https://www.chongdianshijian.com/chongdian300/getrdsession.html', //
+                para: location.href.replace("oauth.html", "getrdsession.html"), //
                 WX_flag: 5
             };
             $.post(Q_UTILS.CONSTANTS.URL.OAUTH, JSON.stringify(request), function(res) {
                 res = JSON.parse(res);
-                window.location.href = res.OAuthUrl;
+                if (res.result == "OK") {
+                    localStorage.setItem("WX_flag", res.WX_flag);
+                    window.location.href = res.OAuthUrl;
+                }
             });
         }
     </script>

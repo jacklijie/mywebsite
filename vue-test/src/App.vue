@@ -2,9 +2,7 @@
   <div id="app">
     <!--<img src="./assets/logo.png">-->
     <router-view></router-view>
-    <modal>
-      
-    </modal>
+    <loading v-show="showLoading"></loading>
   </div>
 </template>
 
@@ -16,13 +14,18 @@ import Store from './assets/js/storage.js'
 
 export default {
   name: 'app',
-  data(){
-    return {}
+  data() {
+    return {
+      showLoading: false
+    }
   },
-  mounted:function(){
+  mounted: function () {
     // 测试localStorage是否可用
     this.checkLocalStorageEnabled();
-
+    this.$on("loading", function (loadingText) {
+      this.showLoading = true;
+      this.$store.commit("changeLoadingText", { loadingText: loadingText });
+    });
     // 刷新进行路由检测跳转 
     // this.$store.commit('ROUTE_CHANGE',{activeRoute: this.activeRoute})
 
@@ -31,13 +34,13 @@ export default {
     //   this.checkLogin();
     // }.bind(this)
   },
-  methods:{
-    checkLocalStorageEnabled(){
+  methods: {
+    checkLocalStorageEnabled() {
       if (!Store.enabled) {
         alert('您的浏览器不支持localStorage，可能会影响体验')
       }
     },
-    checkLogin(){
+    checkLogin() {
       // if(Util.isCurrentUser()){
       //   console.log("处于登录状态");
       //   if(this.$route.name === 'login') this.$router.push({name:'movie'});
@@ -47,20 +50,20 @@ export default {
       //   this.$router.push({name:'login'});
       // }
     },
-    redirect(){
-        setTimeout(function(){
-            this.$router.push({name:'login'})
-        }.bind(this),5000)
+    redirect() {
+      setTimeout(function () {
+        this.$router.push({ name: 'login' })
+      }.bind(this), 5000)
     },
-    formatTime(val){
-      var m = Math.floor(val/60).toString();
-      var s = Math.round(val%60).toString();
-      m = (m.length == 1) ? 0+m : m;
-      s = (s.length == 1) ? 0+s : s;
-      return m+":"+s;
-    // },
-    // getPercent(curTime){
-    //   return ((curTime / (this.audioDuration/1000)).toFixed(2)) * 100 +'%'
+    formatTime(val) {
+      var m = Math.floor(val / 60).toString();
+      var s = Math.round(val % 60).toString();
+      m = (m.length == 1) ? 0 + m : m;
+      s = (s.length == 1) ? 0 + s : s;
+      return m + ":" + s;
+      // },
+      // getPercent(curTime){
+      //   return ((curTime / (this.audioDuration/1000)).toFixed(2)) * 100 +'%'
     }
   }
 }

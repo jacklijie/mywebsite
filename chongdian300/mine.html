@@ -50,8 +50,9 @@
                 Q_UTILS.WX_SHARE.initParams.params = {
                     action: 'FM300Shareconfig',
                     rd_session: Q_UTILS.CONSTANTS.RD_SESSION,
-                    WX_flag: 5,
-                    para: ''
+                    WX_flag: Q_UTILS.CONSTANTS.WX_FLAG,
+                    fromplace: Q_UTILS.CONSTANTS.URL.FROMPLACE,
+                    shareID: Q_UTILS.CONSTANTS.URL.SHAREID
                 };
                 //Q_UTILS.WX_SHARE.initParams.method = 'get';//默认是post
                 //初始化
