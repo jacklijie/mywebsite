@@ -14,6 +14,7 @@
 <script>
 import ajax from "../../util/ajax";
 import url from "../../util/urlService";
+import modal from "../../util/modal";
 
 export default {
     name: 'home',
@@ -26,8 +27,8 @@ export default {
     },
     methods: {
         submit() {
-            this.$emit("loading", "加载中呀");
-            /*let _this = this;
+            modal.loading(this, true);
+            let _this = this;
             let postUrl = url.host + "/nhr/elcontract/queryRecord.action?" + url.getUrlStr();
             ajax.post(postUrl, {
                 request: {
@@ -35,19 +36,21 @@ export default {
                     passWord: _this.pwd
                 }
             }).then(function (res) {
+                modal.loading(_this, false);
                 if (res.data && res.data.response && res.data.response.result) {
                     if (res.data.response.result == "0") {
                         _this.$router.push("/confirm");
                     } else if (res.data.response.result == "2") {
                         _this.$router.push("/regist");
                     } else {
-                        alert("密码错误");
+                        modal.valert(_this, "密码错误");
                     }
                 }
             }).catch(function (err) {
+                modal.loading(this, false);
                 console.log(err);
-                alert("服务异常，请联系系统管理员");
-            })*/
+                modal.valert(_this, "服务异常，请联系系统管理员");
+            })
         }
     }
 }

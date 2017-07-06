@@ -16,17 +16,15 @@
                 <div class="row">
                     <input type="text" v-model="uinfo.registAddress" placeholder="请输入户籍地址">
                 </div>
-                <div class="row box-foot">
+                <div class="row">
                     <input type="text" v-model="uinfo.postcode" placeholder="请输入邮编">
                 </div>
-            </div>
-            <div class="form-box">
                 <div class="row">
                     <input type="text" v-model="uinfo.mobile" placeholder="请输入手机号码">
                 </div>
                 <div class="row box-foot">
-                    <input type="text" v-model="uinfo.vcode" placeholder="请输入手机验证码">
-                    <span class="btn" :class="{'disable':msg.hasSend}" v-text="msg.sendText" @click="sendMsgCode"></span>
+                    <input type="text" v-model="uinfo.vcode" placeholder="请输入短信验证码">
+                    <!--<span class="btn" :class="{'disable':msg.hasSend}" v-text="msg.sendText" @click="sendMsgCode"></span>-->
                 </div>
             </div>
             <footer>
@@ -34,10 +32,12 @@
                 <button @click="reset">重置</button>
             </footer>
         </div>
+        <notice-m v-show="showNotice" type="1"></notice-m>
     </div>
 </template>
 <script>
 import headBack from '../../components/head.vue';
+import noticeM from '../../components/notice/notice.vue';
 import ajax from "../../util/ajax";
 import url from "../../util/urlService";
 import modal from "../../util/modal"
@@ -61,42 +61,17 @@ export default {
             }
         }
     },
+    computed:{
+        showNotice(){
+            return this.$store.state.notice.show
+        }
+    },
+    mounted() {
+        this.$store.commit("NOTICE_STATE", {
+            showNotice: true
+        })
+    },
     methods: {
-        sendMsgCode() {
-            let _this = this;
-            if (_this.msg.hasSend) {
-                return;
-            } else if (this.uinfo.mobile == "") {
-                modal.valert(_this, "手机号不能为空");
-                return;
-            } else if (!/^1[34578]\d{9}$/.test(this.uinfo.mobile)) {
-                modal.valert(_this, "手机号码有误");
-                return;
-            } else {
-                let postUrl = url.host + "/nhr/elcontract/sendMsg.action?" + url.getUrlStr();
-                let timer, count = 120; _this.msg.hasSend = true;
-                timer = setInterval(() => { count--; _this.msg.sendText = "获取(" + count + ")"; if (count == 0) { clearInterval(timer); _this.msg.hasSend = false; _this.msg.sendText = "获取" } }, 1000);
-                return;
-                ajax.post(postUrl, {
-                    request: {
-                        cellPhone: _this.uinfo.mobile
-                    }
-                }).then(function (res) {
-                    if (res.data && res.data.response && res.data.response.result) {
-                        /*if (res.data.response.result == "0") {
-                            _this.$router.push("/confirm");
-                        } else if (res.data.response.result == "2") {
-                            _this.$router.push("/regist");
-                        } else {
-                            alert("密码错误");
-                        }*/
-                    }
-                }).catch(function (err) {
-                    console.log(err);
-                    modal.valert(_this, "服务异常，请联系系统管理员");
-                })
-            }
-        },
         submit() {
             let _this = this;
             if (this.uinfo.name == "") {
@@ -149,7 +124,8 @@ export default {
         }
     },
     components: {
-        headBack
+        headBack,
+        noticeM
     }
 }
 </script>

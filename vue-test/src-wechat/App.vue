@@ -9,7 +9,7 @@
 
 <script>
 import Vue from 'vue'
-import home from './views/home/home.vue'
+import regist from './views/home/regist.vue'
 import Util from './util/util'
 import Store from './assets/js/storage.js'
 

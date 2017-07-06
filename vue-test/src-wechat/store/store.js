@@ -14,6 +14,7 @@ const store = new Vuex.Store({
             show: false
         },
         notice:{
+            text: '',
             show: false
         },
         from: "app"
@@ -31,7 +32,7 @@ const store = new Vuex.Store({
             state.valert.show = payload.showAlert;
         },
         [types.NOTICE_STATE](state, payload) {
-            // state.notice.text = payload.noticeText;
+            state.notice.text = payload.noticeText;
             state.notice.show = payload.showNotice;
         },
         [types.FROM_STATE](state, payload) {
