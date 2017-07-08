@@ -14,7 +14,7 @@ export default new Router({
     { path: '/', name: 'home', component: require('../views/home/home.vue') },
     { path: '/regist', name: 'regist', component: require('../views/home/regist.vue') },
     { path: '/opentype', name: 'opentype', component: require('../views/home/opentype.vue') },
-    { path: '/contract/list', name: 'mycontract', component: require('../views/contract/list.vue') },
+    { path: '/contract/list/:type', name: 'mycontract', component: require('../views/contract/list.vue') },
     {
       path: '*', redirect: './home'
     }

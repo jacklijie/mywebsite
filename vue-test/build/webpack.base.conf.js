@@ -9,7 +9,7 @@ function resolve (dir) {
 
 module.exports = {
   entry: {
-    app: './src-wechat/main.js'
+    app: './src/main.js'
   },
   output: {
     path: config.build.assetsRoot,

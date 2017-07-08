@@ -40,6 +40,7 @@ import headBack from '../../components/head.vue';
 import noticeM from '../../components/notice/notice.vue';
 import ajax from "../../util/ajax";
 import url from "../../util/urlService";
+import link from "../../util/link";
 import modal from "../../util/modal"
 
 export default {
@@ -48,12 +49,12 @@ export default {
         return {
             title: '注册',
             uinfo: {
-                name: "",
-                codeId: "",
-                registAddress: "",
-                postcode: "",
-                mobile: "",
-                vcode: ""
+                name: "李杰",
+                codeId: "510322199008245499",
+                registAddress: "啊死了都快放假啦深刻的风景",
+                postcode: "643208",
+                mobile: "15000334505",
+                vcode: "44330791"
             },
             msg: {
                 sendText: "获取",
@@ -61,8 +62,8 @@ export default {
             }
         }
     },
-    computed:{
-        showNotice(){
+    computed: {
+        showNotice() {
             return this.$store.state.notice.show
         }
     },
@@ -89,13 +90,16 @@ export default {
             } else if (_this.uinfo.mobile == "" || !/^1[34578]\d{9}$/.test(this.uinfo.mobile)) {
                 modal.valert(_this, "手机号码格式不正确");
                 return;
+            } else if (_this.uinfo.vcode == "") {
+                modal.valert(_this, "验证码不能为空");
+                return;
             } else {
-                let postUrl = url.host + "/nhr/elcontract/cloudRegistration.action?" + url.getUrlStr();
-                ajax.post(postUrl, {
-                    request: {
-                        psnCode: url.getUrlObj()["userId"],
-                        passWord: _this.pwd
-                    }
+                // let postUrl = url.host + "/nhr/elcontract/cloudRegistration.action?" + url.getUrlStr();
+                ajax.post(link.cloudRegistration, {
+                    psnName: _this.uinfo.name,
+                    idCard: _this.uinfo.codeId,
+                    cellPhone: _this.uinfo.mobile,
+                    checkCode: _this.uinfo.vcode//验证码(pc端提前生成)
                 }).then(function (res) {
                     if (res.data && res.data.response && res.data.response.result) {
                         if (res.data.response.result == "0") {
@@ -105,6 +109,13 @@ export default {
                         } else {
                             modal.valert(_this, "密码错误");
                         }
+                        ajax.post(link.supplement, {
+                            cellPhone: _this.uinfo.mobile,
+                            address: _this.uinfo.registAddress,
+                            postalCode: _this.uinfo.postcode
+                        }).then(function (resp) {
+                            console.log(resp);
+                        })
                     }
                 }).catch(function (err) {
                     console.log(err);

@@ -40,6 +40,7 @@
 import headBack from '../../components/head.vue';
 import ajax from "../../util/ajax";
 import url from "../../util/urlService";
+import link from "../../util/link";
 import modal from "../../util/modal"
 
 export default {
@@ -48,16 +49,17 @@ export default {
         return {
             title: '注册',
             uinfo: {
-                name: "",
-                codeId: "",
-                registAddress: "",
-                postcode: "",
-                mobile: "",
-                vcode: ""
+                name: "李杰",
+                codeId: "510322199008245499",
+                registAddress: "啊是科技发达；啊口角是非；",
+                postcode: "643204",
+                mobile: "15000334505",
+                vcode: "636824"
             },
             msg: {
                 sendText: "获取",
-                hasSend: false
+                hasSend: false,
+                responseVCode: "636824"
             }
         }
     },
@@ -73,23 +75,19 @@ export default {
                 modal.valert(_this, "手机号码有误");
                 return;
             } else {
-                let postUrl = url.host + "/nhr/elcontract/sendMsg.action?" + url.getUrlStr();
                 let timer, count = 120; _this.msg.hasSend = true;
                 timer = setInterval(() => { count--; _this.msg.sendText = "获取(" + count + ")"; if (count == 0) { clearInterval(timer); _this.msg.hasSend = false; _this.msg.sendText = "获取" } }, 1000);
-                return;
-                ajax.post(postUrl, {
-                    request: {
-                        cellPhone: _this.uinfo.mobile
-                    }
+                ajax.post(link.sendMsg, {
+                    cellPhone: _this.uinfo.mobile
                 }).then(function (res) {
                     if (res.data && res.data.response && res.data.response.result) {
-                        /*if (res.data.response.result == "0") {
-                            _this.$router.push("/confirm");
-                        } else if (res.data.response.result == "2") {
-                            _this.$router.push("/regist");
+                        if (res.data.response.result == "0") {
+                            _this.msg.responseVCode = res.data.response.randomCode;
                         } else {
-                            alert("密码错误");
-                        }*/
+                            modal.valert(_this, res.data.response.reason);
+                        }
+                    } else {
+                        modal.valert(_this, res.message);
                     }
                 }).catch(function (err) {
                     console.log(err);
@@ -114,26 +112,40 @@ export default {
             } else if (_this.uinfo.mobile == "" || !/^1[34578]\d{9}$/.test(this.uinfo.mobile)) {
                 modal.valert(_this, "手机号码格式不正确");
                 return;
+            } else if (_this.uinfo.vcode == "" || _this.uinfo.vcode != _this.msg.responseVCode) {
+                modal.valert(_this, "手机验证码不正确");
+                return;
             } else {
-                let postUrl = url.host + "/nhr/elcontract/cloudRegistration.action?" + url.getUrlStr();
-                ajax.post(postUrl, {
-                    request: {
-                        psnCode: url.getUrlObj()["userId"],
-                        passWord: _this.pwd
-                    }
+                ajax.post(link.cloudRegistration, {
+                    psnCode: url.getUrlObj()["userId"],
+                    psnName: _this.uinfo.name,
+                    idCard: _this.uinfo.codeId,
+                    cellPhone: _this.uinfo.mobile
                 }).then(function (res) {
                     if (res.data && res.data.response && res.data.response.result) {
                         if (res.data.response.result == "0") {
-                            _this.$router.push("/confirm");
-                        } else if (res.data.response.result == "2") {
-                            _this.$router.push("/regist");
+                            ajax.post(link.supplement, {
+                                cellPhone: _this.uinfo.mobile,
+                                address: _this.uinfo.registAddress,
+                                postalCode: _this.uinfo.postcode
+                            }).then(function (resp) {
+                                if (resp.data && resp.data.response && resp.data.response.result) {
+                                    if (resp.data.response.result == "0") {
+                                        console.log(resp);
+                                    } else {
+                                        modal.valert(_this, resp.data.response.reason);
+                                    }
+                                }
+                            }).catch((err) => {
+                                modal.valert(_this, "补充信息接口异常，请联系系统管理员");
+                            })
                         } else {
-                            modal.valert(_this, "密码错误");
+                            modal.valert(_this, res.data.response.reason);
                         }
                     }
                 }).catch(function (err) {
                     console.log(err);
-                    modal.valert(_this, "服务异常，请联系系统管理员");
+                    modal.valert(_this, "注册接口异常，请联系系统管理员");
                 })
             }
         },

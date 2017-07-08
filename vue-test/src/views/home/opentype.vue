@@ -2,21 +2,24 @@
   <div class="choosetype-box">
   
     <head-b :title="title"></head-b>
-    <div class="swip-box" v-if="hastwo">
-      <v-touch class="up" v-on:swipeup="toZhengshiPage">
+    <div class="swip-box" :class="{'redirecting':redirecting}" v-if="hastwo">
+      <v-touch class="up" v-on:swipeup="toZhengshiPage" v-on:tap="toZhengshiPage">
         <div class="up-icon">向上滑动选择</div>
         <img src="../../assets/images/zheng-big.png" alt="zheng-big-icon">
         <p>正式人员合同及相关材料签署</p>
       </v-touch>
-      <v-touch class="down" v-on:swipeup="toPaiqianPage">
+      <v-touch class="down" v-on:swipedown="toPaiqianPage" v-on:tap="toPaiqianPage">
         <img src="../../assets/images/pai-big.png" alt="pai-big-icon">
         <p>派遣人员合同及相关材料签署</p>
         <div class="down-icon">向下滑动选择</div>
       </v-touch>
     </div>
     <div class="one-box" v-else>
-      <div class="row">
+      <div class="row" v-if="isZheng">
         <span>正式人员合同及相关材料签署</span>
+      </div>
+      <div class="row paiqian" v-else>
+        <span>派遣人员合同及相关材料签署</span>
       </div>
     </div>
   </div>
@@ -30,6 +33,7 @@ export default {
     return {
       title: '合同分类',
       hastwo: false,
+      redirecting: false,
       isZheng: true
     }
   },
@@ -38,10 +42,14 @@ export default {
   },
   methods: {
     toZhengshiPage() {
-
+      console.log("toZhengshiPage");
+      this.redirecting = true;
+      setTimeout(() => { this.$router.push({ name: "mycontract", params: { type: "zhengshi" } }); }, 500)
     },
     toPaiqianPage() {
-
+      console.log("toPaiqianPage");
+      this.redirecting = true;
+      setTimeout(() => { this.$router.push({ name: "mycontract", params: { type: "paiqian" } }); }, 500)
     }
   },
   components: {
@@ -67,6 +75,7 @@ export default {
       color: #fff;
       text-align: center;
       padding: 10px 0;
+      transition: transform .5s;
       .up-icon {
         background: url(../../assets/images/slide-up.png) no-repeat center top;
         background-size: 30px;
@@ -81,6 +90,7 @@ export default {
       color: $blue;
       text-align: center;
       padding: 10px 0;
+      transition: transform .5s;
       .down-icon {
         background: url(../../assets/images/slide-down.png) no-repeat center bottom;
         background-size: 30px;
@@ -89,6 +99,14 @@ export default {
         font-size: 12px;
         height: 20px;
         margin-top: 20px;
+      }
+    }
+    &.redirecting {
+      .up {
+        transform: translate3d(0, -100%, 0);
+      }
+      .down {
+        transform: translate3d(0, 100%, 0);
       }
     }
     img {
@@ -133,6 +151,11 @@ export default {
         margin: 10px 0;
         background: url(../../assets/images/slide-right.png) no-repeat center;
         background-size: 100% auto;
+      }
+      &.paiqian{
+        &::before{
+          background-image:url(../../assets/images/pai.png); 
+        }
       }
     }
   }

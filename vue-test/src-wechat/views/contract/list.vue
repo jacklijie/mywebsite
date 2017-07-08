@@ -32,6 +32,9 @@
 </template>
 <script>
 import headB from "../../components/head.vue"
+import ajax from "../../util/ajax"
+import link from "../../util/link"
+
 export default {
     name: 'mycontract',
     data() {
@@ -40,7 +43,14 @@ export default {
         }
     },
     mounted() {
-
+        let _this = this;
+        ajax.post(link.queryContract, {
+            idCard: _this.$store.state.userInfo.idCard
+        }).then((res) => {
+            console.log(res);
+        }).catch((err) => {
+            console.log(err);
+        })
     },
     components: {
         headB
@@ -75,12 +85,12 @@ export default {
                     display: flex;
                     line-height: 30px;
                     justify-content: center;
-                    &.head{
+                    &.head {
                         color: #999;
                     }
-                    span{
+                    span {
                         flex: 1;
-                        a{
+                        a {
                             color: #33b5e6;
                             text-decoration: underline;
                         }

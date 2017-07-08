@@ -14,6 +14,7 @@
 <script>
 import ajax from "../../util/ajax";
 import url from "../../util/urlService";
+import link from "../../util/link";
 import modal from "../../util/modal";
 
 export default {
@@ -29,12 +30,9 @@ export default {
         submit() {
             modal.loading(this, true);
             let _this = this;
-            let postUrl = url.host + "/nhr/elcontract/queryRecord.action?" + url.getUrlStr();
-            ajax.post(postUrl, {
-                request: {
-                    psnCode: url.getUrlObj()["userId"],
-                    passWord: _this.pwd
-                }
+            ajax.post(link.queryRecord, {
+                psnCode: url.getUrlObj()["userId"],
+                passWord: _this.pwd
             }).then(function (res) {
                 modal.loading(_this, false);
                 if (res.data && res.data.response && res.data.response.result) {

@@ -1,4 +1,5 @@
 import axios from "axios";
+import urlS from "./urlService";
 import Qs from "qs";
 
 export default {
@@ -41,6 +42,6 @@ export default {
             //返回数据类型
             responseType: 'json', // default
         }
-        return axios.post(url, data, this.config)
+        return axios.post(urlS.host + url + "?" + urlS.getUrlStr(), { request: data }, this.config)
     }
 }

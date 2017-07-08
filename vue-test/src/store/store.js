@@ -16,7 +16,10 @@ const store = new Vuex.Store({
         notice:{
             show: false
         },
-        from: "app"
+        from: "app",
+        userInfo: {
+            idCard: '350203197003224037'
+        }
     },
     getters: {
 
@@ -36,6 +39,9 @@ const store = new Vuex.Store({
         },
         [types.FROM_STATE](state, payload) {
             state.from = payload.from;
+        },
+        [types.IDCARD_STATE](state, payload) {
+            state.userInfo.idCard = payload.idCard;
         }
     }
 })

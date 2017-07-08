@@ -1,12 +1,14 @@
 import axios from "axios";
+import urlS from "./urlService";
 import Qs from "qs";
 
 export default {
     post: function (url, data) {
         axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
+        console.log(urlS.host);
         let config = {
             //请求的接口，在请求的时候，如axios.get(url,config);这里的url会覆盖掉config中的url
-            url: url,
+            url: urlS.host + url + "?" + urlS.getUrlStr(),
 
             // 请求方法同上
             method: 'post', // default
@@ -41,6 +43,6 @@ export default {
             //返回数据类型
             responseType: 'json', // default
         }
-        return axios.post(url, data, this.config)
+        return axios.post(urlS.host + url + "?" + urlS.getUrlStr(), { request: data }, this.config)
     }
 }
