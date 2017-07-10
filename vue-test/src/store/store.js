@@ -9,16 +9,21 @@ const store = new Vuex.Store({
             text: '加载中',
             show: false
         },
-        valert:{
+        valert: {
             text: '',
             show: false
         },
-        notice:{
+        notice: {
             show: false
         },
         from: "app",
         userInfo: {
-            idCard: '350203197003224037'
+            idCard: '350203197003224037',
+            hasRegisted: false
+        },
+        contract: {
+            daiban: null,
+            historyList: []
         }
     },
     getters: {
@@ -42,6 +47,13 @@ const store = new Vuex.Store({
         },
         [types.IDCARD_STATE](state, payload) {
             state.userInfo.idCard = payload.idCard;
+        },
+        [types.REGIST_STATE](state, payload) {
+            state.userInfo.hasRegisted = payload.hasRegisted;
+        },
+        [types.CONTRACT_STATE](state, payload) {
+            if (!!payload.daiban) state.contract.daiban = payload.daiban;
+            if (!!payload.historyList) state.contract.historyList = payload.historyList;
         }
     }
 })

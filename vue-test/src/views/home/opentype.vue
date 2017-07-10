@@ -26,6 +26,9 @@
 </template>
 <script>
 import headB from '../../components/head.vue'
+import ajax from "../../util/ajax"
+import link from "../../util/link"
+import modal from "../../util/modal"
 
 export default {
   name: 'openType',
@@ -38,7 +41,38 @@ export default {
     }
   },
   mounted() {
-    console.log("flasjdfl");
+    let _this = this;
+    ajax.post(link.queryContract, {
+      idCard: _this.$store.state.userInfo.idCard
+    }).then((res) => {
+      if (res.data && res.data.response && res.data.response.result) {
+        if (res.data.response.result == "0") {
+          if (!!res.data.response.contractInfo) {
+            _this.$store.commit("CONTRACT_STATE",{
+              daiban:res.data.response.contractInfo
+            })
+            /*_this.daiban.cloudcontractId = res.data.response.contractInfo.cloudcontractId;
+            _this.daiban.contractSubject = res.data.response.contractInfo.contractSubject;
+            _this.daiban.contractBeginDate = res.data.response.contractInfo.contractBeginDate;
+            _this.daiban.contractEndDate = res.data.response.contractInfo.contractEndDate;*/
+          }
+          // console.log(res.data.response.contractInfo);
+          if (res.data.response.cloudList.length > 0) {
+            _this.$store.commit("CONTRACT_STATE",{
+              historyList:res.data.response.cloudList
+            })
+            // _this.historyList = res.data.response.cloudList;
+          }
+        } else {
+          modal.valert(_this, res.data.response.reason);
+        }
+      } else {
+        modal.valert(_this, res.data.message);
+      }
+    }).catch((err) => {
+      console.log(err);
+      modal.valert(_this, "服务异常，请联系系统管理员");
+    })
   },
   methods: {
     toZhengshiPage() {
@@ -152,9 +186,9 @@ export default {
         background: url(../../assets/images/slide-right.png) no-repeat center;
         background-size: 100% auto;
       }
-      &.paiqian{
-        &::before{
-          background-image:url(../../assets/images/pai.png); 
+      &.paiqian {
+        &::before {
+          background-image: url(../../assets/images/pai.png);
         }
       }
     }

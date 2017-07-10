@@ -37,7 +37,11 @@ export default {
                 modal.loading(_this, false);
                 if (res.data && res.data.response && res.data.response.result) {
                     if (res.data.response.result == "0") {
-                        _this.$router.push("/confirm");
+                        // _this.$router.push("/confirm");
+                        _this.$store.commit("REGIST_STATE", {
+                            hasRegisted: true
+                        })
+                        _this.$router.push("/regist");
                     } else if (res.data.response.result == "2") {
                         _this.$router.push("/regist");
                     } else {

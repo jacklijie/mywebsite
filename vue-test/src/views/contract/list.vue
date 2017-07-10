@@ -3,20 +3,34 @@
         <head-b title="我的合同"></head-b>
         <div class="con">
             <div class="list-box">
-                <span class="c-head">代办合同(1)</span>
-                <div class="c-body">
+                <span class="c-head" v-text="'代办合同('+(!!daiban.contractSubject?1:0)+')'"></span>
+                <div class="c-body" v-if="!!daiban.contractSubject">
                     <div class="c-body-left">
-                        <span>上海精准德邦物流有限公司</span>
-                        <samp>2015.01.01~2017.01.01</samp>
+                        <span v-text="daiban.contractSubject"></span>
+                        <samp v-text="daiban.contractBeginDate+'~'+daiban.contractEndDate"></samp>
                     </div>
                     <div class="c-body-right">
-                        <span>办理</span>
+                        <span @click="doDetail">办理</span>
                     </div>
+                </div>
+                <div class="c-body-none" v-else>
+                    暂无
                 </div>
             </div>
             <div class="list-box">
-                <span class="c-head">历史合同(0)</span>
-                <div class="c-body-none">
+                <span class="c-head" v-text="'历史合同('+historyList.length+')'"></span>
+                <template v-if="historyList.length>0">
+                    <div class="c-body" v-for="his in historyList">
+                        <div class="c-body-left">
+                            <span v-text="his.contractSubject"></span>
+                            <samp v-text="his.contractBeginDate+'~'+his.contractEndDate"></samp>
+                        </div>
+                        <div class="c-body-right">
+                            <span @click="checkDetail(his.cloudcontractId)">办理</span>
+                        </div>
+                    </div>
+                </template>
+                <div class="c-body-none" v-else>
                     暂无
                 </div>
             </div>
@@ -27,12 +41,19 @@
 import headB from "../../components/head.vue"
 import ajax from "../../util/ajax"
 import link from "../../util/link"
+import modal from "../../util/modal"
 
 export default {
     name: 'mycontract',
     data() {
         return {
-
+            daiban: {
+                cloudcontractId: '',
+                contractSubject: '',
+                contractBeginDate: '',
+                contractEndDate: ''
+            },
+            historyList: []
         }
     },
     mounted() {
@@ -40,10 +61,36 @@ export default {
         ajax.post(link.queryContract, {
             idCard: _this.$store.state.userInfo.idCard
         }).then((res) => {
-            console.log(res);
+            if (res.data && res.data.response && res.data.response.result) {
+                if (res.data.response.result == "0") {
+                    if (!!res.data.response.contractInfo) {
+                        _this.daiban.cloudcontractId = res.data.response.contractInfo.cloudcontractId;
+                        _this.daiban.contractSubject = res.data.response.contractInfo.contractSubject;
+                        _this.daiban.contractBeginDate = res.data.response.contractInfo.contractBeginDate;
+                        _this.daiban.contractEndDate = res.data.response.contractInfo.contractEndDate;
+                    }
+                    // console.log(res.data.response.contractInfo);
+                    if (res.data.response.cloudList.length > 0) {
+                        _this.historyList = res.data.response.cloudList;
+                    }
+                } else {
+                    modal.valert(_this, res.data.response.reason);
+                }
+            } else {
+                modal.valert(_this, res.data.message);
+            }
         }).catch((err) => {
             console.log(err);
+            modal.valert(_this, "服务异常，请联系系统管理员");
         })
+    },
+    methods: {
+        doDetail() {
+
+        },
+        checkDetail(id) {
+
+        }
     },
     components: {
         headB
@@ -81,6 +128,7 @@ export default {
                     padding: 10px;
                     span {
                         font-size: 16px;
+                        display: block;
                     }
                     samp {
                         color: #999;
@@ -99,7 +147,7 @@ export default {
                     }
                 }
             }
-            .c-body-none{
+            .c-body-none {
                 padding: 5px 0;
                 line-height: 30px;
                 font-size: 16px;
