@@ -45,5 +45,12 @@ function isCurrentUser () {
 export default {
 	debounce: debounce,
     getToken: getToken,
-    isCurrentUser:isCurrentUser
+    isCurrentUser:isCurrentUser,
+    back(){
+        if(!!window.androidApi){
+            widnow.androidApi.backCalls();
+        }else{
+            location.href = "js-call://IOS/NavCallBack";
+        }
+    }
 }

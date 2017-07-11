@@ -15,10 +15,10 @@
       </v-touch>
     </div>
     <div class="one-box" v-else>
-      <div class="row" v-if="isZheng">
+      <div class="row" v-if="isZheng" @click="toZhengshiPage">
         <span>正式人员合同及相关材料签署</span>
       </div>
-      <div class="row paiqian" v-else>
+      <div class="row paiqian" v-else @click="toPaiqianPage">
         <span>派遣人员合同及相关材料签署</span>
       </div>
     </div>
@@ -47,10 +47,18 @@ export default {
     }).then((res) => {
       if (res.data && res.data.response && res.data.response.result) {
         if (res.data.response.result == "0") {
+          let psncl = res.data.response.psncl;
+          if (!!psncl) {
+            if (psncl == 3) {
+              _this.hastwo = true;
+            } else if (psncl == 1) {
+              _this.isZheng = false;
+            }
+          }
           if (!!res.data.response.contractInfo) {
-            _this.$store.commit("CONTRACT_STATE",{
-              daiban:res.data.response.contractInfo
-            })
+            _this.$store.commit("CONTRACT_STATE", {
+              daiban: res.data.response.contractInfo
+            });
             /*_this.daiban.cloudcontractId = res.data.response.contractInfo.cloudcontractId;
             _this.daiban.contractSubject = res.data.response.contractInfo.contractSubject;
             _this.daiban.contractBeginDate = res.data.response.contractInfo.contractBeginDate;
@@ -58,8 +66,8 @@ export default {
           }
           // console.log(res.data.response.contractInfo);
           if (res.data.response.cloudList.length > 0) {
-            _this.$store.commit("CONTRACT_STATE",{
-              historyList:res.data.response.cloudList
+            _this.$store.commit("CONTRACT_STATE", {
+              historyList: res.data.response.cloudList
             })
             // _this.historyList = res.data.response.cloudList;
           }

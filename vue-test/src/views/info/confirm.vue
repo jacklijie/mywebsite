@@ -4,38 +4,21 @@
         <headBack :title="title"></headBack>
         <div class="con">
             <span class="tip">
-                *请先注册
+                *请确认补充信息
             </span>
             <div class="form-box">
-                <div class="row">
-                    <input type="text" v-model="uinfo.name" :disabled="!isEdit" placeholder="请输入姓名">
-                </div>
-                <div class="row">
-                    <input type="text" v-model="uinfo.codeId" :disabled="!isEdit" placeholder="请输入身份证号">
-                </div>
-                <div class="row">
-                    <input type="text" v-model="uinfo.registAddress" :disabled="!isEdit" placeholder="请输入户籍地址">
-                </div>
                 <div class="row box-foot">
-                    <input type="text" v-model="uinfo.postcode" :disabled="!isEdit" placeholder="请输入邮编">
+                    <input type="text" v-model="uinfo.postcode" placeholder="请输入邮编">
                 </div>
-            </div>
-            <div class="form-box">
                 <div class="row">
-                    <input type="text" v-model="uinfo.mobile" :disabled="!isEdit" placeholder="请输入手机号码">
+                    <input type="text" v-model="uinfo.registAddress" placeholder="请输入户籍地址">
                 </div>
-                <div class="row box-foot" v-show="isEdit">
-                    <input type="text" v-model="uinfo.vcode" placeholder="请输入手机验证码">
-                    <span class="btn">获取</span>
+                <div class="row">
+                    <input type="text" v-model="uinfo.mobile" placeholder="请输入手机号码">
                 </div>
             </div>
             <footer v-show="!isEdit">
-                <button style="margin-right:10px;">确认</button>
-                <button>编辑</button>
-            </footer>
-            <footer v-show="isEdit">
-                <button style="margin-right:10px;">提交</button>
-                <button>取消</button>
+                <button style="margin-right:10px;" @click="submit">确认</button>
             </footer>
         </div>
     </div>
@@ -44,25 +27,56 @@
 import headBack from '../../components/head.vue';
 import ajax from "../../util/ajax";
 import url from "../../util/urlService";
+import link from "../../util/link";
 
 export default {
     name: 'confirm',
     data() {
         return {
-            title: '注册确认',
+            title: '补充信息确认',
             uinfo: {
-                name: "",
-                codeId: "",
                 registAddress: "",
                 postcode: "",
-                mobile: "",
-                vcode: ""
-            },
-            isEdit: false
+                mobile: ""
+            }
         }
     },
     mounted() {
-
+        // let _this = this;
+        // ajax.post()
+    },
+    methods: {
+        submit() {
+            let _this = this;
+            if (_this.uinfo.registAddress == "") {
+                modal.valert(_this, "户籍地址不能为空");
+                return;
+            } else if (_this.uinfo.postcode == "" || !/^[1-9][0-9]{5}$/.test(_this.uinfo.postcode)) {
+                modal.valert(_this, "邮政编码格式不正确");
+                return;
+            } else if (_this.uinfo.mobile == "" || !/^1[34578]\d{9}$/.test(this.uinfo.mobile)) {
+                modal.valert(_this, "手机号码格式不正确");
+                return;
+            } else {
+                ajax.post(link.supplement, {
+                    cellPhone: _this.uinfo.mobile,
+                    address: _this.uinfo.registAddress,
+                    postalCode: _this.uinfo.postcode
+                }).then((res) => {
+                    if (resp.data && resp.data.response && resp.data.response.result) {
+                        if (resp.data.response.result == "0") {
+                            console.log(resp);
+                        } else {
+                            modal.valert(_this, resp.data.response.reason);
+                        }
+                    } else {
+                        modal.valert(_this, res.data.response.reason);
+                    }
+                }).catch((err) => {
+                    modal.valert(_this, "补充信息接口异常，请联系系统管理员");
+                })
+            }
+        }
     },
     components: {
         headBack

@@ -63,6 +63,11 @@ export default {
             }
         }
     },
+    /*computed:{
+        hasRegisted(){
+            return this.$store.state.userInfo.hasRegisted;
+        }
+    },*/
     methods: {
         sendMsgCode() {
             let _this = this;

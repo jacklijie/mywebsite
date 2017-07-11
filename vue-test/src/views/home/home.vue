@@ -16,6 +16,7 @@ import ajax from "../../util/ajax";
 import url from "../../util/urlService";
 import link from "../../util/link";
 import modal from "../../util/modal";
+import util from "../../util/util"
 
 export default {
     name: 'home',
@@ -36,17 +37,27 @@ export default {
             }).then(function (res) {
                 modal.loading(_this, false);
                 if (res.data && res.data.response && res.data.response.result) {
+                    res.data.response.result = "0";
                     if (res.data.response.result == "0") {
-                        // _this.$router.push("/confirm");
-                        _this.$store.commit("REGIST_STATE", {
+                        _this.$router.push("/confirm");
+                        /*_this.$store.commit("REGIST_STATE", {
                             hasRegisted: true
-                        })
-                        _this.$router.push("/regist");
+                        })*/
+                        // _this.$router.push("/regist");
                     } else if (res.data.response.result == "2") {
                         _this.$router.push("/regist");
                     } else {
-                        modal.valert(_this, "密码错误");
+                        modal.valert(_this, res.data.response.reason);
+                        if (res.data.response.exist == "1") {
+                            setTimeout(() => {
+                                util.back();
+                                console.log("back")
+                            }, 1000);
+                        }
+                        // modal.valert(_this, "密码错误");
                     }
+                } else {
+                    modal.valert(_this, res.data.message);
                 }
             }).catch(function (err) {
                 modal.loading(this, false);
