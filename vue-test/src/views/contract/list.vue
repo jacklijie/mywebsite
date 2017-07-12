@@ -20,7 +20,7 @@
             <div class="list-box">
                 <span class="c-head" v-text="'历史合同('+historyList.length+')'"></span>
                 <template v-if="historyList.length>0">
-                    <div class="c-body" v-for="his in historyList">
+                    <div class="c-body" v-for="his in historyList" v-bind:key="his.cloudcontractId">
                         <div class="c-body-left">
                             <span v-text="his.contractSubject"></span>
                             <samp v-text="his.contractBeginDate+'~'+his.contractEndDate"></samp>
