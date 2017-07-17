@@ -49,8 +49,8 @@ export default {
         return {
             title: '注册',
             uinfo: {
-                name: "李杰",
-                codeId: "510322199008245499",
+                name: "庞清秀",
+                codeId: "452528197202194861",
                 registAddress: "啊是科技发达；啊口角是非；",
                 postcode: "643204",
                 mobile: "15000334505",
@@ -60,7 +60,8 @@ export default {
                 sendText: "获取",
                 hasSend: false,
                 responseVCode: "636824"
-            }
+            },
+            hasRegist: true
         }
     },
     /*computed:{
@@ -121,37 +122,42 @@ export default {
                 modal.valert(_this, "手机验证码不正确");
                 return;
             } else {
-                ajax.post(link.cloudRegistration, {
-                    psnCode: url.getUrlObj()["userId"],
-                    psnName: _this.uinfo.name,
-                    idCard: _this.uinfo.codeId,
-                    cellPhone: _this.uinfo.mobile
-                }).then(function (res) {
-                    if (res.data && res.data.response && res.data.response.result) {
-                        if (res.data.response.result == "0") {
-                            ajax.post(link.supplement, {
-                                cellPhone: _this.uinfo.mobile,
-                                address: _this.uinfo.registAddress,
-                                postalCode: _this.uinfo.postcode
-                            }).then(function (resp) {
-                                if (resp.data && resp.data.response && resp.data.response.result) {
-                                    if (resp.data.response.result == "0") {
-                                        console.log(resp);
-                                    } else {
-                                        modal.valert(_this, resp.data.response.reason);
-                                    }
-                                }
-                            }).catch((err) => {
-                                modal.valert(_this, "补充信息接口异常，请联系系统管理员");
-                            })
-                        } else {
-                            modal.valert(_this, res.data.response.reason);
+                if (!_this.hasRegist) {
+                    ajax.post(link.cloudRegistration, {
+                        psnCode: url.getUrlObj()["userId"],
+                        psnName: _this.uinfo.name,
+                        idCard: _this.uinfo.codeId,
+                        cellPhone: _this.uinfo.mobile
+                    }).then(function (res) {
+                        if (res.data && res.data.response && res.data.response.result) {
+                            if (res.data.response.result == "0") {
+                                _this.hasRegist = true;
+                            } else {
+                                modal.valert(_this, res.data.response.reason);
+                            }
                         }
-                    }
-                }).catch(function (err) {
-                    console.log(err);
-                    modal.valert(_this, "注册接口异常，请联系系统管理员");
-                })
+                    }).catch(function (err) {
+                        console.log(err);
+                        modal.valert(_this, "注册接口异常，请联系系统管理员");
+                    })
+                } else {
+                    ajax.post(link.supplement, {
+                        idCard: _this.uinfo.codeId,
+                        cellPhone: _this.uinfo.mobile,
+                        address: _this.uinfo.registAddress,
+                        postalCode: _this.uinfo.postcode
+                    }).then(function (resp) {
+                        if (resp.data && resp.data.response && resp.data.response.result) {
+                            if (resp.data.response.result == "0") {
+                                console.log(resp);
+                            } else {
+                                modal.valert(_this, resp.data.response.reason);
+                            }
+                        }
+                    }).catch((err) => {
+                        modal.valert(_this, "补充信息接口异常，请联系系统管理员");
+                    })
+                }
             }
         },
         reset() {

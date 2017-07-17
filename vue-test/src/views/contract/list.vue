@@ -86,7 +86,7 @@ export default {
     },
     methods: {
         doDetail() {
-
+            
         },
         checkDetail(id) {
 

@@ -19,6 +19,8 @@ const store = new Vuex.Store({
         from: "app",
         userInfo: {
             idCard: '350203197003224037',
+            address: '',
+            mobile: '',
             hasRegisted: false
         },
         contract: {
@@ -47,6 +49,11 @@ const store = new Vuex.Store({
         },
         [types.IDCARD_STATE](state, payload) {
             state.userInfo.idCard = payload.idCard;
+        },
+        [types.CONFIRM_STATE](state, payload) {
+            state.userInfo.idCard = payload.idCard;
+            state.userInfo.address = payload.address;
+            state.userInfo.mobile = payload.mobile;
         },
         [types.REGIST_STATE](state, payload) {
             state.userInfo.hasRegisted = payload.hasRegisted;

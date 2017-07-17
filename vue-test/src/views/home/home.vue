@@ -29,7 +29,10 @@ export default {
     },
     methods: {
         submit() {
-            modal.loading(this, true);
+            // let res = window.open("https://sdk.yunhetong.com/sdk/viewsopen/m/drag_sign.html?token=TGT-361900-DME99u7LnRQxBKO9hHrqdxAj9MP7NWF5FUjpanAtangjAic77F-cas01.example.org","_blank");
+            // console.log(res);
+            // return;
+            modal.loading(this, true, "登录中");
             let _this = this;
             ajax.post(link.queryRecord, {
                 psnCode: url.getUrlObj()["userId"],
@@ -37,8 +40,13 @@ export default {
             }).then(function (res) {
                 modal.loading(_this, false);
                 if (res.data && res.data.response && res.data.response.result) {
-                    res.data.response.result = "0";
+                    // res.data.response.result = "0";
                     if (res.data.response.result == "0") {
+                        _this.$store.commit("CONFIRM_STATE", {
+                            idCard: res.data.response.contractInfo.idCard,
+                            address: res.data.response.contractInfo.address,
+                            mobile: res.data.response.contractInfo.cellPhone
+                        })
                         _this.$router.push("/confirm");
                         /*_this.$store.commit("REGIST_STATE", {
                             hasRegisted: true

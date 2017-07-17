@@ -7,17 +7,17 @@
                 *请确认补充信息
             </span>
             <div class="form-box">
-                <div class="row box-foot">
+                <div class="row">
                     <input type="text" v-model="uinfo.postcode" placeholder="请输入邮编">
                 </div>
                 <div class="row">
                     <input type="text" v-model="uinfo.registAddress" placeholder="请输入户籍地址">
                 </div>
-                <div class="row">
+                <div class="row box-foot">
                     <input type="text" v-model="uinfo.mobile" placeholder="请输入手机号码">
                 </div>
             </div>
-            <footer v-show="!isEdit">
+            <footer>
                 <button style="margin-right:10px;" @click="submit">确认</button>
             </footer>
         </div>
@@ -28,6 +28,7 @@ import headBack from '../../components/head.vue';
 import ajax from "../../util/ajax";
 import url from "../../util/urlService";
 import link from "../../util/link";
+import modal from "../../util/modal";
 
 export default {
     name: 'confirm',
@@ -41,31 +42,43 @@ export default {
             }
         }
     },
+    computed: {
+        /* address() {
+            return this.$store.state.userInfo.address
+        },
+        mobile() {
+            return this.$store.state.userInfo.mobile
+        } */
+    },
     mounted() {
+        this.uinfo.registAddress = this.$store.state.userInfo.address;
+        this.uinfo.mobile = this.$store.state.userInfo.mobile;
         // let _this = this;
         // ajax.post()
     },
     methods: {
         submit() {
             let _this = this;
-            if (_this.uinfo.registAddress == "") {
-                modal.valert(_this, "户籍地址不能为空");
-                return;
-            } else if (_this.uinfo.postcode == "" || !/^[1-9][0-9]{5}$/.test(_this.uinfo.postcode)) {
+            if (_this.uinfo.postcode == "" || !/^[1-9][0-9]{5}$/.test(_this.uinfo.postcode)) {
                 modal.valert(_this, "邮政编码格式不正确");
+                return;
+            } else if (_this.uinfo.registAddress == "") {
+                modal.valert(_this, "户籍地址不能为空");
                 return;
             } else if (_this.uinfo.mobile == "" || !/^1[34578]\d{9}$/.test(this.uinfo.mobile)) {
                 modal.valert(_this, "手机号码格式不正确");
                 return;
             } else {
                 ajax.post(link.supplement, {
+                    idCard: "350203197003224037",//_this.$store.state.userInfo.idCard,
                     cellPhone: _this.uinfo.mobile,
                     address: _this.uinfo.registAddress,
                     postalCode: _this.uinfo.postcode
-                }).then((res) => {
+                }).then((resp) => {
                     if (resp.data && resp.data.response && resp.data.response.result) {
                         if (resp.data.response.result == "0") {
-                            console.log(resp);
+                            _this.hasRegist = true;
+                            _this.$router.push("/opentype");
                         } else {
                             modal.valert(_this, resp.data.response.reason);
                         }
