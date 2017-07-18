@@ -1,6 +1,8 @@
 <template>
     <header class="app-head">
-        <span class="back" @click="go"></span>
+        <slot>
+            <span class="back" @click="go"></span>
+        </slot>
         <span class="title" v-text="title"></span>
         <span class="menu"></span>
     </header>
@@ -21,6 +23,7 @@ export default {
     },
     methods: {
         go() {
+            console.log(this.$router.path);
             history.go(-1);
         }
 
@@ -30,28 +33,28 @@ export default {
 <style lang="scss" scoped>
 @import "../assets/sass/common";
 
-header.app-head{
+header.app-head {
     background: $blue;
     height: 44px;
     width: 100%;
     display: flex;
     .back {
-      background: url(../assets/images/back.png) no-repeat center;
-      background-size: auto 24px;
-      width: 44px;
-      height: 44px;
+        background: url(../assets/images/back.png) no-repeat center;
+        background-size: auto 24px;
+        width: 44px;
+        height: 44px;
     }
     .title {
-      flex: 1;
-      height: 44px;
-      line-height: 44px;
-      color: #fff;
-      font-size: 18px;
-      text-align: center;
+        flex: 1;
+        height: 44px;
+        line-height: 44px;
+        color: #fff;
+        font-size: 18px;
+        text-align: center;
     }
     .menu {
-      width: 44px;
-      height: 44px;
+        width: 44px;
+        height: 44px;
     }
 }
 </style>

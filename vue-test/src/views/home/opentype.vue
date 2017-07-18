@@ -1,24 +1,26 @@
 <template>
   <div class="choosetype-box">
   
-    <head-b :title="title"></head-b>
+    <head-b :title="title">
+      <span class="back" @click="goBack"></span>
+    </head-b>
     <div class="swip-box" :class="{'redirecting':redirecting}" v-if="hastwo">
-      <v-touch class="up" v-on:swipeup="toZhengshiPage" v-on:tap="toZhengshiPage">
+      <v-touch class="up" v-on:swipeup="toContractListPage('zhengshi')" v-on:tap="toContractListPage('zhengshi')">
         <div class="up-icon">向上滑动选择</div>
         <img src="../../assets/images/zheng-big.png" alt="zheng-big-icon">
         <p>正式人员合同及相关材料签署</p>
       </v-touch>
-      <v-touch class="down" v-on:swipedown="toPaiqianPage" v-on:tap="toPaiqianPage">
+      <v-touch class="down" v-on:swipedown="toContractListPage('paiqian')" v-on:tap="toContractListPage('paiqian')">
         <img src="../../assets/images/pai-big.png" alt="pai-big-icon">
         <p>派遣人员合同及相关材料签署</p>
         <div class="down-icon">向下滑动选择</div>
       </v-touch>
     </div>
     <div class="one-box" v-else>
-      <div class="row" v-if="isZheng" @click="toZhengshiPage">
+      <div class="row" v-if="isZheng" @click="toContractListPage('zhengshi')">
         <span>正式人员合同及相关材料签署</span>
       </div>
-      <div class="row paiqian" v-else @click="toPaiqianPage">
+      <div class="row paiqian" v-else @click="toContractListPage('paiqian')">
         <span>派遣人员合同及相关材料签署</span>
       </div>
     </div>
@@ -26,6 +28,7 @@
 </template>
 <script>
 import headB from '../../components/head.vue'
+import util from "../../util/util"
 import ajax from "../../util/ajax"
 import link from "../../util/link"
 import modal from "../../util/modal"
@@ -48,28 +51,13 @@ export default {
       if (res.data && res.data.response && res.data.response.result) {
         if (res.data.response.result == "0") {
           let psncl = res.data.response.psncl;
+          console.log(psncl);
           if (!!psncl) {
             if (psncl == 3) {
               _this.hastwo = true;
             } else if (psncl == 1) {
               _this.isZheng = false;
             }
-          }
-          if (!!res.data.response.contractInfo) {
-            _this.$store.commit("CONTRACT_STATE", {
-              daiban: res.data.response.contractInfo
-            });
-            /*_this.daiban.cloudcontractId = res.data.response.contractInfo.cloudcontractId;
-            _this.daiban.contractSubject = res.data.response.contractInfo.contractSubject;
-            _this.daiban.contractBeginDate = res.data.response.contractInfo.contractBeginDate;
-            _this.daiban.contractEndDate = res.data.response.contractInfo.contractEndDate;*/
-          }
-          // console.log(res.data.response.contractInfo);
-          if (res.data.response.cloudList.length > 0) {
-            _this.$store.commit("CONTRACT_STATE", {
-              historyList: res.data.response.cloudList
-            })
-            // _this.historyList = res.data.response.cloudList;
           }
         } else {
           modal.valert(_this, res.data.response.reason);
@@ -83,15 +71,39 @@ export default {
     })
   },
   methods: {
-    toZhengshiPage() {
-      console.log("toZhengshiPage");
+    toContractListPage(type) {
       this.redirecting = true;
-      setTimeout(() => { this.$router.push({ name: "mycontract", params: { type: "zhengshi" } }); }, 500)
+      let _this = this;
+      ajax.post(link.queryContract, {
+        idCard: _this.$store.state.userInfo.idCard,
+        psncl: type == "zhengshi" ? "正式人员" : "派遣人员"
+      }).then((res) => {
+        if (res.data && res.data.response && res.data.response.result) {
+          if (res.data.response.result == "0") {
+            if (!!res.data.response.contractInfo) {
+              _this.$store.commit("CONTRACT_STATE", {
+                daiban: res.data.response.contractInfo
+              });
+            }
+            if (res.data.response.cloudList.length > 0) {
+              _this.$store.commit("CONTRACT_STATE", {
+                historyList: res.data.response.cloudList
+              })
+            }
+            setTimeout(() => { this.$router.push({ name: "mycontract", params: { type: type } }); }, 500)
+          } else {
+            modal.valert(_this, res.data.response.reason);
+          }
+        } else {
+          modal.valert(_this, res.data.message);
+        }
+      }).catch((err) => {
+        console.log(err);
+        modal.valert(_this, "服务异常，请联系系统管理员");
+      })
     },
-    toPaiqianPage() {
-      console.log("toPaiqianPage");
-      this.redirecting = true;
-      setTimeout(() => { this.$router.push({ name: "mycontract", params: { type: "paiqian" } }); }, 500)
+    goBack() {
+      util.back();
     }
   },
   components: {

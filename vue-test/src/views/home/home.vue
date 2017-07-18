@@ -42,17 +42,23 @@ export default {
                 if (res.data && res.data.response && res.data.response.result) {
                     // res.data.response.result = "0";
                     if (res.data.response.result == "0") {
-                        _this.$store.commit("CONFIRM_STATE", {
-                            idCard: res.data.response.contractInfo.idCard,
-                            address: res.data.response.contractInfo.address,
-                            mobile: res.data.response.contractInfo.cellPhone
-                        })
-                        _this.$router.push("/confirm");
-                        /*_this.$store.commit("REGIST_STATE", {
-                            hasRegisted: true
-                        })*/
-                        // _this.$router.push("/regist");
+                        if (res.data.response.contractInfo.contractState == "1" && res.data.response.complement == "Y") {
+                            _this.$store.commit("CONFIRM_STATE", {
+                                idCard: res.data.response.contractInfo.idCard,
+                                address: res.data.response.contractInfo.address,
+                                mobile: res.data.response.contractInfo.cellPhone
+                            })
+                            _this.$router.push("/confirm");
+                        } else {
+                            _this.$store.commit("IDCARD_STATE", {
+                                idCard: res.data.response.contractInfo.idCard
+                            })
+                            _this.$router.push("/opentype");
+                        }
                     } else if (res.data.response.result == "2") {
+                        _this.$store.commit("IDCARD_STATE", {
+                            idCard: res.data.response.contractInfo.idCard
+                        })
                         _this.$router.push("/regist");
                     } else {
                         modal.valert(_this, res.data.response.reason);

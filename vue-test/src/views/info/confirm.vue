@@ -8,23 +8,25 @@
             </span>
             <div class="form-box">
                 <div class="row">
-                    <input type="text" v-model="uinfo.postcode" placeholder="请输入邮编">
+                    <input type="text" v-model="uinfo.postcode" maxlength="6" placeholder="请输入邮编">
                 </div>
                 <div class="row">
                     <input type="text" v-model="uinfo.registAddress" placeholder="请输入户籍地址">
                 </div>
                 <div class="row box-foot">
-                    <input type="text" v-model="uinfo.mobile" placeholder="请输入手机号码">
+                    <input type="text" v-model="uinfo.mobile" maxlength="11" placeholder="请输入手机号码">
                 </div>
             </div>
             <footer>
                 <button style="margin-right:10px;" @click="submit">确认</button>
             </footer>
         </div>
+        <notice-m v-show="showNotice" type="2"></notice-m>
     </div>
 </template>
 <script>
 import headBack from '../../components/head.vue';
+import noticeM from '../../components/notice/notice.vue';
 import ajax from "../../util/ajax";
 import url from "../../util/urlService";
 import link from "../../util/link";
@@ -43,16 +45,16 @@ export default {
         }
     },
     computed: {
-        /* address() {
-            return this.$store.state.userInfo.address
-        },
-        mobile() {
-            return this.$store.state.userInfo.mobile
-        } */
+        showNotice() {
+            return this.$store.state.notice.show
+        }
     },
     mounted() {
         this.uinfo.registAddress = this.$store.state.userInfo.address;
         this.uinfo.mobile = this.$store.state.userInfo.mobile;
+        this.$store.commit("NOTICE_STATE", {
+            showNotice: true
+        })
         // let _this = this;
         // ajax.post()
     },
@@ -70,14 +72,15 @@ export default {
                 return;
             } else {
                 ajax.post(link.supplement, {
-                    idCard: "350203197003224037",//_this.$store.state.userInfo.idCard,
+                    idCard: _this.$store.state.userInfo.idCard,
                     cellPhone: _this.uinfo.mobile,
                     address: _this.uinfo.registAddress,
                     postalCode: _this.uinfo.postcode
                 }).then((resp) => {
                     if (resp.data && resp.data.response && resp.data.response.result) {
                         if (resp.data.response.result == "0") {
-                            _this.hasRegist = true;
+                            _this.$router.push("/opentype");
+                        } else if (resp.data.response.result == "2") {
                             _this.$router.push("/opentype");
                         } else {
                             modal.valert(_this, resp.data.response.reason);
@@ -92,7 +95,7 @@ export default {
         }
     },
     components: {
-        headBack
+        headBack, noticeM
     }
 }
 </script>

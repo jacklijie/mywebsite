@@ -55,10 +55,6 @@ export default {
                 postcode: "643208",
                 mobile: "15000334505",
                 vcode: "44330791"
-            },
-            msg: {
-                sendText: "获取",
-                hasSend: false
             }
         }
     },

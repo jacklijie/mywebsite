@@ -3,8 +3,8 @@
         <head-b title="我的合同"></head-b>
         <div class="con">
             <div class="list-box">
-                <span class="c-head" v-text="'代办合同('+(!!daiban.contractSubject?1:0)+')'"></span>
-                <div class="c-body" v-if="!!daiban.contractSubject">
+                <span class="c-head" v-text="'代办合同('+(!!daiban&&!!daiban.contractSubject?1:0)+')'"></span>
+                <div class="c-body" v-if="!!daiban&&!!daiban.contractSubject">
                     <div class="c-body-left">
                         <span v-text="daiban.contractSubject"></span>
                         <samp v-text="daiban.contractBeginDate+'~'+daiban.contractEndDate"></samp>
@@ -26,7 +26,7 @@
                             <samp v-text="his.contractBeginDate+'~'+his.contractEndDate"></samp>
                         </div>
                         <div class="c-body-right">
-                            <span @click="checkDetail(his.cloudcontractId)">办理</span>
+                            <span @click="checkDetail(his.cloudcontractId)">查看</span>
                         </div>
                     </div>
                 </template>
@@ -47,17 +47,17 @@ export default {
     name: 'mycontract',
     data() {
         return {
-            daiban: {
+            daiban: this.$store.state.contract.daiban /* {
                 cloudcontractId: '',
                 contractSubject: '',
                 contractBeginDate: '',
                 contractEndDate: ''
-            },
-            historyList: []
+            } */,
+            historyList: this.$store.state.contract.historyList
         }
     },
     mounted() {
-        let _this = this;
+        /* let _this = this;
         ajax.post(link.queryContract, {
             idCard: _this.$store.state.userInfo.idCard
         }).then((res) => {
@@ -82,14 +82,31 @@ export default {
         }).catch((err) => {
             console.log(err);
             modal.valert(_this, "服务异常，请联系系统管理员");
-        })
+        }) */
     },
     methods: {
         doDetail() {
-            
+            let _this = this;
+            ajax.post(link.contractGenerateCheck, {
+                contractId: _this.daiban.cloudcontractId
+            }).then(res => {
+                if (res.data && res.data.response && res.data.response.result) {
+                    if (res.data.response.result == "0") {
+                        console.log(res.data.response);
+                        _this.$router.push("/contract/detail/do/" + _this.daiban.cloudcontractId);
+                    } else {
+                        modal.valert(_this, res.data.response.reason);
+                    }
+                } else {
+                    modal.valert(_this, res.data.message);
+                }
+            }).catch(err => {
+                console.log(err);
+                modal.valert(_this, "服务异常，请联系系统管理员");
+            })
         },
         checkDetail(id) {
-
+            _this.$router.push("/contract/detail/undo/" + id);
         }
     },
     components: {

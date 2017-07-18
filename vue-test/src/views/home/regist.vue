@@ -11,21 +11,21 @@
                     <input type="text" v-model="uinfo.name" placeholder="请输入姓名">
                 </div>
                 <div class="row">
-                    <input type="text" v-model="uinfo.codeId" placeholder="请输入身份证号">
+                    <input type="text" v-model="uinfo.codeId" maxlength="18" placeholder="请输入身份证号">
                 </div>
                 <div class="row">
                     <input type="text" v-model="uinfo.registAddress" placeholder="请输入户籍地址">
                 </div>
                 <div class="row box-foot">
-                    <input type="text" v-model="uinfo.postcode" placeholder="请输入邮编">
+                    <input type="text" v-model="uinfo.postcode" maxlength="6" placeholder="请输入邮编">
                 </div>
             </div>
             <div class="form-box">
                 <div class="row">
-                    <input type="text" v-model="uinfo.mobile" placeholder="请输入手机号码">
+                    <input type="text" v-model="uinfo.mobile" maxlength="11" placeholder="请输入手机号码">
                 </div>
                 <div class="row box-foot">
-                    <input type="text" v-model="uinfo.vcode" placeholder="请输入手机验证码">
+                    <input type="text" v-model="uinfo.vcode" maxlength="6" placeholder="请输入手机验证码">
                     <span class="btn" :class="{'disable':msg.hasSend}" v-text="msg.sendText" @click="sendMsgCode"></span>
                 </div>
             </div>
@@ -34,10 +34,12 @@
                 <button @click="reset">重置</button>
             </footer>
         </div>
+        <notice-m v-show="showNotice" type="1"></notice-m>
     </div>
 </template>
 <script>
 import headBack from '../../components/head.vue';
+import noticeM from '../../components/notice/notice.vue';
 import ajax from "../../util/ajax";
 import url from "../../util/urlService";
 import link from "../../util/link";
@@ -50,7 +52,7 @@ export default {
             title: '注册',
             uinfo: {
                 name: "庞清秀",
-                codeId: "452528197202194861",
+                codeId: this.$store.state.userInfo.idCard,//"452528197202194861",
                 registAddress: "啊是科技发达；啊口角是非；",
                 postcode: "643204",
                 mobile: "15000334505",
@@ -60,15 +62,19 @@ export default {
                 sendText: "获取",
                 hasSend: false,
                 responseVCode: "636824"
-            },
-            hasRegist: true
+            }
         }
     },
-    /*computed:{
-        hasRegisted(){
-            return this.$store.state.userInfo.hasRegisted;
+    computed: {
+        showNotice() {
+            return this.$store.state.notice.show
         }
-    },*/
+    },
+    mounted() {
+        this.$store.commit("NOTICE_STATE", {
+            showNotice: true
+        })
+    },
     methods: {
         sendMsgCode() {
             let _this = this;
@@ -122,42 +128,46 @@ export default {
                 modal.valert(_this, "手机验证码不正确");
                 return;
             } else {
-                if (!_this.hasRegist) {
-                    ajax.post(link.cloudRegistration, {
-                        psnCode: url.getUrlObj()["userId"],
-                        psnName: _this.uinfo.name,
-                        idCard: _this.uinfo.codeId,
-                        cellPhone: _this.uinfo.mobile
-                    }).then(function (res) {
-                        if (res.data && res.data.response && res.data.response.result) {
-                            if (res.data.response.result == "0") {
-                                _this.hasRegist = true;
-                            } else {
-                                modal.valert(_this, res.data.response.reason);
-                            }
+                modal.loading(_this, true, "提交中");
+                ajax.post(link.cloudRegistration, {
+                    psnCode: url.getUrlObj()["userId"],
+                    psnName: _this.uinfo.name,
+                    idCard: _this.uinfo.codeId,
+                    cellPhone: _this.uinfo.mobile
+                }).then(function (res) {
+                    if (res.data && res.data.response && res.data.response.result) {
+                        if (res.data.response.result == "0") {
+                            _this.hasRegist = true;
+                            ajax.post(link.supplement, {
+                                idCard: _this.uinfo.codeId,
+                                cellPhone: _this.uinfo.mobile,
+                                address: _this.uinfo.registAddress,
+                                postalCode: _this.uinfo.postcode
+                            }).then(function (resp) {
+                                modal.loading(_this, false);
+                                if (resp.data && resp.data.response && resp.data.response.result) {
+                                    if (resp.data.response.result == "0") {
+                                        console.log(resp);
+                                        _this.$router.push("/opentype");
+                                    } else {
+                                        modal.valert(_this, resp.data.response.reason);
+                                    }
+                                }
+                            }).catch((err) => {
+                                modal.loading(_this, false);
+                                modal.valert(_this, "补充信息接口异常，请联系系统管理员");
+                            })
+                        } else {
+                            modal.loading(_this, false);
+                            modal.valert(_this, res.data.response.reason);
                         }
-                    }).catch(function (err) {
-                        console.log(err);
-                        modal.valert(_this, "注册接口异常，请联系系统管理员");
-                    })
-                } else {
-                    ajax.post(link.supplement, {
-                        idCard: _this.uinfo.codeId,
-                        cellPhone: _this.uinfo.mobile,
-                        address: _this.uinfo.registAddress,
-                        postalCode: _this.uinfo.postcode
-                    }).then(function (resp) {
-                        if (resp.data && resp.data.response && resp.data.response.result) {
-                            if (resp.data.response.result == "0") {
-                                console.log(resp);
-                            } else {
-                                modal.valert(_this, resp.data.response.reason);
-                            }
-                        }
-                    }).catch((err) => {
-                        modal.valert(_this, "补充信息接口异常，请联系系统管理员");
-                    })
-                }
+                    } else {
+                        modal.loading(_this, false);
+                    }
+                }).catch(function (err) {
+                    modal.loading(_this, false);
+                    modal.valert(_this, "注册接口异常，请联系系统管理员");
+                })
             }
         },
         reset() {
@@ -172,7 +182,7 @@ export default {
         }
     },
     components: {
-        headBack
+        headBack,noticeM
     }
 }
 </script>

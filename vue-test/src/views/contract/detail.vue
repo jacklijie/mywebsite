@@ -5,7 +5,7 @@
             <div class="img-list">
                 <img src="../../assets/images/zheng-big.png">
             </div>
-            <span class="sign" @click="signStart"></span>
+            <span v-if="isSign" class="sign" @click="signStart"></span>
         </section>
         <footer>
             <div class="foot-box">
@@ -27,25 +27,61 @@
     </div>
 </template>
 <script>
+import ajax from "../../util/ajax"
+import link from "../../util/link"
+import modal from "../../util/modal"
 import headB from "../../components/head.vue"
 import modalPanel from "../../components/modal.vue"
 export default {
     name: "detail",
     data() {
         return {
-            contractList: [],
-            showModal: false
+            contractInfoList: [],
+            showModal: false,
+            isSign: false
         }
     },
     mounted() {
-
+        let _this = this, params = this.$route.params;
+        if (params.type == "do") {
+            this.isSign = true;
+            this.contractInfoList = this.$store.state.contract.daiban.cloudList;
+        } else {
+            let historyList = this.$store.state.contract.historyList;
+            historyList.forEach(function (h) {
+                if (h.contractId == params.contractId) {
+                    _this.contractInfoList = h.cloudList;
+                }
+            }, this);
+        }
+        console.log(this.contractInfoList);
     },
     methods: {
         signStart() {
             this.showModal = true;
         },
         signOK() {
-
+            this.showModal = false;
+            let _this = this;
+            ajax.post(link.getSign, {
+                contractId: _this.$store.state.contract.daiban.cloudcontractId
+            }).then(res => {
+                if (res.data && res.data.response && res.data.response.result) {
+                    if (res.data.response.result == "0") {
+                        _this.isSign = false;
+                        modal.valert(_this, res.data.response.reason);
+                    }else if(res.data.response.result == "1"){
+                        window.open("https://sdk.yunhetong.com/sdk/viewsopen/m/drag_sign.html?token="+res.data.response.token,"_blank");
+                    } else {
+                        modal.valert(_this, res.data.response.reason);
+                    }
+                } else {
+                    modal.valert(_this, res.data.message);
+                }
+            }).catch(err => {
+                console.log(err);
+                modal.valert(_this, "服务异常，请联系系统管理员");
+            })
         },
         signCancel() {
             this.showModal = false;
