@@ -2,18 +2,15 @@
     <div class="contract-box">
         <head-b title="劳动合同"></head-b>
         <section class="con">
-            <div class="img-list">
-                <img src="../../assets/images/zheng-big.png">
-            </div>
+            <!-- <div class="img-list">
+                                                <img src="../../assets/images/zheng-big.png">
+                                            </div> -->
+            <iframe class="img-list" :src="frameUrl"></iframe>
             <span v-if="isSign" class="sign" @click="signStart"></span>
         </section>
         <footer>
             <div class="foot-box">
-                <span>劳动合同</span>
-                <span>员工借调单</span>
-                <span>变更劳动合同协议书</span>
-                <span>变更劳动合同协议书</span>
-                <span>变更劳动合同协议书</span>
+                <span v-for="(item,index) in contractInfoList" :key="index" @click="previewContract(item.cloudcontractId)" v-text="item.contractName"></span>
             </div>
         </footer>
         <modal-panel v-show="showModal">
@@ -38,7 +35,8 @@ export default {
         return {
             contractInfoList: [],
             showModal: false,
-            isSign: false
+            isSign: false,
+            frameUrl: "//www.baidu.com"
         }
     },
     mounted() {
@@ -55,6 +53,31 @@ export default {
             }, this);
         }
         console.log(this.contractInfoList);
+        YHT.init("AppID", obj => {
+            YHT.setToken(_this.$store.state.contract.token);//res.data.response.token);//重新设置token
+            YHT.do(obj);//调用此方法，会继续执行上次未完成的操作
+        });
+        this.previewContract(this.contractInfoList[0].cloudcontractId);
+        /* ajax.post(link.getSign, {
+            contractId: _this.$store.state.contract.daiban.cloudcontractId
+        }).then(res => {
+            if (res.data && res.data.response && res.data.response.result) {
+                if (res.data.response.result == "0") {
+                    _this.isSign = false;
+                }
+                if (res.data.response.token) {
+                    YHT.init("AppID", obj => {
+                        YHT.setToken(res.data.response.token);//重新设置token
+                        YHT.do(obj);//调用此方法，会继续执行上次未完成的操作
+                    });
+                }
+            } else {
+                modal.valert(_this, res.data.message);
+            }
+        }).catch(err => {
+            console.log(err);
+            modal.valert(_this, "服务异常，请联系系统管理员");
+        }) */
     },
     methods: {
         signStart() {
@@ -70,8 +93,8 @@ export default {
                     if (res.data.response.result == "0") {
                         _this.isSign = false;
                         modal.valert(_this, res.data.response.reason);
-                    }else if(res.data.response.result == "1"){
-                        window.open("https://sdk.yunhetong.com/sdk/viewsopen/m/drag_sign.html?token="+res.data.response.token,"_blank");
+                    } else if (res.data.response.result == "1") {
+                        window.open("https://sdk.yunhetong.com/sdk/viewsopen/m/drag_sign.html?token=" + res.data.response.token, "_blank");
                     } else {
                         modal.valert(_this, res.data.response.reason);
                     }
@@ -86,8 +109,20 @@ export default {
         signCancel() {
             this.showModal = false;
         },
-        checkContract() {
-
+        previewContract(contractId) {
+            let backUrl = '', noticeParams = '', _this = this;
+            YHT.queryContract(
+                function successFun(url) {
+                    _this.frameUrl = url;
+                },
+                function failFun(data) {
+                    modal.valert(_this, data);
+                    // alert(data);
+                },
+                contractId,
+                backUrl,
+                noticeParams
+            );
         }
     },
     components: {

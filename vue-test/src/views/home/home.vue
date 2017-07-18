@@ -29,20 +29,16 @@ export default {
     },
     methods: {
         submit() {
-            // let res = window.open("https://sdk.yunhetong.com/sdk/viewsopen/m/drag_sign.html?token=TGT-361900-DME99u7LnRQxBKO9hHrqdxAj9MP7NWF5FUjpanAtangjAic77F-cas01.example.org","_blank");
-            // console.log(res);
-            // return;
-            modal.loading(this, true, "登录中");
             let _this = this;
+            modal.loading(_this, true, "登录中");
             ajax.post(link.queryRecord, {
                 psnCode: url.getUrlObj()["userId"],
                 passWord: _this.pwd
             }).then(function (res) {
                 modal.loading(_this, false);
                 if (res.data && res.data.response && res.data.response.result) {
-                    // res.data.response.result = "0";
                     if (res.data.response.result == "0") {
-                        if (res.data.response.contractInfo.contractState == "1" && res.data.response.complement == "Y") {
+                        if (res.data.response.contractInfo && res.data.response.contractInfo.contractState == "1" && res.data.response.complement == "Y") {
                             _this.$store.commit("CONFIRM_STATE", {
                                 idCard: res.data.response.contractInfo.idCard,
                                 address: res.data.response.contractInfo.address,
@@ -68,13 +64,12 @@ export default {
                                 console.log("back")
                             }, 1000);
                         }
-                        // modal.valert(_this, "密码错误");
                     }
                 } else {
                     modal.valert(_this, res.data.message);
                 }
             }).catch(function (err) {
-                modal.loading(this, false);
+                modal.loading(_this, false);
                 console.log(err);
                 modal.valert(_this, "服务异常，请联系系统管理员");
             })

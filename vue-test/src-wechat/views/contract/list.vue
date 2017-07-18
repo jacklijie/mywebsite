@@ -34,12 +34,14 @@
 import headB from "../../components/head.vue"
 import ajax from "../../util/ajax"
 import link from "../../util/link"
+import modal from "../../util/modal"
 
 export default {
     name: 'mycontract',
     data() {
         return {
-
+            daiban: this.$store.state.contract.daiban,
+            historyList: this.$store.state.contract.historyList
         }
     },
     mounted() {

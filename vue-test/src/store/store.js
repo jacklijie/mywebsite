@@ -25,7 +25,8 @@ const store = new Vuex.Store({
         },
         contract: {
             daiban: null,
-            historyList: []
+            historyList: [],
+            token:''
         }
     },
     getters: {
@@ -61,6 +62,7 @@ const store = new Vuex.Store({
         [types.CONTRACT_STATE](state, payload) {
             if (!!payload.daiban) state.contract.daiban = payload.daiban;
             if (!!payload.historyList) state.contract.historyList = payload.historyList;
+            if (!!payload.token) state.contract.token = payload.token;
         }
     }
 })

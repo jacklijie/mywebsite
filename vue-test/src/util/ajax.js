@@ -43,5 +43,8 @@ export default {
             responseType: 'json', // default
         }
         return axios.post(urlS.host + url + "?" + urlS.getUrlStr(), { request: data }, this.config)
+    },
+    get(url) {
+        return axios.get(url);
     }
 }

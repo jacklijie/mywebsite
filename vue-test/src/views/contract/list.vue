@@ -47,52 +47,25 @@ export default {
     name: 'mycontract',
     data() {
         return {
-            daiban: this.$store.state.contract.daiban /* {
-                cloudcontractId: '',
-                contractSubject: '',
-                contractBeginDate: '',
-                contractEndDate: ''
-            } */,
+            daiban: this.$store.state.contract.daiban,
             historyList: this.$store.state.contract.historyList
         }
     },
     mounted() {
-        /* let _this = this;
-        ajax.post(link.queryContract, {
-            idCard: _this.$store.state.userInfo.idCard
-        }).then((res) => {
-            if (res.data && res.data.response && res.data.response.result) {
-                if (res.data.response.result == "0") {
-                    if (!!res.data.response.contractInfo) {
-                        _this.daiban.cloudcontractId = res.data.response.contractInfo.cloudcontractId;
-                        _this.daiban.contractSubject = res.data.response.contractInfo.contractSubject;
-                        _this.daiban.contractBeginDate = res.data.response.contractInfo.contractBeginDate;
-                        _this.daiban.contractEndDate = res.data.response.contractInfo.contractEndDate;
-                    }
-                    // console.log(res.data.response.contractInfo);
-                    if (res.data.response.cloudList.length > 0) {
-                        _this.historyList = res.data.response.cloudList;
-                    }
-                } else {
-                    modal.valert(_this, res.data.response.reason);
-                }
-            } else {
-                modal.valert(_this, res.data.message);
-            }
-        }).catch((err) => {
-            console.log(err);
-            modal.valert(_this, "服务异常，请联系系统管理员");
-        }) */
     },
     methods: {
         doDetail() {
             let _this = this;
             ajax.post(link.contractGenerateCheck, {
+                idCard: _this.$store.state.userInfo.idCard,
                 contractId: _this.daiban.cloudcontractId
             }).then(res => {
                 if (res.data && res.data.response && res.data.response.result) {
                     if (res.data.response.result == "0") {
                         console.log(res.data.response);
+                        _this.$store.commit("CONTRACT_STATE", {
+                            token: res.data.response.token
+                        });
                         _this.$router.push("/contract/detail/do/" + _this.daiban.cloudcontractId);
                     } else {
                         modal.valert(_this, res.data.response.reason);
@@ -106,7 +79,27 @@ export default {
             })
         },
         checkDetail(id) {
-            _this.$router.push("/contract/detail/undo/" + id);
+            let _this = this;
+            ajax.post(link.queryToken, {
+                contractId: id
+            }).then(res => {
+                if (res.data && res.data.response && res.data.response.result) {
+                    if (res.data.response.result == "0") {
+                        _this.$store.commit("CONTRACT_STATE", {
+                            token: res.data.response.token
+                        });
+                        _this.$router.push("/contract/detail/undo/" + id);
+                    } else {
+                        modal.valert(_this, res.data.response.reason);
+                    }
+                } else {
+                    modal.valert(_this, res.data.message);
+                }
+            }).catch(err => {
+                console.log(err);
+                modal.valert(_this, "服务异常，请联系系统管理员");
+            })
+            // this.$router.push("/contract/detail/undo/" + id);
         }
     },
     components: {

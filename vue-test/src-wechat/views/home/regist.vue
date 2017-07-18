@@ -90,7 +90,7 @@ export default {
                 modal.valert(_this, "验证码不能为空");
                 return;
             } else {
-                // let postUrl = url.host + "/nhr/elcontract/cloudRegistration.action?" + url.getUrlStr();
+                modal.loading(_this, true, "提交中");
                 ajax.post(link.cloudRegistration, {
                     psnName: _this.uinfo.name,
                     idCard: _this.uinfo.codeId,
@@ -99,23 +99,35 @@ export default {
                 }).then(function (res) {
                     if (res.data && res.data.response && res.data.response.result) {
                         if (res.data.response.result == "0") {
-                            _this.$router.push("/confirm");
-                        } else if (res.data.response.result == "2") {
-                            _this.$router.push("/regist");
+                            ajax.post(link.supplement, {
+                                idCard: _this.uinfo.codeId,
+                                cellPhone: _this.uinfo.mobile,
+                                address: _this.uinfo.registAddress,
+                                postalCode: _this.uinfo.postcode
+                            }).then(function (resp) {
+                                modal.loading(_this, false);
+                                if (resp.data && resp.data.response && resp.data.response.result) {
+                                    if (resp.data.response.result == "0") {
+                                        console.log(resp);
+                                        _this.$router.push("/opentype");
+                                    } else {
+                                        modal.valert(_this, resp.data.response.reason);
+                                    }
+                                }
+                            }).catch((err) => {
+                                modal.loading(_this, false);
+                                modal.valert(_this, "补充信息接口异常，请联系系统管理员");
+                            })
                         } else {
-                            modal.valert(_this, "密码错误");
+                            modal.loading(_this, false);
+                            modal.valert(_this, res.data.response.reason);
                         }
-                        ajax.post(link.supplement, {
-                            cellPhone: _this.uinfo.mobile,
-                            address: _this.uinfo.registAddress,
-                            postalCode: _this.uinfo.postcode
-                        }).then(function (resp) {
-                            console.log(resp);
-                        })
+                    } else {
+                        modal.loading(_this, false);
                     }
                 }).catch(function (err) {
-                    console.log(err);
-                    modal.valert(_this, "服务异常，请联系系统管理员");
+                    modal.loading(_this, false);
+                    modal.valert(_this, "注册接口异常，请联系系统管理员");
                 })
             }
         },
