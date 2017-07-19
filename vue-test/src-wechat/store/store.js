@@ -19,7 +19,14 @@ const store = new Vuex.Store({
         },
         from: "app",
         userInfo: {
-            idCard: '411081198212231559'
+            idCard: '411081198212231559',
+            psncl: 1
+        },
+        contract: {
+            daiban: null,
+            historyList: [],
+            cloudList:[],
+            token:''
         }
     },
     getters: {
@@ -43,6 +50,13 @@ const store = new Vuex.Store({
         },
         [types.IDCARD_STATE](state, payload) {
             state.userInfo.idCard = payload.idCard;
+            state.userInfo.psncl = payload.psncl;
+        },
+        [types.CONTRACT_STATE](state, payload) {
+            if (!!payload.daiban) state.contract.daiban = payload.daiban;
+            if (!!payload.historyList) state.contract.historyList = payload.historyList;
+            if (!!payload.cloudList) state.contract.cloudList = payload.cloudList;
+            if (!!payload.token) state.contract.token = payload.token;
         }
     }
 })

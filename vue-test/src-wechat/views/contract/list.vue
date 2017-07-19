@@ -3,8 +3,8 @@
         <head-b title="我的合同"></head-b>
         <div class="con">
             <div class="list-box">
-                <span class="c-head">代办合同(1)</span>
-                <div class="c-body">
+                <span class="c-head" v-text="'代办合同('+(!!daiban&&!!daiban.contractSubject?1:0)+')'"></span>
+                <div class="c-body" v-if="!!daiban&&!!daiban.contractSubject">
                     <div class="row head">
                         <span>合同类型</span>
                         <span>签订人</span>
@@ -12,18 +12,37 @@
                         <span>操作</span>
                     </div>
                     <div class="row">
-                        <span>新签</span>
-                        <span>王小明</span>
-                        <span>营业员</span>
+                        <span v-text="daiban.contractType"></span>
+                        <span v-text="daiban.psnName"></span>
+                        <span v-text="daiban.positionName"></span>
                         <span>
-                            <a>点击开始签署</a>
+                            <a @click="doDetail">点击开始签署</a>
                         </span>
                     </div>
                 </div>
+                <div class="c-body-none" v-else>
+                    暂无
+                </div>
             </div>
             <div class="list-box">
-                <span class="c-head">历史合同(0)</span>
-                <div class="c-body-none">
+                <span class="c-head" v-text="'历史合同('+historyList.length+')'"></span>
+                <div class="c-body" v-if="historyList.length>0">
+                    <div class="row head">
+                        <span>合同类型</span>
+                        <span>签订人</span>
+                        <span>岗位类别</span>
+                        <span>操作</span>
+                    </div>
+                    <div class="row" v-for="his in historyList" :key="his.cloudcontractId">
+                        <span v-text="his.contractType"></span>
+                        <span v-text="his.psnName"></span>
+                        <span v-text="his.positionName"></span>
+                        <span>
+                            <a @click="checkDetail(his.cloudcontractId)">查看</a>
+                        </span>
+                    </div>
+                </div>
+                <div class="c-body-none" v-else>
                     暂无
                 </div>
             </div>
@@ -40,19 +59,86 @@ export default {
     name: 'mycontract',
     data() {
         return {
-            daiban: this.$store.state.contract.daiban,
-            historyList: this.$store.state.contract.historyList
+            daiban: [],
+            historyList: []
         }
     },
     mounted() {
         let _this = this;
         ajax.post(link.queryContract, {
-            idCard: _this.$store.state.userInfo.idCard
+            idCard: _this.$store.state.userInfo.idCard,
+            psncl: _this.$store.state.userInfo.psncl
         }).then((res) => {
-            console.log(res);
-        }).catch((err) => {
+            if (res.data && res.data.response && res.data.response.result) {
+                if (res.data.response.result == "0") {
+                    if (res.data.response.contractInfo) {
+                        this.daiban = res.data.response.contractInfo;
+                        _this.$store.commit("CONTRACT_STATE", {
+                            daiban: res.data.response.contractInfo
+                        });
+                    }
+                    if (res.data.response.cloudList && res.data.response.cloudList.length > 0) {
+                        this.historyList = res.data.response.cloudList;
+                        _this.$store.commit("CONTRACT_STATE", {
+                            historyList: res.data.response.cloudList
+                        })
+                    }
+                } else {
+                    modal.valert(_this, res.data.response.reason);
+                }
+            } else {
+                modal.valert(_this, res.data.message);
+            }
+        }).catch(err => {
             console.log(err);
+            modal.valert(_this, "服务异常，请联系系统管理员");
         })
+    },
+    methods: {
+        doDetail() {
+            let _this = this;
+            ajax.post(link.contractGenerateCheck, {
+                idCard: _this.$store.state.userInfo.idCard,
+                contractId: _this.daiban.cloudcontractId
+            }).then(res => {
+                if (res.data && res.data.response && res.data.response.result) {
+                    if (res.data.response.result == "0") {
+                        console.log(res.data.response);
+                        _this.$store.commit("CONTRACT_STATE", {
+                            token: res.data.response.token
+                        });
+                        _this.$router.push("/contract/detail/do/" + _this.daiban.cloudcontractId);
+                    } else {
+                        modal.valert(_this, res.data.response.reason);
+                    }
+                } else {
+                    modal.valert(_this, res.data.message);
+                }
+            }).catch(err => {
+                console.log(err);
+                modal.valert(_this, "服务异常，请联系系统管理员");
+            })
+        },
+        checkDetail(id) {
+            let _this = this;
+            ajax.post(link.queryToken, {
+                contractId: id
+            }).then(res => {
+                if (res.data && res.data.response) {
+                    _this.$store.commit("CONTRACT_STATE", {
+                        token: res.data.response.cloudList[0].token,
+                        cloudList: res.data.response.cloudList
+                    });
+                    _this.$router.push("/contract/detail/undo/" + id);
+                } else {
+                    modal.valert(_this, res.data.message);
+                }
+            }).catch(err => {
+                console.log(err);
+                modal.valert(_this, "服务异常，请联系系统管理员");
+            })
+            // this.$router.push("/contract/detail/undo/" + id);
+        },
     },
     components: {
         headB

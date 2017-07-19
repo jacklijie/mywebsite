@@ -1,10 +1,12 @@
 <template>
     <div class="contract-box">
-        <head-b title="劳动合同"></head-b>
+        <head-b title="劳动合同">
+            <span class="back" @click="goBack"></span>
+        </head-b>
         <section class="con">
             <!-- <div class="img-list">
-                                                <img src="../../assets/images/zheng-big.png">
-                                            </div> -->
+                     <img src="../../assets/images/zheng-big.png">
+                 </div> -->
             <iframe class="img-list" :src="frameUrl"></iframe>
             <span v-if="isSign" class="sign" @click="signStart"></span>
         </section>
@@ -45,12 +47,7 @@ export default {
             this.isSign = true;
             this.contractInfoList = this.$store.state.contract.daiban.cloudList;
         } else {
-            let historyList = this.$store.state.contract.historyList;
-            historyList.forEach(function (h) {
-                if (h.contractId == params.contractId) {
-                    _this.contractInfoList = h.cloudList;
-                }
-            }, this);
+            _this.contractInfoList = this.$store.state.contract.cloudList
         }
         console.log(this.contractInfoList);
         YHT.init("AppID", obj => {
@@ -58,28 +55,11 @@ export default {
             YHT.do(obj);//调用此方法，会继续执行上次未完成的操作
         });
         this.previewContract(this.contractInfoList[0].cloudcontractId);
-        /* ajax.post(link.getSign, {
-            contractId: _this.$store.state.contract.daiban.cloudcontractId
-        }).then(res => {
-            if (res.data && res.data.response && res.data.response.result) {
-                if (res.data.response.result == "0") {
-                    _this.isSign = false;
-                }
-                if (res.data.response.token) {
-                    YHT.init("AppID", obj => {
-                        YHT.setToken(res.data.response.token);//重新设置token
-                        YHT.do(obj);//调用此方法，会继续执行上次未完成的操作
-                    });
-                }
-            } else {
-                modal.valert(_this, res.data.message);
-            }
-        }).catch(err => {
-            console.log(err);
-            modal.valert(_this, "服务异常，请联系系统管理员");
-        }) */
     },
     methods: {
+        goBack() {
+            this.$router.push({ name: "mycontract" });
+        },
         signStart() {
             this.showModal = true;
         },

@@ -1,6 +1,8 @@
 <template>
     <div class="contracts-box">
-        <head-b title="我的合同"></head-b>
+        <head-b title="我的合同">
+            <span class="back" @click="goBack"></span>
+        </head-b>
         <div class="con">
             <div class="list-box">
                 <span class="c-head" v-text="'代办合同('+(!!daiban&&!!daiban.contractSubject?1:0)+')'"></span>
@@ -83,15 +85,12 @@ export default {
             ajax.post(link.queryToken, {
                 contractId: id
             }).then(res => {
-                if (res.data && res.data.response && res.data.response.result) {
-                    if (res.data.response.result == "0") {
+                if (res.data && res.data.response) {
                         _this.$store.commit("CONTRACT_STATE", {
-                            token: res.data.response.token
+                            token: res.data.response.cloudList[0].token,
+                            cloudList: res.data.response.cloudList
                         });
                         _this.$router.push("/contract/detail/undo/" + id);
-                    } else {
-                        modal.valert(_this, res.data.response.reason);
-                    }
                 } else {
                     modal.valert(_this, res.data.message);
                 }
@@ -100,6 +99,9 @@ export default {
                 modal.valert(_this, "服务异常，请联系系统管理员");
             })
             // this.$router.push("/contract/detail/undo/" + id);
+        },
+        goBack() {
+            this.$router.push({ name: "opentype" });
         }
     },
     components: {

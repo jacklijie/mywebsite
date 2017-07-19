@@ -85,12 +85,12 @@ export default {
                 daiban: res.data.response.contractInfo
               });
             }
-            if (res.data.response.cloudList.length > 0) {
+            if (res.data.response.cloudList && res.data.response.cloudList.length > 0) {
               _this.$store.commit("CONTRACT_STATE", {
                 historyList: res.data.response.cloudList
               })
             }
-            setTimeout(() => { this.$router.push({ name: "mycontract", params: { type: type } }); }, 500)
+            setTimeout(() => { this.$router.push({ name: "mycontract" }); }, 500)
           } else {
             modal.valert(_this, res.data.response.reason);
           }

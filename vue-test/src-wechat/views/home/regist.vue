@@ -49,12 +49,12 @@ export default {
         return {
             title: '注册',
             uinfo: {
-                name: "李杰",
-                codeId: "510322199008245499",
+                name: "朱会民",
+                codeId: "410325198910142515",
                 registAddress: "啊死了都快放假啦深刻的风景",
                 postcode: "643208",
-                mobile: "15000334505",
-                vcode: "44330791"
+                mobile: "13878945612",
+                vcode: "72919930"
             }
         }
     },
@@ -99,6 +99,10 @@ export default {
                 }).then(function (res) {
                     if (res.data && res.data.response && res.data.response.result) {
                         if (res.data.response.result == "0") {
+                            _this.$store.commit("IDCARD_STATE",{
+                                idCard:_this.uinfo.codeId,
+                                psncl: res.data.response.contractInfo.psncl
+                            })
                             ajax.post(link.supplement, {
                                 idCard: _this.uinfo.codeId,
                                 cellPhone: _this.uinfo.mobile,
@@ -109,10 +113,13 @@ export default {
                                 if (resp.data && resp.data.response && resp.data.response.result) {
                                     if (resp.data.response.result == "0") {
                                         console.log(resp);
-                                        _this.$router.push("/opentype");
+                                        _this.$router.push("/contract/list");
                                     } else {
                                         modal.valert(_this, resp.data.response.reason);
                                     }
+                                } else {
+                                    modal.loading(_this, false);
+                                    modal.valert(_this, res.data.message);
                                 }
                             }).catch((err) => {
                                 modal.loading(_this, false);
@@ -124,6 +131,7 @@ export default {
                         }
                     } else {
                         modal.loading(_this, false);
+                        modal.valert(_this, res.data.message);
                     }
                 }).catch(function (err) {
                     modal.loading(_this, false);

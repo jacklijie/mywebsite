@@ -1,19 +1,15 @@
 <template>
     <div class="contract-box">
-        <head-b title="劳动合同"></head-b>
+        <head-b title="劳动合同">
+            <span class="back" @click="goBack"></span>
+        </head-b>
         <section class="con">
-            <div class="img-list">
-                <img src="../../assets/images/zheng-big.png">
-            </div>
-            <span class="sign" @click="signStart"></span>
+            <iframe class="img-list" :src="frameUrl"></iframe>
+            <span v-if="isSign" class="sign" @click="signStart"></span>
         </section>
         <footer>
             <div class="foot-box">
-                <span>劳动合同</span>
-                <span>员工借调单</span>
-                <span>变更劳动合同协议书</span>
-                <span>变更劳动合同协议书</span>
-                <span>变更劳动合同协议书</span>
+                <span v-for="(item,index) in contractInfoList" :key="index" @click="previewContract(item.cloudcontractId)" v-text="item.contractName"></span>
             </div>
         </footer>
         <modal-panel v-show="showModal">
@@ -27,31 +23,83 @@
     </div>
 </template>
 <script>
+import ajax from "../../util/ajax"
+import link from "../../util/link"
+import modal from "../../util/modal"
 import headB from "../../components/head.vue"
 import modalPanel from "../../components/modal.vue"
 export default {
     name: "detail",
     data() {
         return {
-            contractList: [],
-            showModal: false
+            contractInfoList: [],
+            showModal: false,
+            isSign: false,
+            frameUrl: "//www.baidu.com"
         }
     },
     mounted() {
-
+        let _this = this, params = this.$route.params;
+        if (params.type == "do") {
+            this.isSign = true;
+            this.contractInfoList = this.$store.state.contract.daiban.cloudList;
+        } else {
+            _this.contractInfoList = this.$store.state.contract.cloudList
+        }
+        console.log(this.contractInfoList);
+        YHT.init("AppID", obj => {
+            YHT.setToken(_this.$store.state.contract.token);//res.data.response.token);//重新设置token
+            YHT.do(obj);//调用此方法，会继续执行上次未完成的操作
+        });
+        this.previewContract(this.contractInfoList[0].cloudcontractId);
     },
     methods: {
+        goBack() {
+            this.$router.push({ name: "mycontract" });
+        },
         signStart() {
             this.showModal = true;
         },
         signOK() {
-
+            this.showModal = false;
+            let _this = this;
+            ajax.post(link.getSign, {
+                contractId: _this.$store.state.contract.daiban.cloudcontractId
+            }).then(res => {
+                if (res.data && res.data.response && res.data.response.result) {
+                    if (res.data.response.result == "0") {
+                        _this.isSign = false;
+                        modal.valert(_this, res.data.response.reason);
+                    } else if (res.data.response.result == "1") {
+                        window.open("https://sdk.yunhetong.com/sdk/viewsopen/m/drag_sign.html?token=" + res.data.response.token, "_blank");
+                    } else {
+                        modal.valert(_this, res.data.response.reason);
+                    }
+                } else {
+                    modal.valert(_this, res.data.message);
+                }
+            }).catch(err => {
+                console.log(err);
+                modal.valert(_this, "服务异常，请联系系统管理员");
+            })
         },
         signCancel() {
             this.showModal = false;
         },
-        checkContract() {
-
+        previewContract(contractId) {
+            let backUrl = '', noticeParams = '', _this = this;
+            YHT.queryContract(
+                function successFun(url) {
+                    _this.frameUrl = url;
+                },
+                function failFun(data) {
+                    modal.valert(_this, data);
+                    // alert(data);
+                },
+                contractId,
+                backUrl,
+                noticeParams
+            );
         }
     },
     components: {
