@@ -19,7 +19,7 @@ const store = new Vuex.Store({
         },
         from: "app",
         userInfo: {
-            idCard: '411081198212231559',
+            idCard: '',
             psncl: 1
         },
         contract: {

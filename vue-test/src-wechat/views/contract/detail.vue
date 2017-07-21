@@ -9,7 +9,7 @@
         </section>
         <footer>
             <div class="foot-box">
-                <span v-for="(item,index) in contractInfoList" :key="index" @click="previewContract(item.cloudcontractId)" v-text="item.contractName"></span>
+                <span v-for="(item,index) in contractInfoList" :key="index" :class="{'avg':contractInfoList.length<=2}" @click="previewContract(item.cloudcontractId)" v-text="item.contractName"></span>
             </div>
         </footer>
         <modal-panel v-show="showModal">
@@ -35,13 +35,31 @@ export default {
             contractInfoList: [],
             showModal: false,
             isSign: false,
-            frameUrl: "//www.baidu.com"
+            frameUrl: ""
         }
     },
     mounted() {
-        let _this = this, params = this.$route.params;
+        let _this = this, params = this.$route.params, query = this.$route.query;
         if (params.type == "do") {
             this.isSign = true;
+            if (!!query.isSign) {
+                let _this = this;
+                ajax.post(link.getSign, {
+                    contractId: _this.$store.state.contract.daiban.cloudcontractId
+                }).then(res => {
+                    if (res.data && res.data.response && res.data.response.result) {
+                        if (res.data.response.result == "0") {
+                            _this.isSign = false;
+                        } else {
+                            console.info("===debug", res.data.response.reason);
+                        }
+                    } else {
+                        console.info("===debug", res.data.message);
+                    }
+                }).catch(err => {
+                    console.info("===debug", "服务异常，请联系系统管理员");
+                })
+            }
             this.contractInfoList = this.$store.state.contract.daiban.cloudList;
         } else {
             _this.contractInfoList = this.$store.state.contract.cloudList
@@ -71,7 +89,14 @@ export default {
                         _this.isSign = false;
                         modal.valert(_this, res.data.response.reason);
                     } else if (res.data.response.result == "1") {
-                        window.open("https://sdk.yunhetong.com/sdk/viewsopen/m/drag_sign.html?token=" + res.data.response.token, "_blank");
+                        _this.$router.push({
+                            name: "sign", query: {
+                                type: _this.$route.params.type,
+                                id: _this.$route.params.contractId,
+                                token: res.data.response.token
+                            }
+                        });
+                        // window.open("https://sdk.yunhetong.com/sdk/viewsopen/m/drag_sign.html?token=" + res.data.response.token, "_blank");
                     } else {
                         modal.valert(_this, res.data.response.reason);
                     }
@@ -90,7 +115,8 @@ export default {
             let backUrl = '', noticeParams = '', _this = this;
             YHT.queryContract(
                 function successFun(url) {
-                    _this.frameUrl = url;
+                    // _this.frameUrl = url;
+                    _this.frameUrl = "https://sdk.yunhetong.com/sdk/contract/hView?contractId=" + contractId + "&token=" + _this.$store.state.contract.token;
                 },
                 function failFun(data) {
                     modal.valert(_this, data);
@@ -153,6 +179,9 @@ export default {
                 box-sizing: border-box;
                 &:last-of-type {
                     border-right: none;
+                }
+                &.avg {
+                    flex: 1;
                 }
             }
         }

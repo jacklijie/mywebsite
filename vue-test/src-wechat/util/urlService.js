@@ -1,5 +1,5 @@
 export default {
-    host: "http://10.224.198.111:8081",//mrsi_urlIp,
+    host: "http://10.230.28.200:8080",//"http://10.224.198.111:8081",//location.origin,//
     getObjByStr: function (urlStr) {
         var theRequest = new Object();
         var strs = urlStr.split("&");

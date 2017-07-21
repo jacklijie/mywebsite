@@ -49,12 +49,12 @@ export default {
         return {
             title: '注册',
             uinfo: {
-                name: "朱会民",
-                codeId: "410325198910142515",
-                registAddress: "啊死了都快放假啦深刻的风景",
-                postcode: "643208",
-                mobile: "13878945612",
-                vcode: "72919930"
+                name: "",
+                codeId: "",
+                registAddress: "",
+                postcode: "",
+                mobile: "",
+                vcode: ""
             }
         }
     },
