@@ -50,6 +50,7 @@ export default {
     flex-direction: column;
     .con {
         flex: 1;
+        overflow: auto;
         .img-list {
             width: 100%;
             height: 100%;

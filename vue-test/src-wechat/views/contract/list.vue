@@ -66,8 +66,8 @@ export default {
     mounted() {
         let _this = this;
         ajax.post(link.queryContract, {
-            idCard: _this.$store.state.userInfo.idCard,
-            psncl: _this.$store.state.userInfo.psncl
+            idCard: _this.$store.state.userInfo.idCard//,
+            // psncl: _this.$store.state.userInfo.psncl
         }).then((res) => {
             if (res.data && res.data.response && res.data.response.result) {
                 if (res.data.response.result == "0") {
@@ -154,6 +154,7 @@ export default {
     .con {
         flex: 1;
         padding: 0 10px;
+        overflow: auto;
         .list-box {
             margin-top: 10px;
             border-radius: 5px;

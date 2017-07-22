@@ -22,7 +22,7 @@ export default {
     name: 'home',
     data() {
         return {
-            pwd: 'qqqqqq'//上线后清空
+            pwd: ''//上线后清空
         }
     },
     mounted() {

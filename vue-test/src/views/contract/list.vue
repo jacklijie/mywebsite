@@ -117,6 +117,7 @@ export default {
     flex-direction: column;
     .con {
         flex: 1;
+        overflow: auto;
         padding: 0 10px;
         .list-box {
             margin-top: 10px;

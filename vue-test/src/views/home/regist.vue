@@ -51,17 +51,17 @@ export default {
         return {
             title: '注册',
             uinfo: {
-                name: "庞清秀",
+                name: "",
                 codeId: this.$store.state.userInfo.idCard,//"452528197202194861",
-                registAddress: "啊是科技发达；啊口角是非；",
-                postcode: "643204",
-                mobile: "15000334505",
-                vcode: "636824"
+                registAddress: "",
+                postcode: "",
+                mobile: "",
+                vcode: ""
             },
             msg: {
                 sendText: "获取",
                 hasSend: false,
-                responseVCode: "636824"
+                responseVCode: ""
             }
         }
     },

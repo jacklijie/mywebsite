@@ -13,7 +13,7 @@
             </div>
         </footer>
         <modal-panel v-show="showModal">
-            <p>本次合同文档有劳动合同、员工借调蛋，已经全部阅读并确认完毕，确认签字，签署确认后无法修改
+            <p>本次合同文档有{{signTip}}，已经全部阅读并确认完毕，确认签字，签署确认后无法修改
             </p>
             <div class="buttons">
                 <button @click="signOK">确认</button>
@@ -35,12 +35,13 @@ export default {
             contractInfoList: [],
             showModal: false,
             isSign: false,
-            frameUrl: ""
+            frameUrl: "",
+            signTip: ""
         }
     },
     mounted() {
         let _this = this, params = this.$route.params, query = this.$route.query;
-        if (params.type == "do") {
+        if (params.type == "do") {//代办合同进入
             this.isSign = true;
             if (!!query.isSign) {
                 let _this = this;
@@ -61,10 +62,13 @@ export default {
                 })
             }
             this.contractInfoList = this.$store.state.contract.daiban.cloudList;
-        } else {
+        } else {//历史合同进入
             _this.contractInfoList = this.$store.state.contract.cloudList
         }
-        console.log(this.contractInfoList);
+        this.contractInfoList.forEach(cli => {
+            this.signTip += cli.contractName + "、";
+        }, this);
+        this.signTip.substring(0, this.signTip.length - 1);
         YHT.init("AppID", obj => {
             YHT.setToken(_this.$store.state.contract.token);//res.data.response.token);//重新设置token
             YHT.do(obj);//调用此方法，会继续执行上次未完成的操作
@@ -96,7 +100,6 @@ export default {
                                 token: res.data.response.token
                             }
                         });
-                        // window.open("https://sdk.yunhetong.com/sdk/viewsopen/m/drag_sign.html?token=" + res.data.response.token, "_blank");
                     } else {
                         modal.valert(_this, res.data.response.reason);
                     }
@@ -115,12 +118,10 @@ export default {
             let backUrl = '', noticeParams = '', _this = this;
             YHT.queryContract(
                 function successFun(url) {
-                    // _this.frameUrl = url;
                     _this.frameUrl = "https://sdk.yunhetong.com/sdk/contract/hView?contractId=" + contractId + "&token=" + _this.$store.state.contract.token;
                 },
                 function failFun(data) {
                     modal.valert(_this, data);
-                    // alert(data);
                 },
                 contractId,
                 backUrl,
@@ -142,6 +143,7 @@ export default {
     flex-direction: column;
     .con {
         flex: 1;
+        overflow: auto;
         .img-list {
             width: 100%;
             height: 100%;

@@ -5,8 +5,8 @@
         </head-b>
         <section class="con">
             <!-- <div class="img-list">
-                         <img src="../../assets/images/zheng-big.png">
-                     </div> -->
+                             <img src="../../assets/images/zheng-big.png">
+                         </div> -->
             <iframe class="img-list" :src="frameUrl"></iframe>
             <span v-if="isSign" class="sign" @click="signStart"></span>
         </section>
@@ -16,7 +16,7 @@
             </div>
         </footer>
         <modal-panel v-show="showModal">
-            <p>本次合同文档有劳动合同、员工借调蛋，已经全部阅读并确认完毕，确认签字，签署确认后无法修改
+            <p>本次合同文档有{{signTip}}，已经全部阅读并确认完毕，确认签字，签署确认后无法修改
             </p>
             <div class="buttons">
                 <button @click="signOK">确认</button>
@@ -38,7 +38,8 @@ export default {
             contractInfoList: [],
             showModal: false,
             isSign: false,
-            frameUrl: ""
+            frameUrl: "",
+            signTip
         }
     },
     mounted() {
@@ -67,7 +68,10 @@ export default {
         } else {
             _this.contractInfoList = this.$store.state.contract.cloudList
         }
-        console.log(this.contractInfoList);
+        this.contractInfoList.forEach(cli => {
+            this.signTip += cli.contractName + "、";
+        }, this);
+        this.signTip.substring(0, this.signTip.length - 1);
         YHT.init("AppID", obj => {
             YHT.setToken(_this.$store.state.contract.token);//res.data.response.token);//重新设置token
             YHT.do(obj);//调用此方法，会继续执行上次未完成的操作
@@ -144,6 +148,7 @@ export default {
     flex-direction: column;
     .con {
         flex: 1;
+        overflow: auto;
         .img-list {
             width: 100%;
             height: 100%;

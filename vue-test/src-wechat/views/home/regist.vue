@@ -99,32 +99,36 @@ export default {
                 }).then(function (res) {
                     if (res.data && res.data.response && res.data.response.result) {
                         if (res.data.response.result == "0") {
-                            _this.$store.commit("IDCARD_STATE",{
-                                idCard:_this.uinfo.codeId,
-                                psncl: res.data.response.contractInfo.psncl
+                            _this.$store.commit("IDCARD_STATE", {
+                                idCard: _this.uinfo.codeId
                             })
-                            ajax.post(link.supplement, {
-                                idCard: _this.uinfo.codeId,
-                                cellPhone: _this.uinfo.mobile,
-                                address: _this.uinfo.registAddress,
-                                postalCode: _this.uinfo.postcode
-                            }).then(function (resp) {
-                                modal.loading(_this, false);
-                                if (resp.data && resp.data.response && resp.data.response.result) {
-                                    if (resp.data.response.result == "0") {
-                                        console.log(resp);
-                                        _this.$router.push("/contract/list");
-                                    } else {
-                                        modal.valert(_this, resp.data.response.reason);
-                                    }
-                                } else {
+                            if (res.data.response.contractInfo) {
+                                ajax.post(link.supplement, {
+                                    idCard: _this.uinfo.codeId,
+                                    cellPhone: _this.uinfo.mobile,
+                                    address: _this.uinfo.registAddress,
+                                    postalCode: _this.uinfo.postcode
+                                }).then(function (resp) {
                                     modal.loading(_this, false);
-                                    modal.valert(_this, res.data.message);
-                                }
-                            }).catch((err) => {
+                                    if (resp.data && resp.data.response && resp.data.response.result) {
+                                        if (resp.data.response.result == "0") {
+                                            console.log(resp);
+                                            _this.$router.push("/contract/list");
+                                        } else {
+                                            modal.valert(_this, resp.data.response.reason);
+                                        }
+                                    } else {
+                                        modal.loading(_this, false);
+                                        modal.valert(_this, res.data.message);
+                                    }
+                                }).catch((err) => {
+                                    modal.loading(_this, false);
+                                    modal.valert(_this, "补充信息接口异常，请联系系统管理员");
+                                })
+                            } else {
                                 modal.loading(_this, false);
-                                modal.valert(_this, "补充信息接口异常，请联系系统管理员");
-                            })
+                                _this.$router.push("/contract/list");
+                            }
                         } else {
                             modal.loading(_this, false);
                             modal.valert(_this, res.data.response.reason);

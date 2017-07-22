@@ -50,7 +50,7 @@ const store = new Vuex.Store({
         },
         [types.IDCARD_STATE](state, payload) {
             state.userInfo.idCard = payload.idCard;
-            state.userInfo.psncl = payload.psncl;
+            // state.userInfo.psncl = payload.psncl;
         },
         [types.CONTRACT_STATE](state, payload) {
             if (!!payload.daiban) state.contract.daiban = payload.daiban;
