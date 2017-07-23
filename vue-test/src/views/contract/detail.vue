@@ -5,14 +5,14 @@
         </head-b>
         <section class="con">
             <!-- <div class="img-list">
-                             <img src="../../assets/images/zheng-big.png">
-                         </div> -->
-            <iframe class="img-list" :src="frameUrl"></iframe>
+                                                             <img src="../../assets/images/zheng-big.png">
+                                                         </div> -->
+            <iframe class="img-list" :src="frameUrl" :style="frameStyle"></iframe>
             <span v-if="isSign" class="sign" @click="signStart"></span>
         </section>
         <footer>
             <div class="foot-box">
-                <span v-for="(item,index) in contractInfoList" :key="index" @click="previewContract(item.cloudcontractId)" v-text="item.contractName"></span>
+                <span v-for="(item,index) in contractInfoList" :key="index" :class="{'avg':contractInfoList.length<=2}" @click="initToken(item.cloudcontractId)" v-text="item.contractName"></span>
             </div>
         </footer>
         <modal-panel v-show="showModal">
@@ -39,7 +39,13 @@ export default {
             showModal: false,
             isSign: false,
             frameUrl: "",
-            signTip
+            signTip: "",
+            frameStyle: {}
+        }
+    },
+    computed: {
+        isIos() {
+            return !window.andiroidApi;
         }
     },
     mounted() {
@@ -65,18 +71,47 @@ export default {
                 })
             }
             this.contractInfoList = this.$store.state.contract.daiban.cloudList;
+            _this.contractInfoList.forEach(cli => {
+                _this.signTip += cli.contractName + "、";
+            }, _this);
+            _this.signTip.substring(0, _this.signTip.length - 1);
+            _this.initToken(_this.contractInfoList[0].cloudcontractId);
         } else {
-            _this.contractInfoList = this.$store.state.contract.cloudList
+            ajax.post(link.queryToken, {
+                contractId: _this.$route.params.contractid
+            }).then(res => {
+                if (res.data && res.data.response) {
+                    _this.contractInfoList = res.data.response.cloudList;
+                    _this.contractInfoList.forEach(cli => {
+                        _this.signTip += cli.contractName + "、";
+                    }, _this);
+                    _this.signTip.substring(0, _this.signTip.length - 1);
+                    YHT.init("AppID", obj => {
+                        YHT.setToken(res.data.response.cloudList[0].token);//res.data.response.token);//重新设置token
+                        YHT.do(obj);//调用此方法，会继续执行上次未完成的操作
+                    });
+                    _this.previewContract(_this.contractInfoList[0].cloudcontractId, res.data.response.cloudList[0].token);
+                } else {
+                    modal.valert(_this, res.data.message);
+                }
+            }).catch(err => {
+                console.log(err);
+                modal.valert(_this, "服务异常，请联系系统管理员");
+            })
         }
-        this.contractInfoList.forEach(cli => {
-            this.signTip += cli.contractName + "、";
-        }, this);
-        this.signTip.substring(0, this.signTip.length - 1);
-        YHT.init("AppID", obj => {
-            YHT.setToken(_this.$store.state.contract.token);//res.data.response.token);//重新设置token
-            YHT.do(obj);//调用此方法，会继续执行上次未完成的操作
-        });
-        this.previewContract(this.contractInfoList[0].cloudcontractId);
+        setTimeout(() => {
+            if (this.isIos) {
+                this.frameStyle = {
+                    height: document.body.clientHeight - 64 - 40 + "px",
+                    top: "64px"
+                }
+            } else {
+                this.frameStyle = {
+                    height: document.body.clientHeight - 44 - 40 + "px",
+                    top: "44px"
+                }
+            }
+        }, 500);
     },
     methods: {
         goBack() {
@@ -99,7 +134,7 @@ export default {
                         _this.$router.push({
                             name: "sign", query: {
                                 type: _this.$route.params.type,
-                                id: _this.$route.params.contractId,
+                                id: _this.$route.params.contractid,
                                 token: res.data.response.token
                             }
                         });
@@ -118,11 +153,31 @@ export default {
         signCancel() {
             this.showModal = false;
         },
-        previewContract(contractId) {
+        initToken(contractId) {
+            let _this = this;
+            ajax.post(link.queryToken, {
+                contractId: _this.$route.params.contractid
+            }).then(res => {
+                if (res.data && res.data.response) {
+                    YHT.init("AppID", obj => {
+                        YHT.setToken(res.data.response.cloudList[0].token);//res.data.response.token);//重新设置token
+                        YHT.do(obj);//调用此方法，会继续执行上次未完成的操作
+                    });
+                    _this.previewContract(contractId);
+                } else {
+                    modal.valert(_this, res.data.message);
+                }
+            }).catch(err => {
+                console.log(err);
+                modal.valert(_this, "服务异常，请联系系统管理员");
+            })
+        },
+        previewContract(contractId, token) {
             let backUrl = '', noticeParams = '', _this = this;
             YHT.queryContract(
                 function successFun(url) {
                     _this.frameUrl = url;
+                    YHT.setToken("");//res.data.response.token);//重新设置token
                 },
                 function failFun(data) {
                     modal.valert(_this, data);
@@ -152,6 +207,9 @@ export default {
         .img-list {
             width: 100%;
             height: 100%;
+            left: 0;
+            top: 40px;
+            position: absolute;
             img {
                 width: 100%;
             }
@@ -162,8 +220,9 @@ export default {
             right: 20px;
             width: 31px;
             height: 32px;
-            background: url(../../assets/images/edit.png) no-repeat;
-            background-size: 100%;
+            background: url(../../assets/images/edit.png) no-repeat center center;
+            padding: 15px;
+            background-size: 50%;
         }
     }
     footer {
@@ -186,6 +245,9 @@ export default {
                 box-sizing: border-box;
                 &:last-of-type {
                     border-right: none;
+                }
+                &.avg {
+                    flex: 1;
                 }
             }
         }

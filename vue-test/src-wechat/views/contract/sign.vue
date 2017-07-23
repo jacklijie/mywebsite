@@ -3,9 +3,11 @@
         <head-b title="开始签署">
             <span class="back" @click="goBack"></span>
         </head-b>
-        <section class="con">
-            <iframe class="img-list" :src="frameUrl"></iframe>
-        </section>
+        <div style="padding-bottom:50px; box-sizing:border-box;margin-top:44px;">
+            <section class="con">
+                <iframe class="img-list" :src="frameUrl" :style="{'height':frameHeight}"></iframe>
+            </section>
+        </div>
     </div>
 </template>
 
@@ -19,13 +21,19 @@ export default {
             backParam: {
                 type: "",
                 id: ""
-            }
+            },
+            frameHeight: '100%'
         }
     },
+    computed: {
+    },
     mounted() {
-        modal.valert(this,"注意：签署完成后需手动点击左上角返回上一页面");
+        modal.valert(this, "注意：签署完成后需手动点击左上角返回上一页面");
         this.backParam = { type: this.$route.query.type, id: this.$route.query.id };
-        this.frameUrl = "https://sdk.yunhetong.com/sdk/viewsopen/m/drag_sign.html?token=" + this.$route.query.token;
+        setTimeout(() => {
+            this.frameHeight = document.body.clientHeight - 44 + "px";
+            this.frameUrl = "https://sdk.yunhetong.com/sdk/viewsopen/m/drag_sign.html?token=" + this.$route.query.token;
+        }, 500);
     },
     methods: {
         goBack() {
@@ -46,14 +54,19 @@ export default {
 .sign-box {
     width: 100%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
+    /* display: flex;
+    flex-direction: column; */
     .con {
-        flex: 1;
+        // flex: 1;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 44px;
         overflow: auto;
         .img-list {
             width: 100%;
             height: 100%;
+            border: none;
         }
     }
 }

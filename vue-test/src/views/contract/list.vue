@@ -54,6 +54,9 @@ export default {
         }
     },
     mounted() {
+        if (this.$store.state.contract.daiban && this.$store.state.contract.daiban.contractSubject) {
+            modal.valert(this, "请务必于" + this.$store.state.contract.daiban.contractEndDate + "前完成代办任务");
+        }
     },
     methods: {
         doDetail() {
@@ -81,24 +84,7 @@ export default {
             })
         },
         checkDetail(id) {
-            let _this = this;
-            ajax.post(link.queryToken, {
-                contractId: id
-            }).then(res => {
-                if (res.data && res.data.response) {
-                        _this.$store.commit("CONTRACT_STATE", {
-                            token: res.data.response.cloudList[0].token,
-                            cloudList: res.data.response.cloudList
-                        });
-                        _this.$router.push("/contract/detail/undo/" + id);
-                } else {
-                    modal.valert(_this, res.data.message);
-                }
-            }).catch(err => {
-                console.log(err);
-                modal.valert(_this, "服务异常，请联系系统管理员");
-            })
-            // this.$router.push("/contract/detail/undo/" + id);
+            this.$router.push("/contract/detail/undo/" + id);
         },
         goBack() {
             this.$router.push({ name: "opentype" });

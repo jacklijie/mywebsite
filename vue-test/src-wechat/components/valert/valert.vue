@@ -32,6 +32,7 @@ export default {
     align-self: center;
     span {
         display: block;
+        margin: 10px;
     }
     button {
         background-color: #ccc;

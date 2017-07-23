@@ -50,7 +50,8 @@ export default {
         if(!!window.androidApi){
             widnow.androidApi.backCalls();
         }else{
-            location.href = "js-call://IOS/NavCallBack";
+            console.log("backdone");
+            window.location.href = "js-call://IOS/NavCallBack";
         }
     }
 }

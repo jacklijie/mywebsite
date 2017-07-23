@@ -5,6 +5,7 @@
         <div class="con">
             <span class="tip">
                 *请先注册
+                <samp v-show="!showNotice" class="help-tip" @click="show_notice_event"></samp>
             </span>
             <div class="form-box">
                 <div class="row">
@@ -64,11 +65,14 @@ export default {
         }
     },
     mounted() {
-        this.$store.commit("NOTICE_STATE", {
-            showNotice: true
-        })
+        this.show_notice_event();
     },
     methods: {
+        show_notice_event() {
+            this.$store.commit("NOTICE_STATE", {
+                showNotice: true
+            })
+        },
         submit() {
             let _this = this;
             if (this.uinfo.name == "") {
@@ -103,28 +107,33 @@ export default {
                                 idCard: _this.uinfo.codeId
                             })
                             if (res.data.response.contractInfo) {
-                                ajax.post(link.supplement, {
-                                    idCard: _this.uinfo.codeId,
-                                    cellPhone: _this.uinfo.mobile,
-                                    address: _this.uinfo.registAddress,
-                                    postalCode: _this.uinfo.postcode
-                                }).then(function (resp) {
+                                if (res.data.response.contractInfo.contractState == "2") {
                                     modal.loading(_this, false);
-                                    if (resp.data && resp.data.response && resp.data.response.result) {
-                                        if (resp.data.response.result == "0") {
-                                            console.log(resp);
-                                            _this.$router.push("/contract/list");
-                                        } else {
-                                            modal.valert(_this, resp.data.response.reason);
-                                        }
-                                    } else {
+                                    _this.$router.push("/contract/list");
+                                } else {
+                                    ajax.post(link.supplement, {
+                                        idCard: _this.uinfo.codeId,
+                                        cellPhone: _this.uinfo.mobile,
+                                        address: _this.uinfo.registAddress,
+                                        postalCode: _this.uinfo.postcode
+                                    }).then(function (resp) {
                                         modal.loading(_this, false);
-                                        modal.valert(_this, res.data.message);
-                                    }
-                                }).catch((err) => {
-                                    modal.loading(_this, false);
-                                    modal.valert(_this, "补充信息接口异常，请联系系统管理员");
-                                })
+                                        if (resp.data && resp.data.response && resp.data.response.result) {
+                                            if (resp.data.response.result == "0") {
+                                                console.log(resp);
+                                                _this.$router.push("/contract/list");
+                                            } else {
+                                                modal.valert(_this, resp.data.response.reason);
+                                            }
+                                        } else {
+                                            modal.loading(_this, false);
+                                            modal.valert(_this, res.data.message);
+                                        }
+                                    }).catch((err) => {
+                                        modal.loading(_this, false);
+                                        modal.valert(_this, "补充信息接口异常，请联系系统管理员");
+                                    })
+                                }
                             } else {
                                 modal.loading(_this, false);
                                 _this.$router.push("/contract/list");
@@ -176,6 +185,19 @@ export default {
             display: block;
             &.error {
                 color: red;
+            }
+            .help-tip {
+                color: #fff;
+                background-color: $blue;
+                width: 24px;
+                height: 24px;
+                margin-top: 8px;
+                border-radius: 100%;
+                line-height: 30px;
+                float: right;
+                text-align: center;
+                background: url(../../assets/images/help-icon.png);
+                background-size: 100%;
             }
         }
         .form-box {

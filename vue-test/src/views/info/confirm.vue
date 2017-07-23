@@ -5,6 +5,7 @@
         <div class="con">
             <span class="tip">
                 *请确认补充信息
+                <samp v-show="!showNotice" class="help-tip" @click="show_notice_event"></samp>
             </span>
             <div class="form-box">
                 <div class="row">
@@ -52,13 +53,14 @@ export default {
     mounted() {
         this.uinfo.registAddress = this.$store.state.userInfo.address;
         this.uinfo.mobile = this.$store.state.userInfo.mobile;
-        this.$store.commit("NOTICE_STATE", {
-            showNotice: true
-        })
-        // let _this = this;
-        // ajax.post()
+        this.show_notice_event();
     },
     methods: {
+        show_notice_event() {
+            this.$store.commit("NOTICE_STATE", {
+                showNotice: true
+            })
+        },
         submit() {
             let _this = this;
             if (_this.uinfo.postcode == "" || !/^[1-9][0-9]{5}$/.test(_this.uinfo.postcode)) {
@@ -115,6 +117,19 @@ export default {
             display: block;
             &.error {
                 color: red;
+            }
+            .help-tip {
+                color: #fff;
+                background-color: $blue;
+                width: 24px;
+                height: 24px;
+                margin-top: 8px;
+                border-radius: 100%;
+                line-height: 30px;
+                float: right;
+                text-align: center;
+                background: url(../../assets/images/help-icon.png);
+                background-size: 100%;
             }
         }
         .form-box {

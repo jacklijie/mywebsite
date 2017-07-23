@@ -5,6 +5,7 @@
         <div class="con">
             <span class="tip">
                 *请先注册
+                <samp v-show="!showNotice" class="help-tip" @click="show_notice_event"></samp>
             </span>
             <div class="form-box">
                 <div class="row">
@@ -34,6 +35,7 @@
                 <button @click="reset">重置</button>
             </footer>
         </div>
+    
         <notice-m v-show="showNotice" type="1"></notice-m>
     </div>
 </template>
@@ -44,6 +46,7 @@ import ajax from "../../util/ajax";
 import url from "../../util/urlService";
 import link from "../../util/link";
 import modal from "../../util/modal"
+import axios from "axios"
 
 export default {
     name: 'regist',
@@ -71,11 +74,14 @@ export default {
         }
     },
     mounted() {
-        this.$store.commit("NOTICE_STATE", {
-            showNotice: true
-        })
+        this.show_notice_event();
     },
     methods: {
+        show_notice_event() {
+            this.$store.commit("NOTICE_STATE", {
+                showNotice: true
+            })
+        },
         sendMsgCode() {
             let _this = this;
             if (_this.msg.hasSend) {
@@ -89,7 +95,7 @@ export default {
             } else {
                 let timer, count = 120; _this.msg.hasSend = true;
                 timer = setInterval(() => { count--; _this.msg.sendText = "获取(" + count + ")"; if (count == 0) { clearInterval(timer); _this.msg.hasSend = false; _this.msg.sendText = "获取" } }, 1000);
-                ajax.post(link.sendMsg, {
+                /* ajax.post(link.sendMsg, {
                     cellPhone: _this.uinfo.mobile
                 }).then(function (res) {
                     if (res.data && res.data.response && res.data.response.result) {
@@ -104,6 +110,24 @@ export default {
                 }).catch(function (err) {
                     console.log(err);
                     modal.valert(_this, "服务异常，请联系系统管理员");
+                }) */
+                axios.post("http://10.224.198.111:8081/nhr/elcontract/sendMsg.action", {
+                    request: {
+                        cellPhone: _this.uinfo.mobile
+                    }
+                }).then(res => {
+                    if (res.data && res.data.response && res.data.response.result) {
+                        if (res.data.response.result == "0") {
+                            _this.msg.responseVCode = res.data.response.randomCode;
+                        } else {
+                            modal.valert(_this, res.data.response.reason);
+                        }
+                    } else {
+                        modal.valert(_this, res.message);
+                    }
+                }).catch(function (err) {
+                    console.log(err);
+                    modal.valert(_this, "短信异常，请联系系统管理员");
                 })
             }
         },
@@ -182,7 +206,7 @@ export default {
         }
     },
     components: {
-        headBack,noticeM
+        headBack, noticeM
     }
 }
 </script>
@@ -202,6 +226,19 @@ export default {
             display: block;
             &.error {
                 color: red;
+            }
+            .help-tip {
+                color: #fff;
+                background-color: $blue;
+                width: 24px;
+                height: 24px;
+                margin-top: 8px;
+                border-radius: 100%;
+                line-height: 30px;
+                float: right;
+                text-align: center;
+                background: url(../../assets/images/help-icon.png);
+                background-size: 100%;
             }
         }
         .form-box {

@@ -1,17 +1,25 @@
 <template>
     <div class="login-box">
+        <head-back title="登录">
+            <span class="back" @click="goBack"></span>
+        </head-back>
         <div class="con">
-            <div class="row" style="padding: 0 15px;">
-                <label>薪酬福利密码：</label>
-                <input type="password" v-model="pwd">
-            </div>
-            <div class="row">
-                <button @click="submit">验证</button>
+            <div class="flex-box">
+                <div class="row">
+                    <div class="label_pwd">薪酬福利密码：</div>
+                    <div class="pwd">
+                        <input type="password" v-model="pwd">
+                    </div>
+                </div>
+                <div class="row">
+                    <button @click="submit">验证</button>
+                </div>
             </div>
         </div>
     </div>
 </template>
 <script>
+import headBack from '../../components/head.vue';
 import ajax from "../../util/ajax";
 import url from "../../util/urlService";
 import link from "../../util/link";
@@ -28,6 +36,9 @@ export default {
     mounted() {
     },
     methods: {
+        goBack() {
+            util.back();
+        },
         submit() {
             let _this = this;
             modal.loading(_this, true, "登录中");
@@ -74,7 +85,8 @@ export default {
                 modal.valert(_this, "服务异常，请联系系统管理员");
             })
         }
-    }
+    },
+    components: { headBack }
 }
 </script>
 
@@ -83,30 +95,47 @@ export default {
 
 .login-box {
     height: 100%;
-    padding: 0 10px;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
+    flex-direction: column;
     .con {
         width: 100%;
-        height: auto;
+        flex: 1;
+        padding: 0 10px;
+        box-sizing: border-box;
+        .flex-box {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
         .row {
             display: flex;
+            width: 100%;
+            box-sizing: border-box;
             font-size: 16px; // width: 100%;
             height: 50px;
             line-height: 50px;
             margin-bottom: 20px;
-            label {
+            .label_pwd {
                 // padding-left: 15px;
-                white-space: nowrap;
+                // white-space: nowrap;
+                width: 112px; // display: inline-block;
+            }
+            .pwd {
+                flex: 1;
             }
             input {
-                flex: 1;
+                width: 100%;
                 height: 40px;
                 line-height: 40px;
                 margin: 5px 0;
                 padding: 0 10px;
                 border-radius: 5px;
+                box-sizing: border-box;
             }
             button {
                 width: 100%;

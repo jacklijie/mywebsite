@@ -10,16 +10,14 @@
 <script>
 export default {
     mounted: function () {
-
     },
     data() {
         return {
-
+            
         }
     },
     props: ['title'],
     computed: {
-
     },
     methods: {
         go() {

@@ -1,6 +1,8 @@
 <template>
     <div class="contracts-box">
-        <head-b title="我的合同"></head-b>
+        <head-b title="我的合同">
+            <span class="back" @click="goBack"></span>
+        </head-b>
         <div class="con">
             <div class="list-box">
                 <span class="c-head" v-text="'代办合同('+(!!daiban&&!!daiban.contractSubject?1:0)+')'"></span>
@@ -76,6 +78,9 @@ export default {
                         _this.$store.commit("CONTRACT_STATE", {
                             daiban: res.data.response.contractInfo
                         });
+                        if (this.daiban.contractSubject) {
+                            modal.valert(this, "请务必于" + this.daiban.contractEndDate + "前完成代办任务");
+                        }
                     }
                     if (res.data.response.cloudList && res.data.response.cloudList.length > 0) {
                         this.historyList = res.data.response.cloudList;
@@ -95,6 +100,9 @@ export default {
         })
     },
     methods: {
+        goBack() {
+            this.$router.push({ name: "regist" });
+        },
         doDetail() {
             let _this = this;
             ajax.post(link.contractGenerateCheck, {
@@ -120,7 +128,7 @@ export default {
             })
         },
         checkDetail(id) {
-            let _this = this;
+            /* let _this = this;
             ajax.post(link.queryToken, {
                 contractId: id
             }).then(res => {
@@ -136,8 +144,8 @@ export default {
             }).catch(err => {
                 console.log(err);
                 modal.valert(_this, "服务异常，请联系系统管理员");
-            })
-            // this.$router.push("/contract/detail/undo/" + id);
+            }) */
+            this.$router.push("/contract/detail/undo/" + id);
         },
     },
     components: {

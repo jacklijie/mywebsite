@@ -1,5 +1,5 @@
 <template>
-    <header class="app-head">
+    <header class="app-head" :class="{'ios-head':isIos}">
         <slot>
             <span class="back" @click="go"></span>
         </slot>
@@ -19,7 +19,9 @@ export default {
     },
     props: ['title'],
     computed: {
-
+        isIos(){
+            return !window.androidApi;
+        }
     },
     methods: {
         go() {
@@ -38,6 +40,9 @@ header.app-head {
     height: 44px;
     width: 100%;
     display: flex;
+    &.ios-head{
+        padding-top:20px;
+    }
     .back {
         background: url(../assets/images/back.png) no-repeat center;
         background-size: auto 24px;
