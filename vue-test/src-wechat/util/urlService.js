@@ -1,5 +1,5 @@
 export default {
-    host: location.origin,//"http://10.230.28.200:8080",//"http://10.224.198.111:8081",//
+    host: "http://10.230.28.200:8080",//location.origin,//"http://10.224.198.111:8081",//
     getObjByStr: function (urlStr) {
         var theRequest = new Object();
         var strs = urlStr.split("&");

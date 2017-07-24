@@ -5,10 +5,11 @@
         </head-b>
         <section class="con">
             <!-- <div class="img-list">
-                                                             <img src="../../assets/images/zheng-big.png">
-                                                         </div> -->
+                        <img src="../../assets/images/zheng-big.png">
+                    </div> -->
             <iframe class="img-list" :src="frameUrl" :style="frameStyle"></iframe>
             <span v-if="isSign" class="sign" @click="signStart"></span>
+            <span v-else class="down" @click="download"></span>
         </section>
         <footer>
             <div class="foot-box">
@@ -40,7 +41,9 @@ export default {
             isSign: false,
             frameUrl: "",
             signTip: "",
-            frameStyle: {}
+            frameStyle: {},
+            currentContractId: "",
+            currentToken: ""
         }
     },
     computed: {
@@ -111,15 +114,22 @@ export default {
                     top: "44px"
                 }
             }
+            document.getElementById("scrollObj").scrollLeft = 450 - (document.body.clientWidth / 2);
         }, 500);
     },
     methods: {
+        download() {
+            window.open("https://sdk.yunhetong.com/sdk/contract/download?token=" + this.currentToken + "&contractId=" + this.currentContractId, "_blank");
+        },
         goBack() {
             this.$router.push({ name: "mycontract" });
         },
         signStart() {
-            this.showModal = true;
+            this.showModal = true;//点击签署按钮显示弹窗提示
         },
+        /**
+         * 确认签署
+         */
         signOK() {
             this.showModal = false;
             let _this = this;
@@ -153,6 +163,9 @@ export default {
         signCancel() {
             this.showModal = false;
         },
+        /**
+         * 获取token并初始化云合同sdk
+         */
         initToken(contractId) {
             let _this = this;
             ajax.post(link.queryToken, {
@@ -174,6 +187,8 @@ export default {
         },
         previewContract(contractId, token) {
             let backUrl = '', noticeParams = '', _this = this;
+            this.currentContractId = contractId;
+            this.currentToken = token;
             YHT.queryContract(
                 function successFun(url) {
                     _this.frameUrl = url;
@@ -205,11 +220,11 @@ export default {
         flex: 1;
         overflow: auto;
         .img-list {
-            width: 100%;
+            width: 900px;
             height: 100%;
             left: 0;
-            top: 40px;
-            position: absolute;
+            top: 44px; // transform: translateX(-50%);
+            // position: absolute;
             img {
                 width: 100%;
             }
@@ -221,6 +236,16 @@ export default {
             width: 31px;
             height: 32px;
             background: url(../../assets/images/edit.png) no-repeat center center;
+            padding: 15px;
+            background-size: 50%;
+        }
+        .down {
+            position: fixed;
+            top: 20%;
+            right: 20px;
+            width: 31px;
+            height: 32px;
+            background: url(../../assets/images/download-icon.png) no-repeat center center;
             padding: 15px;
             background-size: 50%;
         }
