@@ -90,6 +90,9 @@ export default {
                 historyList: res.data.response.cloudList
               })
             }
+            _this.$store.commit("USER_TYPE_STATE", {
+              psncl: type == "zhengshi" ? 2 : 1
+            })
             setTimeout(() => { this.$router.push({ name: "mycontract" }); }, 500)
           } else {
             modal.valert(_this, res.data.response.reason);

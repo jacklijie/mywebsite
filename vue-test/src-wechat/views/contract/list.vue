@@ -79,7 +79,7 @@ export default {
                             daiban: res.data.response.contractInfo
                         });
                         if (this.daiban.contractSubject) {
-                            modal.valert(this, "请务必于" + this.daiban.contractEndDate + "前完成代办任务");
+                            modal.valert(this, "请务必于" + this.daiban.contractBeginDate + "前完成代办任务");
                         }
                     }
                     if (res.data.response.cloudList && res.data.response.cloudList.length > 0) {
@@ -101,6 +101,7 @@ export default {
     },
     methods: {
         goBack() {
+            this.$store.commit("CLEAR_DAIBAN_STATE", {});
             this.$router.push({ name: "regist" });
         },
         doDetail() {

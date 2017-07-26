@@ -9,6 +9,7 @@ export default new Router({
     { path: '/contract/list', name: 'mycontract', component: require('../views/contract/list.vue') },
     { path: '/contract/detail/:type/:contractid', name: 'detail', component: require('../views/contract/detail.vue') },
     { path: '/contract/sign', name: 'sign', component: require('../views/contract/sign.vue') },
+    { path: '/test', name: 'test', component: require('../views/contract/test.vue') },
     {
       path: '*', redirect: './regist'
     }

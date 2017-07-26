@@ -21,7 +21,8 @@ const store = new Vuex.Store({
             idCard: '350203197003224037',
             address: '',
             mobile: '',
-            hasRegisted: false
+            hasRegisted: false,
+            psncl:1//1:paiqian,2:zhengshi,3:all
         },
         contract: {
             daiban: null,
@@ -59,6 +60,14 @@ const store = new Vuex.Store({
         },
         [types.REGIST_STATE](state, payload) {
             state.userInfo.hasRegisted = payload.hasRegisted;
+        },
+        [types.USER_TYPE_STATE](state, payload) {
+            state.userInfo.psncl = payload.psncl;
+        },
+        [types.CLEAR_DAIBAN_STATE](state, payload) {
+            state.contract.daiban = null;
+            state.contract.historyList = [];
+            state.contract.cloudList = [];
         },
         [types.CONTRACT_STATE](state, payload) {
             if (!!payload.daiban) state.contract.daiban = payload.daiban;

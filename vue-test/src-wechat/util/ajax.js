@@ -45,6 +45,9 @@ export default {
         }
         return axios.post(urlS.host + url + "?" + urlS.getUrlStr(), { request: data }, this.config)
     },
+    postOther(url, data) {
+        return axios.post(url, data);
+    },
     get(url) {
         return axios.get(url);
     }

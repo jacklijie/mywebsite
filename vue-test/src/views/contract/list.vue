@@ -54,8 +54,40 @@ export default {
         }
     },
     mounted() {
-        if (this.$store.state.contract.daiban && this.$store.state.contract.daiban.contractSubject) {
-            modal.valert(this, "请务必于" + this.$store.state.contract.daiban.contractEndDate + "前完成代办任务");
+        if (this.$route.query.isSign) {
+            let _this = this;
+            ajax.post(link.queryContract, {
+                idCard: _this.$store.state.userInfo.idCard,
+                psncl: _this.$store.state.userInfo.psncl == 2 ? "正式人员" : "派遣人员"
+            }).then((res) => {
+                if (res.data && res.data.response && res.data.response.result) {
+                    if (res.data.response.result == "0") {
+                        if (!!res.data.response.contractInfo) {
+                            _this.daiban = res.data.response.contractInfo;
+                            _this.$store.commit("CONTRACT_STATE", {
+                                daiban: res.data.response.contractInfo
+                            });
+                        }
+                        if (res.data.response.cloudList && res.data.response.cloudList.length > 0) {
+                            _this.historyList = res.data.response.cloudList;
+                            _this.$store.commit("CONTRACT_STATE", {
+                                historyList: res.data.response.cloudList
+                            })
+                        }
+                    } else {
+                        modal.valert(_this, res.data.response.reason);
+                    }
+                } else {
+                    modal.valert(_this, res.data.message);
+                }
+            }).catch((err) => {
+                console.log(err);
+                modal.valert(_this, "服务异常，请联系系统管理员");
+            })
+        } else {
+            if (this.$store.state.contract.daiban && this.$store.state.contract.daiban.contractSubject) {
+                modal.valert(this, "请务必于" + this.$store.state.contract.daiban.contractBeginDate + "前完成代办任务");
+            }
         }
     },
     methods: {
@@ -87,6 +119,7 @@ export default {
             this.$router.push("/contract/detail/undo/" + id);
         },
         goBack() {
+            this.$store.commit("CLEAR_DAIBAN_STATE", {});
             this.$router.push({ name: "opentype" });
         }
     },

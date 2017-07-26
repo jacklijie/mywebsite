@@ -52,6 +52,11 @@ const store = new Vuex.Store({
             state.userInfo.idCard = payload.idCard;
             // state.userInfo.psncl = payload.psncl;
         },
+        [types.CLEAR_DAIBAN_STATE](state, payload) {
+            state.contract.daiban = null;
+            state.contract.historyList = [];
+            state.contract.cloudList = [];
+        },
         [types.CONTRACT_STATE](state, payload) {
             if (!!payload.daiban) state.contract.daiban = payload.daiban;
             if (!!payload.historyList) state.contract.historyList = payload.historyList;
