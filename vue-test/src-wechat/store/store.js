@@ -9,11 +9,11 @@ const store = new Vuex.Store({
             text: '加载中',
             show: false
         },
-        valert:{
+        valert: {
             text: '',
             show: false
         },
-        notice:{
+        notice: {
             text: '',
             show: false
         },
@@ -25,8 +25,8 @@ const store = new Vuex.Store({
         contract: {
             daiban: null,
             historyList: [],
-            cloudList:[],
-            token:''
+            cloudList: [],
+            token: ''
         }
     },
     getters: {
@@ -50,6 +50,7 @@ const store = new Vuex.Store({
         },
         [types.IDCARD_STATE](state, payload) {
             state.userInfo.idCard = payload.idCard;
+            sessionStorage.setItem("idcard", payload.idCard);
             // state.userInfo.psncl = payload.psncl;
         },
         [types.CLEAR_DAIBAN_STATE](state, payload) {

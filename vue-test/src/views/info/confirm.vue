@@ -73,12 +73,14 @@ export default {
                 modal.valert(_this, "手机号码格式不正确");
                 return;
             } else {
+                modal.loading(this, true);
                 ajax.post(link.supplement, {
                     idCard: _this.$store.state.userInfo.idCard,
                     cellPhone: _this.uinfo.mobile,
                     address: _this.uinfo.registAddress,
                     postalCode: _this.uinfo.postcode
                 }).then((resp) => {
+                    modal.loading(this, false);
                     if (resp.data && resp.data.response && resp.data.response.result) {
                         if (resp.data.response.result == "0") {
                             _this.$router.push("/opentype");
@@ -91,6 +93,7 @@ export default {
                         modal.valert(_this, res.data.response.reason);
                     }
                 }).catch((err) => {
+                    modal.loading(this, false);
                     modal.valert(_this, "补充信息接口异常，请联系系统管理员");
                 })
             }

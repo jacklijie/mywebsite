@@ -4,10 +4,9 @@
             <span class="back" @click="goBack"></span>
         </head-b>
         <section class="con" id="scrollObj">
-            <!-- <div class="img-list">
-                                            <img src="../../assets/images/zheng-big.png">
-                                        </div> -->
             <iframe class="img-list" :src="frameUrl" :style="frameStyle"></iframe>
+            <v-touch class="touch-box" v-on:pinch="pinchStart" v-bind:pinch-options="{threshold:0.1}">
+            </v-touch>
             <span v-if="isSign" class="sign" @click="signStart"></span>
             <span v-else class="down" @click="download"></span>
         </section>
@@ -77,7 +76,7 @@ export default {
             _this.contractInfoList.forEach(cli => {
                 _this.signTip += cli.contractName + "、";
             }, _this);
-            _this.signTip.substring(0, _this.signTip.length - 2);
+            _this.signTip = _this.signTip.substring(0, _this.signTip.length - 1);
             _this.initToken(_this.contractInfoList[0].cloudcontractId);
         } else {
             ajax.post(link.queryToken, {
@@ -88,7 +87,7 @@ export default {
                     _this.contractInfoList.forEach(cli => {
                         _this.signTip += cli.contractName + "、";
                     }, _this);
-                    _this.signTip.substring(0, _this.signTip.length - 2);
+                    _this.signTip = _this.signTip.substring(0, _this.signTip.length - 1);
                     YHT.init("AppID", obj => {
                         YHT.setToken(res.data.response.cloudList[0].token);//res.data.response.token);//重新设置token
                         YHT.do(obj);//调用此方法，会继续执行上次未完成的操作
@@ -118,6 +117,10 @@ export default {
         }, 500);
     },
     methods: {
+        pinchStart(e) {
+            console.log("pinch");
+            console.log(e);
+        },
         download() {
             window.open("https://sdk.yunhetong.com/sdk/contract/download?token=" + this.currentToken + "&contractId=" + this.currentContractId, "_blank");
         },
@@ -227,6 +230,9 @@ export default {
         overflow: auto;
         position: relative;
         -webkit-overflow-scrolling: touch;
+        // .touch-box{
+
+        // }
         .img-list {
             width: 900px;
             height: 100%;
@@ -276,7 +282,7 @@ export default {
             &.avg {
                 display: flex;
                 justify-content: flex-start;
-                span{
+                span {
                     flex: 1;
                 }
             }

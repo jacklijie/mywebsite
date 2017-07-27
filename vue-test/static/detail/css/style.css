@@ -1,0 +1,248 @@
+@charset "utf-8";
+html, body {
+	width: 100%;
+	height: 100%;
+}
+
+.container {
+	width: 900px;
+	height: 100%;
+	margin: 0 auto;
+}
+
+.container .contract-hd {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 900px;
+	height: 120px;
+	text-align: center;
+	line-height: 120px;
+	-webkit-line-height: 120px;
+	background-color: #363765;	
+	color: #fff;
+	zoom: 1;
+	z-index: 20;
+}
+.container .contract-hd.ios-head{
+	padding-top:50px;
+	box-sizing: content-box;
+	-webkit-box-sizing: content-box;
+}
+.container .contract-hd .back-btn{
+	position: absolute;
+	bottom: 0;
+	left:0;
+	width: 120px;
+	height: 120px;
+	background: url(../img/back.png) no-repeat center;
+	background-size: auto 66px;
+}
+
+.contract-hidding {
+	-webkit-transition-duration: .4s;
+	transition-duration: .4s;
+	-webkit-transform: translate3d(0, 0, 0);
+	transform: translate3d(0, 0, 0);
+}
+
+.contract-hd-hidden{
+	-webkit-transition-duration: .4s;
+	transition-duration: .4s;
+	-webkit-transform: translate3d(0,-100%,0);
+	transform: translate3d(0,-100%,0);
+}
+
+.contract-hd .contract-title {
+	display: inline-block;
+	width: 300px;
+	margin: 0 auto;
+	padding: 0 10px;
+	text-align: center;
+}
+
+.contract-title .title {
+	font-size: 54px;
+	font-weight: normal;
+}
+
+.container .contract-bd {
+	width: 100%;
+	height: 100%;
+	margin-top: 100px;
+	margin-bottom: 100px;
+}
+.container .contract-bd.ios-con{
+	margin-top: 170px;
+}
+
+.contract-bd .frame-wrapper{
+	width: 100%;
+	height: 100%;
+	/** @TODO：安卓用此属性无法全屏滚动 */
+	/*pointer-events: none;*/
+}
+
+.container .contract-ft {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 900px;
+	height: 100px;
+	background-color: #fff;
+	zoom: 1;
+	line-height: 100px;
+}
+
+.footer-wrapper {
+	min-width: 100%;
+	overflow-x: auto;
+}
+
+.contract-ft-hidden{
+	-webkit-transition-duration: .4s;
+	transition-duration: .4s;
+	-webkit-transform: translate3d(0,100%,0);
+	transform: translate3d(0,100%,0);
+}
+
+.footer-wrapper div{
+	display: inline-block;
+	float: left;
+	font-size: 32px;
+	padding: 0 5px;
+	color: #2c3e50;
+}
+
+/**
+ * 横屏样式
+ * 
+ */
+@media all and (orientation : landscape) {
+	.container .contract-hd, .container .contract-ft  {
+		height: 55px;
+		line-height: 55px;
+	}
+
+	.contract-title .title {
+		font-size: 24px;
+	}
+}
+
+.sign {
+	position: fixed;
+	top: 20%;
+	right: 8%;
+	width: 120px;
+	height: 120px;
+	background: url(../img/edit.png) no-repeat center center;
+	padding: 50px;
+	background-size: 50%;
+	/* display: none; */
+}
+.down {
+	position: fixed;
+	top: 20%;
+	right: 8%;
+	width: 120px;
+	height: 120px;
+	background: url(../img/download-icon.png) no-repeat center center;
+	padding: 50px;
+	background-size: 50%;
+	/* display: none; */
+}
+
+.modal {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    left: 0;
+	top: 0;
+	display: none;
+}
+.modal .modal-bg {
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, .3);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.modal .modal-bg .box {
+	width: 80%;
+	min-height: 300px;
+	background-color: #fff;
+	border-radius: 5px;
+	display: flex;
+	font-size: 36px;
+	justify-content: center;
+}
+.alert-box {
+	align-self: center;
+	text-align: center;
+}
+.alert-box span {
+	display: block;
+	margin: 30px;
+}
+.alert-box button {
+	background-color: #eee;
+	border: 1px solid #bbb;
+	margin-top: 30px;
+	padding: 10px 20px;
+    font-size: 28px;
+}
+
+.modal .modal-bg .box {
+	flex-direction: column;
+}
+.modal .modal-bg .box p {
+	width: 90%;
+	margin: 0 auto;
+}
+.modal .modal-bg .box .buttons {
+	display: flex;
+	justify-content: space-around;
+	width: 80%;
+	margin: 0 auto;
+	margin-top: 30px;
+}
+.modal .modal-bg .box .buttons button {
+	padding: 10px 20px;
+    font-size: 28px;
+    background: #eee;
+    border: 1px solid #bbb;
+}
+
+
+.foot-box {
+	min-width: 100%;
+	/* height: 100px;
+	line-height: 40px; */
+	overflow-x: auto;
+	position: relative;
+	-webkit-overflow-scrolling: touch;
+	white-space: nowrap;
+	border-top: 1px solid #ccc;
+	font-size:36px;
+}
+.foot-box.avg {
+	display: flex;
+	justify-content: flex-start;
+}
+.foot-box.avg span{
+		flex: 1;
+}
+.foot-box span {
+	display: inline-block;
+	padding: 0 30px;
+	/* height: 40px; */
+	text-align: center;
+	white-space: nowrap;
+	border-right: 1px solid #ccc;
+	box-sizing: border-box;
+}
+.foot-box span:last-of-type {
+	border-right: none;
+}
+        

@@ -46,7 +46,7 @@ export default {
   mounted() {
     let _this = this;
     ajax.post(link.queryContract, {
-      idCard: _this.$store.state.userInfo.idCard
+      idCard: sessionStorage.getItem("idcard")
     }).then((res) => {
       if (res.data && res.data.response && res.data.response.result) {
         if (res.data.response.result == "0") {
@@ -75,7 +75,7 @@ export default {
       this.redirecting = true;
       let _this = this;
       ajax.post(link.queryContract, {
-        idCard: _this.$store.state.userInfo.idCard,
+        idCard: sessionStorage.getItem("idcard"),
         psncl: type == "zhengshi" ? "正式人员" : "派遣人员"
       }).then((res) => {
         if (res.data && res.data.response && res.data.response.result) {
@@ -84,15 +84,18 @@ export default {
               _this.$store.commit("CONTRACT_STATE", {
                 daiban: res.data.response.contractInfo
               });
+              sessionStorage.setItem("daiban", JSON.stringify(res.data.response.contractInfo));
             }
             if (res.data.response.cloudList && res.data.response.cloudList.length > 0) {
               _this.$store.commit("CONTRACT_STATE", {
                 historyList: res.data.response.cloudList
               })
+              sessionStorage.setItem("historyList", JSON.stringify(res.data.response.cloudList));
             }
             _this.$store.commit("USER_TYPE_STATE", {
               psncl: type == "zhengshi" ? 2 : 1
             })
+            sessionStorage.setItem("psncl", type == "zhengshi" ? "2" : "1");
             setTimeout(() => { this.$router.push({ name: "mycontract" }); }, 500)
           } else {
             modal.valert(_this, res.data.response.reason);
@@ -212,6 +215,41 @@ export default {
       &.paiqian {
         &::before {
           background-image: url(../../assets/images/pai.png);
+        }
+      }
+    }
+  }
+}
+
+@media (max-width:320px) {
+  .choosetype-box {
+    .one-box {
+      .row {
+        height: 70px;
+        line-height: 70px;
+        &::before {
+          content: '';
+          width: 50px;
+          height: 50px;
+          margin: 10px;
+          background: url(../../assets/images/zheng.png) no-repeat center;
+          background-size: 100%;
+        }
+        span {
+          color: $blue;
+          text-align: left;
+          font-size: 14px;
+          flex: 1;
+        }
+        &:after {
+          content: '';
+          position: absolute;
+          right: 5px;
+          width: 25px;
+          height: 50px;
+          margin: 10px 0;
+          background: url(../../assets/images/slide-right.png) no-repeat center;
+          background-size: 100% auto;
         }
       }
     }

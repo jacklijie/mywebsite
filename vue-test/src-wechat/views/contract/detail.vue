@@ -69,7 +69,7 @@ export default {
             _this.contractInfoList.forEach(cli => {
                 _this.signTip += cli.contractName + "、";
             }, _this);
-            _this.signTip.substring(0, _this.signTip.length - 2);
+            _this.signTip = _this.signTip.substring(0, _this.signTip.length - 1);
             _this.initToken(_this.contractInfoList[0].cloudcontractId);
         } else {//历史合同进入
             ajax.post(link.queryToken, {
@@ -80,7 +80,7 @@ export default {
                     _this.contractInfoList.forEach(cli => {
                         _this.signTip += cli.contractName + "、";
                     }, _this);
-                    _this.signTip.substring(0, _this.signTip.length - 2);
+                    _this.signTip = _this.signTip.substring(0, _this.signTip.length - 1);
                     YHT.init("AppID", obj => {
                         YHT.setToken(res.data.response.cloudList[0].token);//res.data.response.token);//重新设置token
                         YHT.do(obj);//调用此方法，会继续执行上次未完成的操作
@@ -251,7 +251,7 @@ export default {
             &.avg {
                 display: flex;
                 justify-content: flex-start;
-                span{
+                span {
                     flex: 1;
                 }
             }

@@ -68,7 +68,7 @@ export default {
     mounted() {
         let _this = this;
         ajax.post(link.queryContract, {
-            idCard: _this.$store.state.userInfo.idCard//,
+            idCard: _this.$store.state.userInfo.idCard || sessionStorage.getItem("idcard"),
             // psncl: _this.$store.state.userInfo.psncl
         }).then((res) => {
             if (res.data && res.data.response && res.data.response.result) {
@@ -81,12 +81,14 @@ export default {
                         if (this.daiban.contractSubject) {
                             modal.valert(this, "请务必于" + this.daiban.contractBeginDate + "前完成代办任务");
                         }
+                        sessionStorage.setItem("daiban", JSON.stringify(res.data.response.contractInfo));
                     }
                     if (res.data.response.cloudList && res.data.response.cloudList.length > 0) {
                         this.historyList = res.data.response.cloudList;
                         _this.$store.commit("CONTRACT_STATE", {
                             historyList: res.data.response.cloudList
                         })
+                        sessionStorage.setItem("historyList", JSON.stringify(res.data.response.cloudList));
                     }
                 } else {
                     modal.valert(_this, res.data.response.reason);
@@ -107,7 +109,7 @@ export default {
         doDetail() {
             let _this = this;
             ajax.post(link.contractGenerateCheck, {
-                idCard: _this.$store.state.userInfo.idCard,
+                idCard: _this.$store.state.userInfo.idCard || sessionStorage.getItem("idcard"),
                 contractId: _this.daiban.cloudcontractId
             }).then(res => {
                 if (res.data && res.data.response && res.data.response.result) {
@@ -116,7 +118,9 @@ export default {
                         _this.$store.commit("CONTRACT_STATE", {
                             token: res.data.response.token
                         });
-                        _this.$router.push("/contract/detail/do/" + _this.daiban.cloudcontractId);
+                        sessionStorage.setItem("urlStr", location.search.substr(0));
+                        window.location.href = "static/detail/index.html?type=do&contractid=" + _this.daiban.cloudcontractId;
+                        // _this.$router.push("/contract/detail/do/" + _this.daiban.cloudcontractId);
                     } else {
                         modal.valert(_this, res.data.response.reason);
                     }
@@ -146,7 +150,9 @@ export default {
                 console.log(err);
                 modal.valert(_this, "服务异常，请联系系统管理员");
             }) */
-            this.$router.push("/contract/detail/undo/" + id);
+            sessionStorage.setItem("urlStr", location.search.substr(0));
+            window.location.href = "static/detail/index.html?type=undo&contractid=" + id;
+            // this.$router.push("/contract/detail/undo/" + id);
         },
     },
     components: {

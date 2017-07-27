@@ -49,7 +49,7 @@ export default {
     back() {
         console.log("backdone");
         if (!!window.androidApi) {
-            widnow.androidApi.finishWebView();
+            window.androidApi.finishWebView();
         } else {
             // if (!window.iosBack()) {
             window.location.href = "js-call://IOS/NavCallBack";
