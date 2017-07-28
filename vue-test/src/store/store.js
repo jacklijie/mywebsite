@@ -70,6 +70,9 @@ const store = new Vuex.Store({
             state.contract.daiban = null;
             state.contract.historyList = [];
             state.contract.cloudList = [];
+            sessionStorage.removeItem("daiban");
+            sessionStorage.removeItem("historyList");
+            sessionStorage.removeItem("cloudList");
         },
         [types.CONTRACT_STATE](state, payload) {
             if (!!payload.daiban) state.contract.daiban = payload.daiban;

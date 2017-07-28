@@ -37,12 +37,12 @@ export default {
     },
     methods: {
         goBack() {
-            window.location.href = "detail.action?type=do&isSign=1&contractid=" + this.backParam.id;
-            /* this.$router.push({
+            // window.location.href = "detail.action?type=do&isSign=1&contractid=" + this.backParam.id;
+             this.$router.push({
                 name: "detail",
                 params: { type: this.backParam.type, contractid: this.backParam.id },
                 query: { isSign: "1" }
-            }); */
+            }); 
         }
     },
     components: {

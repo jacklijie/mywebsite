@@ -3,10 +3,14 @@
         <head-b title="劳动合同">
             <span class="back" @click="goBack"></span>
         </head-b>
-        <section class="con" id="scrollObj">
-            <iframe class="img-list" :src="frameUrl" :style="frameStyle"></iframe>
+        <section class="con" id="scrollObj" :class="{'ios-con':isIos,'plus':!isplus}">
+            <div class="img-box" :style="frameBoxStyle">
+                <iframe class="img-list" :src="frameUrl" :style="frameStyle"></iframe>
+            </div>
             <span v-if="isSign" class="sign" @click="signStart"></span>
             <span v-else class="down" @click="download"></span>
+            <span v-if="isplus" class="plus" @click="plus"></span>
+            <span v-else class="plus-off" @click="plusOff"></span>
         </section>
         <footer>
             <div class="foot-box" :class="{'avg':contractInfoList.length<=2}">
@@ -39,42 +43,65 @@ export default {
             frameUrl: "",
             signTip: "",
             frameStyle: {},
+            frameBoxStyle:{},
             currentContractId: "",
-            currentToken: ""
+            currentToken: "",
+            scale: 1,
+            isplus: true
+        }
+    },
+    computed: {
+        isIos() {
+            return navigator.userAgent.indexOf('iPhone') != -1;
         }
     },
     mounted() {
         let _this = this, params = this.$route.params, query = this.$route.query;
         if (params.type == "do") {//代办合同进入
             this.isSign = true;
-            if (!!query.isSign) {
-                let _this = this;
-                ajax.post(link.getSign, {
-                    contractId: _this.$store.state.contract.daiban.cloudcontractId
-                }).then(res => {
-                    if (res.data && res.data.response && res.data.response.result) {
-                        if (res.data.response.result == "0") {
-                            _this.isSign = false;
-                        } else {
-                            console.info("===debug", res.data.response.reason);
-                        }
-                    } else {
-                        console.info("===debug", res.data.message);
-                    }
-                }).catch(err => {
-                    console.info("===debug", "服务异常，请联系系统管理员");
-                })
-            }
             this.contractInfoList = this.$store.state.contract.daiban.cloudList;
             _this.contractInfoList.forEach(cli => {
                 _this.signTip += cli.contractName + "、";
             }, _this);
             _this.signTip = _this.signTip.substring(0, _this.signTip.length - 1);
-            _this.initToken(_this.contractInfoList[0].cloudcontractId);
+            if (!!query.isSign) {
+                modal.loading(this, true);
+                ajax.post(link.getSign, {
+                    contractId: params.contractid
+                }).then(res => {
+                    modal.loading(this, false);
+                    if (res.data && res.data.response && res.data.response.result) {
+                        if (res.data.response.result == "0") {
+                            _this.isSign = false;
+                            YHT.init("AppID", obj => {
+                                YHT.setToken(res.data.response.token);//res.data.response.token);//重新设置token
+                                YHT.do(obj);//调用此方法，会继续执行上次未完成的操作
+                            });
+                            _this.previewContract(_this.contractInfoList[0].cloudcontractId, res.data.response.token);
+                        } else {
+                            modal.valert(_this, res.data.response.reason);
+                            _this.initToken(_this.contractInfoList[0].cloudcontractId);
+                            // _this.isSign = false;
+                            console.info("===debug", res.data.response.reason);
+                        }
+                    } else {
+                        // _this.isSign = false;
+                        console.info("===debug", res.data.message);
+                    }
+                }).catch(err => {
+                    // _this.isSign = false;
+                    modal.loading(this, false);
+                    console.info("===debug", "服务异常，请联系系统管理员");
+                })
+            } else {
+                _this.initToken(_this.contractInfoList[0].cloudcontractId);
+            }
         } else {//历史合同进入
+            modal.loading(this, true);
             ajax.post(link.queryToken, {
                 contractId: _this.$route.params.contractid
             }).then(res => {
+                modal.loading(this, false);
                 if (res.data && res.data.response) {
                     _this.contractInfoList = res.data.response.cloudList;
                     _this.contractInfoList.forEach(cli => {
@@ -90,19 +117,52 @@ export default {
                     modal.valert(_this, res.data.message);
                 }
             }).catch(err => {
+                modal.loading(this, false);
                 console.log(err);
                 modal.valert(_this, "服务异常，请联系系统管理员");
             })
         }
         setTimeout(() => {
+            let scaleDpi = window.innerWidth / 900;
             this.frameStyle = {
-                height: document.body.clientHeight - 44 - 40 + "px",
-                top: "44px"
+                height: window.innerHeight / scaleDpi - 84 + "px"
             }
-            document.getElementById("scrollObj").scrollLeft = 450 - (document.body.clientWidth / 2);
+            this.frameBoxStyle = {
+                height: window.innerHeight / scaleDpi - 84 + "px",
+                transform: "scale(" + scaleDpi + ") translateZ(0)",
+                '-webkit-transform': "scale(" + scaleDpi + ")"
+            }
+            // document.getElementById("scrollObj").scrollLeft = 450 - (document.body.clientWidth / 2);
         }, 500);
     },
     methods: {
+        // scrollEvent(e){
+        //     console.log(e.target.scrollTop);
+        //     if(e.target.scrollTop>10){
+        //         document.getElementById("scrollObj").scrollTop = 5;
+        //     }
+        //     return false;
+        // },
+        plus() {
+            this.frameBoxStyle.transform = "scale(1)";
+            setTimeout(() => {
+                this.isplus = false;
+            }, 500);
+        },
+        plusOff() {
+            let scaleDpi = window.innerWidth / 900;
+            console.log("plusOff", scaleDpi);
+            this.frameBoxStyle = {
+                height: window.innerHeight / scaleDpi - 84 + "px",
+                transform: "scale(" + scaleDpi + ")"
+            }
+            // this.frameStyle.transform = "scale(" + scaleDpi + ")";
+            setTimeout(() => {
+                document.getElementById("scrollObj").scrollTop = 0;
+                document.getElementById("scrollObj").scrollLeft = 0;
+                this.isplus = true;
+            }, 500);
+        },
         download() {
             window.open("https://sdk.yunhetong.com/sdk/contract/download?token=" + this.currentToken + "&contractId=" + this.currentContractId, "_blank");
         },
@@ -118,9 +178,11 @@ export default {
         signOK() {
             this.showModal = false;
             let _this = this;
+            modal.loading(this, true);
             ajax.post(link.getSign, {
                 contractId: _this.$store.state.contract.daiban.cloudcontractId
             }).then(res => {
+                modal.loading(this, false);
                 if (res.data && res.data.response && res.data.response.result) {
                     if (res.data.response.result == "0") {
                         _this.isSign = false;
@@ -140,6 +202,7 @@ export default {
                     modal.valert(_this, res.data.message);
                 }
             }).catch(err => {
+                modal.loading(this, false);
                 console.log(err);
                 modal.valert(_this, "服务异常，请联系系统管理员");
             })
@@ -149,9 +212,11 @@ export default {
         },
         initToken(contractId) {
             let _this = this;
+            modal.loading(this, true);
             ajax.post(link.queryToken, {
                 contractId: _this.$route.params.contractid
             }).then(res => {
+                modal.loading(this, false);
                 if (res.data && res.data.response) {
                     console.info("token", res.data.response.cloudList[0].token);
                     YHT.init("AppID", obj => {
@@ -163,6 +228,7 @@ export default {
                     modal.valert(_this, res.data.message);
                 }
             }).catch(err => {
+                modal.loading(this, false);
                 console.log(err);
                 modal.valert(_this, "服务异常，请联系系统管理员");
             })
@@ -199,15 +265,33 @@ export default {
     flex-direction: column;
     .con {
         flex: 1;
-        overflow: auto;
+        overflow: hidden;
         position: relative;
-        -webkit-overflow-scrolling: touch;
+        &.ios-con {
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            &.plus {
+                overflow-x: scroll;
+                overflow-y: scroll;
+            }
+        }
+        &.plus {
+            overflow: scroll;
+        }
+        .img-box {
+            width: 900px;
+            height: 100%;
+            left: 0px;
+            top: 44px;
+            transform-origin: left top;
+        }
         .img-list {
             width: 900px;
             height: 100%;
             left: 0px;
-            top: 44px; // transform: translateX(50%);
-            // position: absolute;
+            top: 0px;
+            // transform-origin: left top;
             img {
                 width: 100%;
             }
@@ -229,6 +313,26 @@ export default {
             width: 31px;
             height: 32px;
             background: url(../../assets/images/download-icon.png) no-repeat center center;
+            padding: 15px;
+            background-size: 50%;
+        }
+        .plus {
+            position: fixed;
+            bottom: 10%;
+            right: 20px;
+            width: 31px;
+            height: 32px;
+            background: url(../../assets/images/plus.png) no-repeat center center;
+            padding: 15px;
+            background-size: 50%;
+        }
+        .plus-off {
+            position: fixed;
+            bottom: 10%;
+            right: 20px;
+            width: 31px;
+            height: 32px;
+            background: url(../../assets/images/plus-off.png) no-repeat center center;
             padding: 15px;
             background-size: 50%;
         }

@@ -5,7 +5,7 @@
         </head-b>
         <div class="con">
             <div class="list-box">
-                <span class="c-head" v-text="'代办合同('+(!!daiban&&!!daiban.contractSubject?1:0)+')'"></span>
+                <span class="c-head" v-text="'待办合同('+(!!daiban&&!!daiban.contractSubject?1:0)+')'"></span>
                 <div class="c-body" v-if="!!daiban&&!!daiban.contractSubject">
                     <div class="row head">
                         <span>合同类型</span>
@@ -79,7 +79,7 @@ export default {
                             daiban: res.data.response.contractInfo
                         });
                         if (this.daiban.contractSubject) {
-                            modal.valert(this, "请务必于" + this.daiban.contractBeginDate + "前完成代办任务");
+                            modal.valert(this, "请务必于" + this.daiban.contractBeginDate + "前完成待办任务");
                         }
                         sessionStorage.setItem("daiban", JSON.stringify(res.data.response.contractInfo));
                     }
@@ -118,9 +118,9 @@ export default {
                         _this.$store.commit("CONTRACT_STATE", {
                             token: res.data.response.token
                         });
-                        sessionStorage.setItem("urlStr", location.search.substr(0));
-                        window.location.href = "static/detail/index.html?type=do&contractid=" + _this.daiban.cloudcontractId;
-                        // _this.$router.push("/contract/detail/do/" + _this.daiban.cloudcontractId);
+                        // sessionStorage.setItem("urlStr", location.search.substr(0));
+                        // window.location.href = "static/detail/index.html?type=do&contractid=" + _this.daiban.cloudcontractId;
+                        _this.$router.push("/contract/detail/do/" + _this.daiban.cloudcontractId);
                     } else {
                         modal.valert(_this, res.data.response.reason);
                     }
@@ -150,9 +150,9 @@ export default {
                 console.log(err);
                 modal.valert(_this, "服务异常，请联系系统管理员");
             }) */
-            sessionStorage.setItem("urlStr", location.search.substr(0));
-            window.location.href = "static/detail/index.html?type=undo&contractid=" + id;
-            // this.$router.push("/contract/detail/undo/" + id);
+            // sessionStorage.setItem("urlStr", location.search.substr(0));
+            // window.location.href = "static/detail/index.html?type=undo&contractid=" + id;
+            this.$router.push("/contract/detail/undo/" + id);
         },
     },
     components: {
@@ -186,14 +186,23 @@ export default {
             .c-body {
                 padding: 5px;
                 .row {
+                    display: -webkit-box;
+                    display: -webkit-flex;
+                    display: -ms-flexbox;
                     display: flex;
                     line-height: 30px;
+                    -webkit-box-pack: center;
+                    -ms-flex-pack: center;
                     justify-content: center;
                     &.head {
                         color: #999;
                     }
                     span {
+                        -webkit-box-flex: 1;
+                        -ms-flex: 1;
                         flex: 1;
+                        display: block;
+                        width: 0%;
                         a {
                             color: #33b5e6;
                             text-decoration: underline;

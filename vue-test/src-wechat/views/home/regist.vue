@@ -28,9 +28,9 @@
                     <!--<span class="btn" :class="{'disable':msg.hasSend}" v-text="msg.sendText" @click="sendMsgCode"></span>-->
                 </div>
             </div>
-            <footer>
-                <button style="margin-right:10px;" @click="submit">确认</button>
-                <button @click="reset">重置</button>
+            <footer class="footer">
+                <button class="button" style="margin-right:4%;" @click="submit">确认</button>
+                <button class="button" @click="reset">重置</button>
             </footer>
         </div>
         <notice-m v-show="showNotice" type="1"></notice-m>
@@ -238,14 +238,16 @@ export default {
                 }
             }
         }
-        footer {
-            display: flex;
+        .footer {
+            width: 100%;
+            height: 40px;
             margin-top: 40px;
-            justify-content: center;
-            button {
-                flex: .9;
+            .button {
+                width: 48%;
+                float: left;
                 color: #fff;
                 height: 40px;
+                line-height: 40px;
                 border-radius: 5px;
                 background-color: $blue;
             }

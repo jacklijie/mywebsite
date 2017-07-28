@@ -4,8 +4,8 @@
             <span class="back" @click="goBack"></span>
         </head-b>
         <!-- <section class="con">
-                    <iframe class="img-list" :src="frameUrl"></iframe>
-                </section> -->
+                        <iframe class="img-list" :src="frameUrl"></iframe>
+                    </section> -->
         <div style="padding-bottom:50px; box-sizing:border-box;" :style="{marginTop:(isIos?'64px':'44px')}">
             <section class="con" :class="{'ios-con':isIos}" :style="{'height':frameHeight}">
                 <iframe class="img-list" :src="frameUrl" :style="{'height':frameHeight}"></iframe>
@@ -21,6 +21,7 @@ export default {
     data() {
         return {
             frameUrl: "",
+            frameHeight: "",
             backParam: {
                 type: "",
                 id: ""
@@ -43,12 +44,12 @@ export default {
     },
     methods: {
         goBack() {
-            window.location.href = "detail.action?type=do&isSign=1&contractid=" + this.backParam.id;
-            // this.$router.push({
-            //     name: "detail",
-            //     params: { type: this.backParam.type, contractid: this.backParam.id },
-            //     query: { isSign: "1" }
-            // });
+            // window.location.href = "detail.action?type=do&isSign=1&contractid=" + this.backParam.id;
+            this.$router.push({
+                name: "detail",
+                params: { type: this.backParam.type, contractid: this.backParam.id },
+                query: { isSign: "1" }
+            });
         }
     },
     components: {

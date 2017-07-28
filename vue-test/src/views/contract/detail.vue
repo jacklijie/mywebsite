@@ -3,12 +3,12 @@
         <head-b title="劳动合同">
             <span class="back" @click="goBack"></span>
         </head-b>
-        <section class="con" id="scrollObj">
+        <section class="con" id="scrollObj" :class="{'ios-con':isIos}">
             <iframe class="img-list" :src="frameUrl" :style="frameStyle"></iframe>
-            <v-touch class="touch-box" v-on:pinch="pinchStart" v-bind:pinch-options="{threshold:0.1}">
-            </v-touch>
+            <!-- <v-touch class="touch-box" v-on:pinch="pinchStart" v-bind:pinch-options="{threshold:0.1}">
+                                                    </v-touch> -->
             <span v-if="isSign" class="sign" @click="signStart"></span>
-            <span v-else class="down" @click="download"></span>
+            <span v-else-if="!isIos" class="down" @click="download"></span>
         </section>
         <footer>
             <div class="foot-box" :class="{'avg':contractInfoList.length<=2}">
@@ -42,7 +42,8 @@ export default {
             signTip: "",
             frameStyle: {},
             currentContractId: "",
-            currentToken: ""
+            currentToken: "",
+            scale: 1
         }
     },
     computed: {
@@ -56,32 +57,53 @@ export default {
             this.isSign = true;
             if (!!query.isSign) {
                 let _this = this;
+                modal.loading(this, true);
                 ajax.post(link.getSign, {
-                    contractId: _this.$store.state.contract.daiban.cloudcontractId
+                    contractId: params.contractid
                 }).then(res => {
+                    modal.loading(this, false);
                     if (res.data && res.data.response && res.data.response.result) {
                         if (res.data.response.result == "0") {
                             _this.isSign = false;
+                            this.contractInfoList = this.$store.state.contract.daiban.cloudList;
+                            _this.contractInfoList.forEach(cli => {
+                                _this.signTip += cli.contractName + "、";
+                            }, _this);
+                            _this.signTip = _this.signTip.substring(0, _this.signTip.length - 1);
+                            YHT.init("AppID", obj => {
+                                YHT.setToken(res.data.response.token);//res.data.response.token);//重新设置token
+                                YHT.do(obj);//调用此方法，会继续执行上次未完成的操作
+                            });
+                            _this.previewContract(_this.contractInfoList[0].cloudcontractId, res.data.response.token);
                         } else {
+                            modal.valert(_this, res.data.response.reason);
+                            _this.initToken(_this.contractInfoList[0].cloudcontractId);
+                            // _this.isSign = false;
                             console.info("===debug", res.data.response.reason);
                         }
                     } else {
+                        // _this.isSign = false;
                         console.info("===debug", res.data.message);
                     }
                 }).catch(err => {
+                    modal.loading(this, false);
+                    // _this.isSign = false;
                     console.info("===debug", "服务异常，请联系系统管理员");
                 })
+            } else {
+                this.contractInfoList = this.$store.state.contract.daiban.cloudList;
+                _this.contractInfoList.forEach(cli => {
+                    _this.signTip += cli.contractName + "、";
+                }, _this);
+                _this.signTip = _this.signTip.substring(0, _this.signTip.length - 1);
+                _this.initToken(_this.contractInfoList[0].cloudcontractId);
             }
-            this.contractInfoList = this.$store.state.contract.daiban.cloudList;
-            _this.contractInfoList.forEach(cli => {
-                _this.signTip += cli.contractName + "、";
-            }, _this);
-            _this.signTip = _this.signTip.substring(0, _this.signTip.length - 1);
-            _this.initToken(_this.contractInfoList[0].cloudcontractId);
         } else {
+            modal.loading(this, true);
             ajax.post(link.queryToken, {
                 contractId: _this.$route.params.contractid
             }).then(res => {
+                modal.loading(this, false);
                 if (res.data && res.data.response) {
                     _this.contractInfoList = res.data.response.cloudList;
                     _this.contractInfoList.forEach(cli => {
@@ -97,29 +119,37 @@ export default {
                     modal.valert(_this, res.data.message);
                 }
             }).catch(err => {
+                modal.loading(this, false);
                 console.log(err);
                 modal.valert(_this, "服务异常，请联系系统管理员");
             })
         }
         setTimeout(() => {
+            let scaleDpi = window.innerWidth / 900;
             if (this.isIos) {
                 this.frameStyle = {
-                    height: document.body.clientHeight - 64 - 40 + "px",
-                    top: "64px"
+                    height: window.innerHeight / scaleDpi - 104 + "px",
+                    top: "64px",
+                    transform: "scale(" + scaleDpi + ")"
                 }
             } else {
                 this.frameStyle = {
-                    height: document.body.clientHeight - 44 - 40 + "px",
-                    top: "44px"
+                    height: window.innerHeight / scaleDpi - 84 + "px",
+                    top: "44px",
+                    transform: "scale(" + scaleDpi + ")"
                 }
             }
-            document.getElementById("scrollObj").scrollLeft = 450 - (document.body.clientWidth / 2);
+            // document.getElementById("scrollObj").scrollLeft = 450 - (document.body.clientWidth / 2);
         }, 500);
     },
     methods: {
         pinchStart(e) {
-            console.log("pinch");
-            console.log(e);
+            // console.log("pinch");
+            // console.log(e);
+            let scale = this.scale * Math.pow(e.scale, 1 / 5);
+            console.log(scale);
+            this.frameStyle.transform = "scale(" + scale + ")";
+            this.scale = scale;
         },
         download() {
             window.open("https://sdk.yunhetong.com/sdk/contract/download?token=" + this.currentToken + "&contractId=" + this.currentContractId, "_blank");
@@ -142,9 +172,11 @@ export default {
         signOK() {
             this.showModal = false;
             let _this = this;
+            modal.loading(this, true);
             ajax.post(link.getSign, {
                 contractId: _this.$store.state.contract.daiban.cloudcontractId
             }).then(res => {
+                modal.loading(this, false);
                 if (res.data && res.data.response && res.data.response.result) {
                     if (res.data.response.result == "0") {
                         _this.isSign = false;
@@ -165,6 +197,7 @@ export default {
                     modal.valert(_this, res.data.message);
                 }
             }).catch(err => {
+                modal.loading(this, false);
                 console.log(err);
                 modal.valert(_this, "服务异常，请联系系统管理员");
             })
@@ -177,9 +210,11 @@ export default {
          */
         initToken(contractId) {
             let _this = this;
+            modal.loading(this, true);
             ajax.post(link.queryToken, {
                 contractId: _this.$route.params.contractid
             }).then(res => {
+                modal.loading(this, false);
                 if (res.data && res.data.response) {
                     YHT.init("AppID", obj => {
                         YHT.setToken(res.data.response.cloudList[0].token);//res.data.response.token);//重新设置token
@@ -190,6 +225,7 @@ export default {
                     modal.valert(_this, res.data.message);
                 }
             }).catch(err => {
+                modal.loading(this, false);
                 console.log(err);
                 modal.valert(_this, "服务异常，请联系系统管理员");
             })
@@ -227,18 +263,33 @@ export default {
     flex-direction: column;
     .con {
         flex: 1;
-        overflow: auto;
+        overflow: hidden;
         position: relative;
-        -webkit-overflow-scrolling: touch;
-        // .touch-box{
-
-        // }
+        &.ios-con {
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        /* .touch-box{
+            width:900px;
+            height:100%;
+        } */
+        .touch-box {
+            position: fixed;
+            left: 0;
+            top: 64px;
+            right: 0;
+            bottom: 40px;
+            width: 100%;
+        }
         .img-list {
             width: 900px;
             height: 100%;
             left: 0;
-            top: 44px; // transform: translateX(-50%);
+            top: 44px;
+            transform-origin: left top; // transform: translateX(-50%);
             // position: absolute;
+            -webkit-overflow-scrolling: touch;
             img {
                 width: 100%;
             }

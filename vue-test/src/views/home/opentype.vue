@@ -7,7 +7,7 @@
     <div class="swip-box" :class="{'redirecting':redirecting}" v-if="hastwo">
       <v-touch class="up" v-on:swipeup="toContractListPage('zhengshi')" v-on:tap="toContractListPage('zhengshi')">
         <div class="up-icon">向上滑动选择</div>
-        <img src="../../assets/images/zheng-big.png" alt="zheng-big-icon">
+        <!-- <img src="../../assets/images/zheng-big.png" alt="zheng-big-icon"> -->
         <p>正式人员合同及相关材料签署</p>
       </v-touch>
       <v-touch class="down" v-on:swipedown="toContractListPage('paiqian')" v-on:tap="toContractListPage('paiqian')">
@@ -45,9 +45,11 @@ export default {
   },
   mounted() {
     let _this = this;
+    modal.loading(this, true);
     ajax.post(link.queryContract, {
       idCard: sessionStorage.getItem("idcard")
     }).then((res) => {
+      modal.loading(this, false);
       if (res.data && res.data.response && res.data.response.result) {
         if (res.data.response.result == "0") {
           let psncl = res.data.response.psncl;
@@ -66,6 +68,7 @@ export default {
         modal.valert(_this, res.data.message);
       }
     }).catch((err) => {
+      modal.loading(this, false);
       console.log(err);
       modal.valert(_this, "服务异常，请联系系统管理员");
     })
@@ -74,12 +77,15 @@ export default {
     toContractListPage(type) {
       this.redirecting = true;
       let _this = this;
+      modal.loading(this, true);
       ajax.post(link.queryContract, {
         idCard: sessionStorage.getItem("idcard"),
         psncl: type == "zhengshi" ? "正式人员" : "派遣人员"
       }).then((res) => {
+        modal.loading(this, false);
         if (res.data && res.data.response && res.data.response.result) {
           if (res.data.response.result == "0") {
+            this.$store.commit("CLEAR_DAIBAN_STATE", {});
             if (!!res.data.response.contractInfo) {
               _this.$store.commit("CONTRACT_STATE", {
                 daiban: res.data.response.contractInfo
@@ -104,6 +110,7 @@ export default {
           modal.valert(_this, res.data.message);
         }
       }).catch((err) => {
+        modal.loading(this, false);
         console.log(err);
         modal.valert(_this, "服务异常，请联系系统管理员");
       })
@@ -131,7 +138,10 @@ export default {
     flex-direction: column;
     .up {
       flex: 1;
-      background-color: $blue;
+      position: relative;
+      background: url(../../assets/images/zheng-big.png) $blue center no-repeat;
+      background-size: auto 100px;
+      // background-color: $blue;
       color: #fff;
       text-align: center;
       padding: 10px 0;
@@ -139,10 +149,16 @@ export default {
       .up-icon {
         background: url(../../assets/images/slide-up.png) no-repeat center top;
         background-size: 30px;
-        padding-top: 35px;
+        padding-top: 30px;
         text-align: center;
         font-size: 12px; // width: 50px;
         height: 30px;
+      }
+      p{
+        position: absolute;
+        width: 100%;
+        bottom: 10px;
+        text-align: center;
       }
     }
     .down {
@@ -154,7 +170,7 @@ export default {
       .down-icon {
         background: url(../../assets/images/slide-down.png) no-repeat center bottom;
         background-size: 30px;
-        padding-bottom: 35px;
+        padding-bottom: 25px;
         text-align: center;
         font-size: 12px;
         height: 20px;
