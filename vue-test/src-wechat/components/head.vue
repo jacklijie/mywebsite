@@ -65,6 +65,7 @@ header.app-head {
         flex: 1;
         display: block;
         width: 0%;
+        margin-left: 44px;
     }
     .menu {
         width: 44px;

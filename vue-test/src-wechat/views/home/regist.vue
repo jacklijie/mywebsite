@@ -12,19 +12,19 @@
                     <input type="text" v-model="uinfo.name" placeholder="请输入姓名">
                 </div>
                 <div class="row">
-                    <input type="text" v-model="uinfo.codeId" placeholder="请输入身份证号">
+                    <input type="text" v-model="uinfo.codeId" maxlength="18" placeholder="请输入身份证号">
                 </div>
                 <div class="row">
                     <input type="text" v-model="uinfo.registAddress" placeholder="请输入户籍地址">
                 </div>
                 <div class="row">
-                    <input type="text" v-model="uinfo.postcode" placeholder="请输入邮编">
+                    <input type="text" v-model="uinfo.postcode" maxlength="6" placeholder="请输入邮编">
                 </div>
                 <div class="row">
-                    <input type="text" v-model="uinfo.mobile" placeholder="请输入手机号码">
+                    <input type="text" v-model="uinfo.mobile" maxlength="11" placeholder="请输入手机号码">
                 </div>
                 <div class="row box-foot">
-                    <input type="text" v-model="uinfo.vcode" placeholder="请输入短信验证码">
+                    <input type="text" v-model="uinfo.vcode" maxlength="8" placeholder="请输入短信验证码">
                     <!--<span class="btn" :class="{'disable':msg.hasSend}" v-text="msg.sendText" @click="sendMsgCode"></span>-->
                 </div>
             </div>

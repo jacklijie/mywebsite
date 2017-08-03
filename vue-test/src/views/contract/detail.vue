@@ -3,12 +3,16 @@
         <head-b title="劳动合同">
             <span class="back" @click="goBack"></span>
         </head-b>
-        <section class="con" id="scrollObj" :class="{'ios-con':isIos}">
-            <iframe class="img-list" :src="frameUrl" :style="frameStyle"></iframe>
+        <section class="con" id="scrollObj" :class="{'ios-con':isIos,'plus':!isplus}">
+            <div class="img-box" :style="frameBoxStyle">
+                <iframe class="img-list" :src="frameUrl" :style="frameStyle"></iframe>
+            </div>
             <!-- <v-touch class="touch-box" v-on:pinch="pinchStart" v-bind:pinch-options="{threshold:0.1}">
-                                                    </v-touch> -->
+                                                                </v-touch> -->
             <span v-if="isSign" class="sign" @click="signStart"></span>
             <span v-else-if="!isIos" class="down" @click="download"></span>
+            <span v-if="isplus" class="plus" @click="plus"></span>
+            <span v-else class="plus-off" @click="plusOff"></span>
         </section>
         <footer>
             <div class="foot-box" :class="{'avg':contractInfoList.length<=2}">
@@ -41,9 +45,11 @@ export default {
             frameUrl: "",
             signTip: "",
             frameStyle: {},
+            frameBoxStyle:{},
             currentContractId: "",
             currentToken: "",
-            scale: 1
+            scale: 1,
+            isplus: true
         }
     },
     computed: {
@@ -65,7 +71,7 @@ export default {
                     if (res.data && res.data.response && res.data.response.result) {
                         if (res.data.response.result == "0") {
                             _this.isSign = false;
-                            this.contractInfoList = this.$store.state.contract.daiban.cloudList;
+                            _this.contractInfoList = this.$store.state.contract.daiban.cloudList;
                             _this.contractInfoList.forEach(cli => {
                                 _this.signTip += cli.contractName + "、";
                             }, _this);
@@ -77,6 +83,7 @@ export default {
                             _this.previewContract(_this.contractInfoList[0].cloudcontractId, res.data.response.token);
                         } else {
                             modal.valert(_this, res.data.response.reason);
+                            _this.contractInfoList = this.$store.state.contract.daiban.cloudList;
                             _this.initToken(_this.contractInfoList[0].cloudcontractId);
                             // _this.isSign = false;
                             console.info("===debug", res.data.response.reason);
@@ -126,31 +133,48 @@ export default {
         }
         setTimeout(() => {
             let scaleDpi = window.innerWidth / 900;
-            if (this.isIos) {
-                this.frameStyle = {
-                    height: window.innerHeight / scaleDpi - 104 + "px",
-                    top: "64px",
-                    transform: "scale(" + scaleDpi + ")"
-                }
-            } else {
-                this.frameStyle = {
-                    height: window.innerHeight / scaleDpi - 84 + "px",
-                    top: "44px",
-                    transform: "scale(" + scaleDpi + ")"
-                }
+            this.frameStyle = {
+                height: window.innerHeight / scaleDpi - 84 + "px"
+            }
+            this.frameBoxStyle = {
+                height: window.innerHeight / scaleDpi - 84 + "px",
+                transform: "scale(" + scaleDpi + ") translateZ(0)",
+                '-webkit-transform': "scale(" + scaleDpi + ") translateZ(0)"
             }
             // document.getElementById("scrollObj").scrollLeft = 450 - (document.body.clientWidth / 2);
         }, 500);
     },
     methods: {
-        pinchStart(e) {
-            // console.log("pinch");
-            // console.log(e);
+        plus() {
+            let scaleDpi = window.innerWidth / 900;
+            this.frameBoxStyle = {
+                height: window.innerHeight / scaleDpi - 84 + "px",
+                transform: "scale(1) translateZ(0)",
+                '-webkit-transform': "scale(1) translateZ(0)"
+            }
+            setTimeout(() => {
+                this.isplus = false;
+            }, 300);
+        },
+        plusOff() {
+            let scaleDpi = window.innerWidth / 900;
+            console.log("plusOff", scaleDpi);
+            this.frameBoxStyle = {
+                height: window.innerHeight / scaleDpi - 84 + "px",
+                transform: "scale(" + scaleDpi + ") translateZ(0)",
+                '-webkit-transform': "scale(" + scaleDpi + ") translateZ(0)"
+            }
+            setTimeout(() => {
+                document.getElementById("scrollObj").scrollTop = 0;
+                document.getElementById("scrollObj").scrollLeft = 0;
+                this.isplus = true;
+            }, 300);
+        },
+        /* pinchStart(e) {
             let scale = this.scale * Math.pow(e.scale, 1 / 5);
-            console.log(scale);
             this.frameStyle.transform = "scale(" + scale + ")";
             this.scale = scale;
-        },
+        }, */
         download() {
             window.open("https://sdk.yunhetong.com/sdk/contract/download?token=" + this.currentToken + "&contractId=" + this.currentContractId, "_blank");
         },
@@ -282,6 +306,13 @@ export default {
             bottom: 40px;
             width: 100%;
         }
+        .img-box {
+            width: 900px;
+            height: 100%;
+            left: 0px;
+            top: 44px;
+            transform-origin: left top;
+        }
         .img-list {
             width: 900px;
             height: 100%;
@@ -311,6 +342,26 @@ export default {
             width: 31px;
             height: 32px;
             background: url(../../assets/images/download-icon.png) no-repeat center center;
+            padding: 15px;
+            background-size: 50%;
+        }
+        .plus {
+            position: fixed;
+            bottom: 10%;
+            right: 20px;
+            width: 31px;
+            height: 32px;
+            background: url(../../assets/images/plus.png) no-repeat center center;
+            padding: 15px;
+            background-size: 50%;
+        }
+        .plus-off {
+            position: fixed;
+            bottom: 10%;
+            right: 20px;
+            width: 31px;
+            height: 32px;
+            background: url(../../assets/images/plus-off.png) no-repeat center center;
             padding: 15px;
             background-size: 50%;
         }

@@ -144,24 +144,30 @@ export default {
         //     return false;
         // },
         plus() {
-            this.frameBoxStyle.transform = "scale(1)";
+            let scaleDpi = window.innerWidth / 900;
+            this.frameBoxStyle = {
+                height: window.innerHeight / scaleDpi - 84 + "px",
+                transform: "scale(1) translateZ(0)",
+                '-webkit-transform': "scale(1) translateZ(0)"
+            }
+            // this.frameBoxStyle.transform = "scale(1)";
             setTimeout(() => {
                 this.isplus = false;
-            }, 500);
+            }, 300);
         },
         plusOff() {
             let scaleDpi = window.innerWidth / 900;
             console.log("plusOff", scaleDpi);
             this.frameBoxStyle = {
                 height: window.innerHeight / scaleDpi - 84 + "px",
-                transform: "scale(" + scaleDpi + ")"
+                transform: "scale(" + scaleDpi + ") translateZ(0)",
+                '-webkit-transform': "scale(" + scaleDpi + ")"
             }
-            // this.frameStyle.transform = "scale(" + scaleDpi + ")";
             setTimeout(() => {
                 document.getElementById("scrollObj").scrollTop = 0;
                 document.getElementById("scrollObj").scrollLeft = 0;
                 this.isplus = true;
-            }, 500);
+            }, 300);
         },
         download() {
             window.open("https://sdk.yunhetong.com/sdk/contract/download?token=" + this.currentToken + "&contractId=" + this.currentContractId, "_blank");

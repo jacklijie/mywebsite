@@ -1,25 +1,18 @@
-var host = "http://10.230.28.200:8080";//location.origin;//
+var host = location.origin;//"http://10.230.28.200:8080";
 $(document).ready(function (e) {
 	var scaleDpi = window.screen.width / 900;
 	$(".contract-title .title").css("font-size", 18 / scaleDpi + "px");
 	$("body,html,button").css("font-size", 12 / scaleDpi + "px");
 	$(".sign").width(30 / scaleDpi + "px").height(30 / scaleDpi + "px").css("padding", 15 / scaleDpi + "px");
 
-	var isAndroid = !!window.androidApi;
-	// if (isAndroid) {
-	// 	$("#header,#footer,.sign,.down").addClass("android-style");
-	// }
+	if (navigator.userAgent.indexOf('iPhone') == -1) {
+		$("#header,#footer,.sign,.down").addClass("android-style");
+	}
 
 
 	setTimeout(function () {
 		// alert(window.innerHeight);
 		$(".contract-bd").height($("body").height() - 220 + "px");
-		if (!isAndroid) {
-			$("#header").css({ "padding-top": 20 / scaleDpi + "px", "box-sizing": "content-box" });
-			$("#header").css({ "padding-top": 20 / scaleDpi + "px", "box-sizing": "content-box" });
-			$(".contract-bd").css("top", 120 + 20 / scaleDpi + "px");
-			$(".contract-bd").height(window.screen.height - 220 - 20 / scaleDpi + "px");
-		}
 	}, 300);
 
 
@@ -54,7 +47,7 @@ $(document).ready(function (e) {
 				if (res && res.response && res.response.result) {
 					if (res.response.result == "0") {
 						$(".sign").hide();
-						if (isAndroid) $(".down").show();
+						$(".down").show();
 						YHT.init("AppID", function (obj) {
 							YHT.setToken(res.response.token);//重新设置token
 							YHT.do(obj);//调用此方法，会继续执行上次未完成的操作
@@ -79,7 +72,7 @@ $(document).ready(function (e) {
 		}
 	} else {
 		$(".sign").hide();
-		if (isAndroid) $(".down").show();
+		$(".down").show();
 		var jsonPost = {
 			"request": { "contractId": params.contractid }
 		};
@@ -157,7 +150,7 @@ $(document).ready(function (e) {
 	};
 });
 function backToList() {
-	var backUrl = "../../index.html" + sessionStorage.getItem("urlStr") + "#/contract/list";
+	var backUrl = "toQrCode.action" + sessionStorage.getItem("urlStr") + "#/contract/list";
 	var params = getUrlObj();
 	if (params.isSign) {
 		backUrl += "?isSign=1";
@@ -189,9 +182,9 @@ function goToSignPage() {
 		if (res && res.response && res.response.result) {
 			if (res.response.result == "0") {
 				$(".sign").hide();
-				if (isAndroid) $(".down").show();
+				$(".down").show();
 			} else if (res.response.result == "1") {
-				location.href = "../../index.html" + sessionStorage.getItem("urlStr") + "#/contract/sign?type=" + params.type + "&id=" + params.contractid + "&token=" + res.response.token;
+				location.href = "toQrCode.action#/contract/sign?type=" + params.type + "&id=" + params.contractid + "&token=" + res.response.token;
 			} else {
 				$("#alertText").html(res.response.reason);
 				$("#modal").show();

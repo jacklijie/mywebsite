@@ -112,12 +112,12 @@ export default {
                         _this.$store.commit("CONTRACT_STATE", {
                             token: res.data.response.token
                         });
-                        // if (!window.androidApi)
-                        _this.$router.push("/contract/detail/do/" + _this.daiban.cloudcontractId);
-                        // else {
-                        //     sessionStorage.setItem("urlStr", location.search.substr(0));
-                        //     window.location.href = "static/detail/index.html?type=do&contractid=" + _this.daiban.cloudcontractId;
-                        // }
+                        if (!!window.androidApi)
+                            _this.$router.push("/contract/detail/do/" + _this.daiban.cloudcontractId);
+                        else {
+                            sessionStorage.setItem("urlStr", location.search.substr(0));
+                            window.location.href = "static/detail/index.html?type=do&contractid=" + _this.daiban.cloudcontractId;
+                        }
                     } else {
                         modal.valert(_this, res.data.response.reason);
                     }
@@ -131,12 +131,12 @@ export default {
             })
         },
         checkDetail(id) {
-            // if (!window.androidApi)
-            this.$router.push("/contract/detail/undo/" + id);
-            // else {
-            //     sessionStorage.setItem("urlStr", location.search.substr(0));
-            //     window.location.href = "static/detail/index.html?type=undo&contractid=" + id;
-            // }
+            if (!!window.androidApi)
+                this.$router.push("/contract/detail/undo/" + id);
+            else {
+                sessionStorage.setItem("urlStr", location.search.substr(0));
+                window.location.href = "static/detail/index.html?type=undo&contractid=" + id;
+            }
         },
         goBack() {
             this.$store.commit("CLEAR_DAIBAN_STATE", {});

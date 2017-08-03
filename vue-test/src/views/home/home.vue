@@ -95,7 +95,12 @@ export default {
 
 .login-box {
     height: 100%;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
     justify-content: center;
     align-items: flex-start;
     flex-direction: column;

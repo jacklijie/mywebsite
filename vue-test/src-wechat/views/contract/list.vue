@@ -118,9 +118,9 @@ export default {
                         _this.$store.commit("CONTRACT_STATE", {
                             token: res.data.response.token
                         });
-                        // sessionStorage.setItem("urlStr", location.search.substr(0));
-                        // window.location.href = "static/detail/index.html?type=do&contractid=" + _this.daiban.cloudcontractId;
-                        _this.$router.push("/contract/detail/do/" + _this.daiban.cloudcontractId);
+                        sessionStorage.setItem("urlStr", location.search.substr(0));
+                        window.location.href = "detail.action?type=do&contractid=" + _this.daiban.cloudcontractId;
+                        // _this.$router.push("/contract/detail/do/" + _this.daiban.cloudcontractId);
                     } else {
                         modal.valert(_this, res.data.response.reason);
                     }
@@ -150,9 +150,9 @@ export default {
                 console.log(err);
                 modal.valert(_this, "服务异常，请联系系统管理员");
             }) */
-            // sessionStorage.setItem("urlStr", location.search.substr(0));
-            // window.location.href = "static/detail/index.html?type=undo&contractid=" + id;
-            this.$router.push("/contract/detail/undo/" + id);
+            sessionStorage.setItem("urlStr", location.search.substr(0));
+            window.location.href = "detail.action?type=undo&contractid=" + id;
+            // this.$router.push("/contract/detail/undo/" + id);
         },
     },
     components: {
