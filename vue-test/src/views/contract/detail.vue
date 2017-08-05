@@ -289,10 +289,13 @@ export default {
         flex: 1;
         overflow: hidden;
         position: relative;
-        &.ios-con {
+        /* &.ios-con {
             overflow-x: hidden;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+        } */
+        &.plus {
+            overflow: scroll;
         }
         /* .touch-box{
             width:900px;

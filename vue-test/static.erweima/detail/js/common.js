@@ -60,9 +60,13 @@ $(document).ready(function (e) {
 						console.info("===debug", res.response.reason);
 					}
 				} else {
+					$(".sign").hide();
+					$("#alertText").html(res.message);
+					$("#modal").show();
 					console.info("===debug", res.message);
 				}
 			}).error(function (err) {
+				$(".sign").hide();
 				$("#loading").hide();
 				$("#alertText").html("服务异常，请联系系统管理员");
 				$("#modal").show();
