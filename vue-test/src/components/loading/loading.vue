@@ -57,8 +57,7 @@ export default {
         align-items: center;
         .box {
             width: 80%;
-            min-height: 150px;
-            // background-color: #fff;
+            min-height: 150px; // background-color: #fff;
             border-radius: 5px;
             display: flex;
             justify-content: center;
@@ -72,8 +71,7 @@ export default {
     .loading {
         width: 150px;
         height: 15px;
-        margin: 0 auto;
-        // margin-top: 100px;
+        margin: 0 auto; // margin-top: 100px;
         text-align: center;
     }
     .loading span {

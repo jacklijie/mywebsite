@@ -5,9 +5,10 @@ import Qs from "qs";
 export default {
     post: function (url, data) {
         axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
+        console.log(urlS.host);
         let config = {
             //请求的接口，在请求的时候，如axios.get(url,config);这里的url会覆盖掉config中的url
-            url: url,
+            url: urlS.host + url + "?" + urlS.getUrlStr(),
 
             // 请求方法同上
             method: 'post', // default
@@ -43,6 +44,9 @@ export default {
             responseType: 'json', // default
         }
         return axios.post(urlS.host + url + "?" + urlS.getUrlStr(), { request: data }, this.config)
+    },
+    postOther(url, data) {
+        return axios.post(url, data);
     },
     get(url) {
         return axios.get(url);

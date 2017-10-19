@@ -14,21 +14,19 @@ const store = new Vuex.Store({
             show: false
         },
         notice: {
+            text: '',
             show: false
         },
         from: "app",
         userInfo: {
             idCard: '',
-            address: '',
-            mobile: '',
-            hasRegisted: false,
-            psncl:1//1:paiqian,2:zhengshi,3:all
+            psncl: 1
         },
         contract: {
             daiban: null,
             historyList: [],
-            cloudList:[],
-            token:''
+            cloudList: [],
+            token: ''
         }
     },
     getters: {
@@ -44,7 +42,7 @@ const store = new Vuex.Store({
             state.valert.show = payload.showAlert;
         },
         [types.NOTICE_STATE](state, payload) {
-            // state.notice.text = payload.noticeText;
+            state.notice.text = payload.noticeText;
             state.notice.show = payload.showNotice;
         },
         [types.FROM_STATE](state, payload) {
@@ -53,26 +51,12 @@ const store = new Vuex.Store({
         [types.IDCARD_STATE](state, payload) {
             state.userInfo.idCard = payload.idCard;
             sessionStorage.setItem("idcard", payload.idCard);
-        },
-        [types.CONFIRM_STATE](state, payload) {
-            state.userInfo.idCard = payload.idCard;
-            state.userInfo.address = payload.address;
-            state.userInfo.mobile = payload.mobile;
-            sessionStorage.setItem("idcard", payload.idCard);
-        },
-        [types.REGIST_STATE](state, payload) {
-            state.userInfo.hasRegisted = payload.hasRegisted;
-        },
-        [types.USER_TYPE_STATE](state, payload) {
-            state.userInfo.psncl = payload.psncl;
+            // state.userInfo.psncl = payload.psncl;
         },
         [types.CLEAR_DAIBAN_STATE](state, payload) {
             state.contract.daiban = null;
             state.contract.historyList = [];
             state.contract.cloudList = [];
-            sessionStorage.removeItem("daiban");
-            sessionStorage.removeItem("historyList");
-            sessionStorage.removeItem("cloudList");
         },
         [types.CONTRACT_STATE](state, payload) {
             if (!!payload.daiban) state.contract.daiban = payload.daiban;

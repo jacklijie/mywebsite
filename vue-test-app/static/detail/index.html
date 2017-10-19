@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<link rel="stylesheet" href="css/reset.css">
+	<link rel="stylesheet" href="css/style.css">
+	<script src="../config.js" type="text/javascript" charset="utf-8"></script>
+	<script src="http://apps.bdimg.com/libs/jquery/1.8.3/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/yht.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/yhtapi.js" type="text/javascript" charset="utf-8"></script>
+	<!-- <script src="http://sdk.yunhetong.com/sdk/api/m/yht.js" type="text/javascript" charset="utf-8"></script>  -->
+	<!-- <script src="../../../lib/jquery-1.8.3.min.js"></script> -->
+	<script src="js/touch.min.js"></script>
+	<script src="js/common.js"></script>
+	<meta name="viewport" content="width=900,intial-scale=1,minimum-scale=0.1,maximum-scale=1.5,user-scalable=yes">
+	<meta content="fullscreen=yes,preventMove=no" name="ML-Config">
+</head>
+
+<body>
+	<div class="container">
+		<div id="header" class="contract-hd">
+			<span class="back-btn" onclick="backToList()"></span>
+			<div class="contract-title">
+				<h1 class="title">劳动合同</h1>
+			</div>
+		</div>
+		<div class="contract-bd">
+			<iframe id="frame" name="frame" class="frame-wrapper" allowfullscreen src="" frameborder="0" srcolling="auto"></iframe>
+		</div>
+		<span class="sign" onclick="$('#modal-panel').show()"></span>
+		<!-- <span class="down" onclick="download()"></span> -->
+		<div id="footer" class="contract-ft">
+			<div class="foot-box">
+				<div class="foot-table"></div>
+			</div>
+		</div>
+	</div>
+
+	<div id="modal" class="modal">
+		<div class="modal-bg">
+			<div class="box">
+				<div class="alert-box">
+					<span id="alertText">已经全部阅读并确认完毕</span>
+					<button onclick="$('#modal').hide();">确定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="modal-panel" class="modal">
+		<div class="modal-bg">
+			<div class="box">
+				<p>本次合同文档有<span id="signTip"></span>，已经全部阅读并确认完毕，确认签字，签署确认后无法修改
+				</p>
+				<div class="buttons">
+					<button onclick="goToSignPage()">确认</button>
+					<button onclick="$('#modal-panel').hide();">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="loading" class="modal-light">
+		<div class="modal-bg">
+			<div class="box">
+				<div class="loading-box">
+					<div class="loading">
+						<span></span>
+						<span></span>
+						<span></span>
+						<span></span>
+						<span></span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

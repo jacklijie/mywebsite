@@ -7,10 +7,8 @@
             <div class="img-box" :style="frameBoxStyle">
                 <iframe class="img-list" :src="frameUrl" :style="frameStyle"></iframe>
             </div>
-            <!-- <v-touch class="touch-box" v-on:pinch="pinchStart" v-bind:pinch-options="{threshold:0.1}">
-                                                                </v-touch> -->
             <span v-if="isSign" class="sign" @click="signStart"></span>
-            <span v-else-if="!isIos" class="down" @click="download"></span>
+            <span v-else class="down" @click="download"></span>
             <span v-if="isplus" class="plus" @click="plus"></span>
             <span v-else class="plus-off" @click="plusOff"></span>
         </section>
@@ -54,15 +52,19 @@ export default {
     },
     computed: {
         isIos() {
-            return !window.andiroidApi;
+            return navigator.userAgent.indexOf('iPhone') != -1;
         }
     },
     mounted() {
         let _this = this, params = this.$route.params, query = this.$route.query;
-        if (params.type == "do") {
+        if (params.type == "do") {//代办合同进入
             this.isSign = true;
+            this.contractInfoList = this.$store.state.contract.daiban.cloudList;
+            _this.contractInfoList.forEach(cli => {
+                _this.signTip += cli.contractName + "、";
+            }, _this);
+            _this.signTip = _this.signTip.substring(0, _this.signTip.length - 1);
             if (!!query.isSign) {
-                let _this = this;
                 modal.loading(this, true);
                 ajax.post(link.getSign, {
                     contractId: params.contractid
@@ -71,11 +73,6 @@ export default {
                     if (res.data && res.data.response && res.data.response.result) {
                         if (res.data.response.result == "0") {
                             _this.isSign = false;
-                            _this.contractInfoList = this.$store.state.contract.daiban.cloudList;
-                            _this.contractInfoList.forEach(cli => {
-                                _this.signTip += cli.contractName + "、";
-                            }, _this);
-                            _this.signTip = _this.signTip.substring(0, _this.signTip.length - 1);
                             YHT.init("AppID", obj => {
                                 YHT.setToken(res.data.response.token);//res.data.response.token);//重新设置token
                                 YHT.do(obj);//调用此方法，会继续执行上次未完成的操作
@@ -83,7 +80,6 @@ export default {
                             _this.previewContract(_this.contractInfoList[0].cloudcontractId, res.data.response.token);
                         } else {
                             modal.valert(_this, res.data.response.reason);
-                            _this.contractInfoList = this.$store.state.contract.daiban.cloudList;
                             _this.initToken(_this.contractInfoList[0].cloudcontractId);
                             // _this.isSign = false;
                             console.info("===debug", res.data.response.reason);
@@ -93,19 +89,14 @@ export default {
                         console.info("===debug", res.data.message);
                     }
                 }).catch(err => {
-                    modal.loading(this, false);
                     // _this.isSign = false;
+                    modal.loading(this, false);
                     console.info("===debug", "服务异常，请联系系统管理员");
                 })
             } else {
-                this.contractInfoList = this.$store.state.contract.daiban.cloudList;
-                _this.contractInfoList.forEach(cli => {
-                    _this.signTip += cli.contractName + "、";
-                }, _this);
-                _this.signTip = _this.signTip.substring(0, _this.signTip.length - 1);
                 _this.initToken(_this.contractInfoList[0].cloudcontractId);
             }
-        } else {
+        } else {//历史合同进入
             modal.loading(this, true);
             ajax.post(link.queryToken, {
                 contractId: _this.$route.params.contractid
@@ -139,12 +130,19 @@ export default {
             this.frameBoxStyle = {
                 height: window.innerHeight / scaleDpi - 84 + "px",
                 transform: "scale(" + scaleDpi + ") translateZ(0)",
-                '-webkit-transform': "scale(" + scaleDpi + ") translateZ(0)"
+                '-webkit-transform': "scale(" + scaleDpi + ")"
             }
             // document.getElementById("scrollObj").scrollLeft = 450 - (document.body.clientWidth / 2);
         }, 500);
     },
     methods: {
+        // scrollEvent(e){
+        //     console.log(e.target.scrollTop);
+        //     if(e.target.scrollTop>10){
+        //         document.getElementById("scrollObj").scrollTop = 5;
+        //     }
+        //     return false;
+        // },
         plus() {
             let scaleDpi = window.innerWidth / 900;
             this.frameBoxStyle = {
@@ -152,6 +150,7 @@ export default {
                 transform: "scale(1) translateZ(0)",
                 '-webkit-transform': "scale(1) translateZ(0)"
             }
+            // this.frameBoxStyle.transform = "scale(1)";
             setTimeout(() => {
                 this.isplus = false;
             }, 300);
@@ -162,7 +161,7 @@ export default {
             this.frameBoxStyle = {
                 height: window.innerHeight / scaleDpi - 84 + "px",
                 transform: "scale(" + scaleDpi + ") translateZ(0)",
-                '-webkit-transform': "scale(" + scaleDpi + ") translateZ(0)"
+                '-webkit-transform': "scale(" + scaleDpi + ")"
             }
             setTimeout(() => {
                 document.getElementById("scrollObj").scrollTop = 0;
@@ -170,29 +169,18 @@ export default {
                 this.isplus = true;
             }, 300);
         },
-        /* pinchStart(e) {
-            let scale = this.scale * Math.pow(e.scale, 1 / 5);
-            this.frameStyle.transform = "scale(" + scale + ")";
-            this.scale = scale;
-        }, */
         download() {
             window.open("https://sdk.yunhetong.com/sdk/contract/download?token=" + this.currentToken + "&contractId=" + this.currentContractId, "_blank");
         },
         goBack() {
             if (!this.isSign) {
                 this.$store.commit("CLEAR_DAIBAN_STATE", {});
-                this.$router.push({ name: "mycontract", query: { isSign: "true" } });
             }
-            else {
-                this.$router.push({ name: "mycontract" });
-            }
+            this.$router.push({ name: "mycontract" });
         },
         signStart() {
-            this.showModal = true;//点击签署按钮显示弹窗提示
+            this.showModal = true;
         },
-        /**
-         * 确认签署
-         */
         signOK() {
             this.showModal = false;
             let _this = this;
@@ -213,7 +201,6 @@ export default {
                                 token: res.data.response.token
                             }
                         });
-                        // window.open("https://sdk.yunhetong.com/sdk/viewsopen/m/drag_sign.html?token=" + res.data.response.token, "_blank");
                     } else {
                         modal.valert(_this, res.data.response.reason);
                     }
@@ -229,9 +216,6 @@ export default {
         signCancel() {
             this.showModal = false;
         },
-        /**
-         * 获取token并初始化云合同sdk
-         */
         initToken(contractId) {
             let _this = this;
             modal.loading(this, true);
@@ -240,11 +224,12 @@ export default {
             }).then(res => {
                 modal.loading(this, false);
                 if (res.data && res.data.response) {
+                    console.info("token", res.data.response.cloudList[0].token);
                     YHT.init("AppID", obj => {
                         YHT.setToken(res.data.response.cloudList[0].token);//res.data.response.token);//重新设置token
                         YHT.do(obj);//调用此方法，会继续执行上次未完成的操作
                     });
-                    _this.previewContract(contractId);
+                    _this.previewContract(contractId, res.data.response.cloudList[0].token);
                 } else {
                     modal.valert(_this, res.data.message);
                 }
@@ -260,12 +245,11 @@ export default {
             this.currentToken = token;
             YHT.queryContract(
                 function successFun(url) {
-                    _this.frameUrl = url;
+                    _this.frameUrl = url;//"https://sdk.yunhetong.com/sdk/contract/hView?contractId=" + contractId + "&token=" + token;
                     YHT.setToken("");//res.data.response.token);//重新设置token
                 },
                 function failFun(data) {
                     modal.valert(_this, data);
-                    // alert(data);
                 },
                 contractId,
                 backUrl,
@@ -289,25 +273,17 @@ export default {
         flex: 1;
         overflow: hidden;
         position: relative;
-        /* &.ios-con {
+        &.ios-con {
             overflow-x: hidden;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-        } */
+            &.plus {
+                overflow-x: scroll;
+                overflow-y: scroll;
+            }
+        }
         &.plus {
             overflow: scroll;
-        }
-        /* .touch-box{
-            width:900px;
-            height:100%;
-        } */
-        .touch-box {
-            position: fixed;
-            left: 0;
-            top: 64px;
-            right: 0;
-            bottom: 40px;
-            width: 100%;
         }
         .img-box {
             width: 900px;
@@ -319,11 +295,9 @@ export default {
         .img-list {
             width: 900px;
             height: 100%;
-            left: 0;
-            top: 44px;
-            transform-origin: left top; // transform: translateX(-50%);
-            // position: absolute;
-            -webkit-overflow-scrolling: touch;
+            left: 0px;
+            top: 0px;
+            // transform-origin: left top;
             img {
                 width: 100%;
             }

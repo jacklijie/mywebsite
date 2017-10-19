@@ -9,8 +9,6 @@ function resolve (dir) {
 
 module.exports = {
   entry: {
-    // "babel-polyfill":"babel-polyfill",//用来解决的兼容性
-    // app: './src-wechat/main.js'
     app: './src/main.js'
   },
   output: {

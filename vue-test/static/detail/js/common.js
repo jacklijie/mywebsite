@@ -1,25 +1,18 @@
-var host = "http://10.230.28.200:8080";//location.origin;//
+var host = location.origin;//"http://10.230.28.200:8080";//
 $(document).ready(function (e) {
 	var scaleDpi = window.screen.width / 900;
 	$(".contract-title .title").css("font-size", 18 / scaleDpi + "px");
 	$("body,html,button").css("font-size", 12 / scaleDpi + "px");
 	$(".sign").width(30 / scaleDpi + "px").height(30 / scaleDpi + "px").css("padding", 15 / scaleDpi + "px");
 
-	var isAndroid = !!window.androidApi;
-	// if (isAndroid) {
-	// 	$("#header,#footer,.sign,.down").addClass("android-style");
-	// }
+	if (navigator.userAgent.indexOf('iPhone') == -1) {
+		$("#header,#footer,.sign,.down").addClass("android-style");
+	}
 
 
 	setTimeout(function () {
 		// alert(window.innerHeight);
 		$(".contract-bd").height($("body").height() - 220 + "px");
-		if (!isAndroid) {
-			$("#header").css({ "padding-top": 20 / scaleDpi + "px", "box-sizing": "content-box" });
-			$("#header").css({ "padding-top": 20 / scaleDpi + "px", "box-sizing": "content-box" });
-			$(".contract-bd").css("top", 120 + 20 / scaleDpi + "px");
-			$(".contract-bd").height(window.screen.height - 220 - 20 / scaleDpi + "px");
-		}
 	}, 300);
 
 
@@ -54,22 +47,28 @@ $(document).ready(function (e) {
 				if (res && res.response && res.response.result) {
 					if (res.response.result == "0") {
 						$(".sign").hide();
-						if (isAndroid) $(".down").show();
+						// $(".down").show();
 						YHT.init("AppID", function (obj) {
 							YHT.setToken(res.response.token);//重新设置token
 							YHT.do(obj);//调用此方法，会继续执行上次未完成的操作
 						});
 						previewContract(contractInfoList[0].cloudcontractId, res.response.token);
 					} else {
+						// if (!!params.isSign) {
 						$("#alertText").html(res.response.reason);
 						$("#modal").show();
+						// }
 						initToken(contractInfoList[0].cloudcontractId);
 						console.info("===debug", res.response.reason);
 					}
 				} else {
+					$(".sign").hide();
+					$("#alertText").html(res.message);
+					$("#modal").show();
 					console.info("===debug", res.message);
 				}
 			}).error(function (err) {
+				$(".sign").hide();
 				$("#loading").hide();
 				$("#alertText").html("服务异常，请联系系统管理员");
 				$("#modal").show();
@@ -79,7 +78,7 @@ $(document).ready(function (e) {
 		}
 	} else {
 		$(".sign").hide();
-		if (isAndroid) $(".down").show();
+		// $(".down").show();
 		var jsonPost = {
 			"request": { "contractId": params.contractid }
 		};
@@ -157,7 +156,8 @@ $(document).ready(function (e) {
 	};
 });
 function backToList() {
-	var backUrl = "../../index.html" + sessionStorage.getItem("urlStr") + "#/contract/list";
+	// var backUrl = "../../index.html" + sessionStorage.getItem("urlStr") + "#/contract/list";
+	var backUrl = "toQrCode.action" + sessionStorage.getItem("urlStr") + "#/contract/list";
 	var params = getUrlObj();
 	if (params.isSign) {
 		backUrl += "?isSign=1";
@@ -177,6 +177,7 @@ function goToSignPage() {
 		"request": { "contractId": params.contractid }
 	};
 	$("#loading").show();
+	var contractInfoList = JSON.parse(sessionStorage.getItem("daiban")).cloudList;
 	$.ajax({
 		type: "POST",
 		url: host + "/nhr/elcontract/querySign.action",
@@ -189,12 +190,15 @@ function goToSignPage() {
 		if (res && res.response && res.response.result) {
 			if (res.response.result == "0") {
 				$(".sign").hide();
-				if (isAndroid) $(".down").show();
+				// $(".down").show();
+				initToken(contractInfoList[0].cloudcontractId);
 			} else if (res.response.result == "1") {
-				location.href = "../../index.html" + sessionStorage.getItem("urlStr") + "#/contract/sign?type=" + params.type + "&id=" + params.contractid + "&token=" + res.response.token;
+				// location.href = "../../index.html#/contract/sign?type=" + params.type + "&id=" + params.contractid + "&token=" + res.response.token;
+				location.href = "toQrCode.action#/contract/sign?type=" + params.type + "&id=" + params.contractid + "&token=" + res.response.token;
 			} else {
 				$("#alertText").html(res.response.reason);
 				$("#modal").show();
+				initToken(contractInfoList[0].cloudcontractId);
 			}
 		} else {
 			$("#alertText").html(res.message);
@@ -210,15 +214,16 @@ function goToSignPage() {
 
 function showFoot(contractList) {
 	var showStr = "";
-	contractList.forEach(function (cli) {
-		showStr += '<span onclick="initToken(' + cli.cloudcontractId + ')">' + cli.contractName + '</span>';
+	contractList.forEach(function (cli, i) {
+		showStr += '<span onclick="initToken(' + cli.cloudcontractId + ',' + (i + 1) + ')">' + cli.contractName + '</span>';
 	}, this);
-	$(".foot-box").html(showStr);
-	if (contractList.length <= 2) {
-		$(".foot-box").addClass("avg");
-	}
+	$(".foot-table").html(showStr);
+	$(".foot-table span:first-of-type").addClass("active");
 }
-function initToken(contractId) {
+function initToken(contractId,index) {
+	if (index) {
+		$(".foot-table span:nth-of-type(" + index + ")").addClass("active").siblings("span").removeClass("active");
+	}
 	var params = getUrlObj();
 	var jsonPost = {
 		"request": { "contractId": params.contractid }
